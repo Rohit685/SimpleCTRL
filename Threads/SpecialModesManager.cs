@@ -65,118 +65,114 @@ namespace SimpleCTRL.Threads
         private static void HeatBrakes()
         {
             // Unsure if its disabling the brake correctly
-            var process = new GameFiber(delegate
+            try
             {
-                try
+                Vehicle veh = Game.LocalPlayer.Character.CurrentVehicle;
+
+                if (!EntityExtensions.Exists(veh) || ignoredClasses.Contains(veh.Class) || veh.Driver != Game.LocalPlayer.Character)
                 {
-                    Vehicle veh = Game.LocalPlayer.Character.CurrentVehicle;
+                    GameFiber.Sleep(2000);
+                    return;
+                }
 
-                    if (!EntityExtensions.Exists(veh) || ignoredClasses.Contains(veh.Class) || veh.Driver != Game.LocalPlayer.Character)
+                int hotBrakes = 0;
+                int oldBrakeValue = -1;
+                if (API.DecorExistOn(veh, "brakeHeat"))
+                {
+                    hotBrakes = API.DecorGetInt(veh, "brakeHeat");
+                    oldBrakeValue = hotBrakes;
+                }
+
+                if (hotBrakes < 5)
+                {
+                    notified = hotNotify = false;
+                }
+
+                if (veh.Speed > 5f && veh.CurrentGear != 0 && Controls.IsControlPressed(GameControl.VehicleBrake))
+                {
+                    if (hotBrakes > 10000)
                     {
-                        GameFiber.Sleep(2000);
-                        return;
+                        Game.DisplayHelp("~r~Your brakes are disabled due to being too hot.");
+                        Game.DisableControlAction(0, GameControl.VehicleBrake, true);
                     }
-
-                    int hotBrakes = 0;
-                    int oldBrakeValue = -1;
-                    if (API.DecorExistOn(veh, "brakeHeat"))
+                    else if (hotBrakes > 5000)
                     {
-                        hotBrakes = API.DecorGetInt(veh, "brakeHeat");
-                        oldBrakeValue = hotBrakes;
-                    }
-
-                    if (hotBrakes < 5)
-                    {
-                        notified = hotNotify = false;
-                    }
-
-                    if (veh.Speed > 5f && veh.CurrentGear != 0 && Controls.IsControlPressed(GameControl.VehicleBrake))
-                    {
-                        if (hotBrakes > 10000)
+                        if (hotBrakes % 2 == 0)
                         {
-                            Game.DisplayHelp("~r~Your brakes are disabled due to being too hot.");
-                            Game.DisableControlAction(0, GameControl.VehicleBrake, true);
-                        }
-                        else if (hotBrakes > 5000)
-                        {
-                            if (hotBrakes % 2 == 0)
+                            if (!hotNotify)
                             {
-                                if (!hotNotify)
-                                {
-                                    Game.DisplayNotification("~y~Your brakes are ~r~REALLY ~y~getting hot!");
-                                    notified = true;
-                                    hotNotify = true;
-                                }
-                                Game.DisableControlAction(0, GameControl.VehicleBrake, true);
-                            }
-                        }
-                        else if (hotBrakes > 3500)
-                        {
-                            if (hotBrakes % 4 == 0)
-                            {
-                                Game.DisableControlAction(0, GameControl.VehicleBrake, true);
-                            }
-                        }
-                        else if (hotBrakes > 2500 && hotBrakes % 10 == 0)
-                        {
-                            if (!notified)
-                            {
-                                Game.DisplayNotification("~y~Your brakes are getting hot!");
+                                Game.DisplayNotification("~y~Your brakes are ~r~REALLY ~y~getting hot!");
                                 notified = true;
+                                hotNotify = true;
                             }
                             Game.DisableControlAction(0, GameControl.VehicleBrake, true);
                         }
-
-                        hotBrakes += GetBrakePressure(API.GetControlValue(0, 72));
-                        if (Controls.IsControlPressed(GameControl.VehicleAccelerate))
+                    }
+                    else if (hotBrakes > 3500)
+                    {
+                        if (hotBrakes % 4 == 0)
                         {
-                            hotBrakes += 5;
+                            Game.DisableControlAction(0, GameControl.VehicleBrake, true);
                         }
-
-                        API.SetVehicleBrakeLights(veh, true);
                     }
-
-                    if (Controls.IsControlPressed(GameControl.VehicleHandbrake) && veh.Speed > 2f && hotBrakes > 1000 && hotBrakes % 4 == 0)
+                    else if (hotBrakes > 2500 && hotBrakes % 10 == 0)
                     {
-                        Game.DisableControlAction(0, GameControl.VehicleHandbrake, true);
-                    }
-
-                    if (veh.Mods.BrakesModIndex > 1)
-                    {
-                        hotBrakes -= (int)Math.Round((double)GetBrakePressure(API.GetControlValue(0, 72)) / 3);
-                    }
-
-                    if (veh.IsInWater && hotBrakes < 200)
-                    {
-                        hotBrakes -= 25;
-                    }
-
-                    if (hotBrakes > 0)
-                    {
-                        if (new Random(100).Next() < 34)
+                        if (!notified)
                         {
-                            hotBrakes -= 4;
+                            Game.DisplayNotification("~y~Your brakes are getting hot!");
+                            notified = true;
                         }
-                        hotBrakes -= 1;
+                        Game.DisableControlAction(0, GameControl.VehicleBrake, true);
                     }
 
-                    if (hotBrakes < 0)
+                    hotBrakes += GetBrakePressure(API.GetControlValue(0, 72));
+                    if (Controls.IsControlPressed(GameControl.VehicleAccelerate))
                     {
-                        hotBrakes = 0;
+                        hotBrakes += 5;
                     }
 
-                    // Basically ignores updating the decor if the brakes are cold and unused this tick
-                    if (oldBrakeValue != hotBrakes)
-                    {
-                        API.DecorSetInt(veh, "brakeHeat", hotBrakes);
-                    }
+                    API.SetVehicleBrakeLights(veh, true);
                 }
-                catch (Exception ex)
+
+                if (Controls.IsControlPressed(GameControl.VehicleHandbrake) && veh.Speed > 2f && hotBrakes > 1000 && hotBrakes % 4 == 0)
                 {
-                    Game.LogTrivial($"An exception occurred: {ex.Message}");
+                    Game.DisableControlAction(0, GameControl.VehicleHandbrake, true);
                 }
-            }, "");
-            process.Start();
+
+                if (veh.Mods.BrakesModIndex > 1)
+                {
+                    hotBrakes -= (int)Math.Round((double)GetBrakePressure(API.GetControlValue(0, 72)) / 3);
+                }
+
+                if (veh.IsInWater && hotBrakes < 200)
+                {
+                    hotBrakes -= 25;
+                }
+
+                if (hotBrakes > 0)
+                {
+                    if (new Random(100).Next() < 34)
+                    {
+                        hotBrakes -= 4;
+                    }
+                    hotBrakes -= 1;
+                }
+
+                if (hotBrakes < 0)
+                {
+                    hotBrakes = 0;
+                }
+
+                // Basically ignores updating the decor if the brakes are cold and unused this tick
+                if (oldBrakeValue != hotBrakes)
+                {
+                    API.DecorSetInt(veh, "brakeHeat", hotBrakes);
+                }
+            }
+            catch (Exception ex)
+            {
+                Game.LogTrivial($"An exception occurred: {ex.Message}");
+            }
         }
 
         private static int GetBrakePressure(int pressure)

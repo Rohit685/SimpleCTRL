@@ -1,4 +1,5 @@
 ﻿using Rage;
+using SimpleCTRL.Handlers;
 using System;
 
 namespace SimpleCTRL.Utils
@@ -28,15 +29,15 @@ namespace SimpleCTRL.Utils
 
 		public static void Log(LoggingLevel level, string message, string caller, Exception ex = null)
 		{
-			// if ((int)level >= ConfigHandler.LoggingLevel)
-			// {
+			if ((int)level >= ConfigHandler.LogLevel)
+			{
 				Game.LogTrivial("SimpleCTRL: [" + caller + "] " + message);
 				if (ex != null)
 				{
 					Error(ex.Message, caller);
 					Debug(ex.StackTrace, caller);
 				}
-			// }
+			}
 		}
 	}
 }
