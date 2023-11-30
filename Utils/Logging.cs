@@ -31,7 +31,7 @@ namespace SimpleCTRL.Utils
 		{
 			if ((int)level >= ConfigHandler.LogLevel)
 			{
-				Game.LogTrivial("SimpleCTRL: [" + caller + "] " + message);
+				Game.LogTrivial("[" + caller + "] " + message);
 				if (ex != null)
 				{
 					Error(ex.Message, caller);

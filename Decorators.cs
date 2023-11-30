@@ -1,6 +1,5 @@
-﻿using Common.Client.Native;
+﻿using Common.Native;
 using Rage;
-using Rage.Native;
 using System;
 using System.Collections.Generic;
 
@@ -71,7 +70,7 @@ namespace SimpleCTRL
             EnsureReady();
 
             *pointer = 0;
-            API.DecorRegister(decorator, (int)type);
+            N.DecorRegister(decorator, (int)type);
             *pointer = 1;
         }
         /// <summary>
@@ -85,7 +84,7 @@ namespace SimpleCTRL
             *pointer = 0;
             foreach (KeyValuePair<string, DecoratorType> decorator in decorators)
             {
-                API.DecorRegister(decorator.Key, (int)decorator.Value);
+                N.DecorRegister(decorator.Key, (int)decorator.Value);
             }
             *pointer = 1;
         }

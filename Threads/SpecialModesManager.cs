@@ -1,9 +1,11 @@
-﻿using Common.Client;
-using Common.Client.Elements;
-using Common.Client.Native;
+﻿using Common;
+using Common.Elements;
+using Common.Models;
+using Common.Native;
 using Rage;
 using Rage.Native;
 using SimpleCTRL.Handlers;
+using SimpleCTRL.Utils;
 using System;
 using System.Collections.Generic;
 
@@ -11,7 +13,7 @@ namespace SimpleCTRL.Threads
 {
     static class SpecialModesManager
     {
-        #region Variables
+        #region Fields
         private static bool notified, hotNotify;
         private static readonly List<VehicleClass> ignoredClasses = new List<VehicleClass> { VehicleClass.Boat, VehicleClass.Helicopter, VehicleClass.Plane, VehicleClass.Cycle, VehicleClass.Military, VehicleClass.Rail, VehicleClass.Utility };
 
@@ -29,37 +31,27 @@ namespace SimpleCTRL.Threads
         public static float healthPetrolTankLast, healthPetrolTankCurrent, healthPetrolTankNew = 1000f;
         private static float healthPetrolTankDelta, healthPetrolTankDeltaScaled = 0f;
 
-        public static List<Blip> mechanicBlips = new List<Blip>();
-
         private static readonly string repairAnimDict = "anim@amb@clubhouse@tutorial@bkr_tut_ig3@";
         private static readonly string repairAnimString = "machinic_loop_mechandplayer";
         #endregion
 
-        #region Brake Lights
+        #region Functions
         private static void BrakeLights()
         {
-            if (Game.LocalPlayer.Character.IsInAnyVehicle(false)) 
+            if (Game.LocalPlayer.Character.IsInAnyVehicle(false))
             {
                 Vehicle currentVehicle = Game.LocalPlayer.Character.CurrentVehicle;
                 Vehicle lastVehicle = Game.LocalPlayer.LastVehicle;
 
                 if (currentVehicle.Exists() && currentVehicle.Speed < 0.1)
                 {
-                    API.SetVehicleBrakeLights(currentVehicle, true);
+                    N.SetVehicleBrakeLights(currentVehicle, true);
                 }
                 else if (lastVehicle.Exists() && lastVehicle.Speed < 0.1)
                 {
-                    API.SetVehicleBrakeLights(currentVehicle, true);
+                    N.SetVehicleBrakeLights(currentVehicle, true);
                 }
             }
-        }
-        #endregion
-
-        #region Heat Brakes
-        public static void RegisterDecor()
-        {
-            Decorators.Initialize();
-            Decorators.Register("brakeHeat", DecoratorType.Int);
         }
 
         private static void HeatBrakes()
@@ -71,15 +63,14 @@ namespace SimpleCTRL.Threads
 
                 if (!EntityExtensions.Exists(veh) || ignoredClasses.Contains(veh.Class) || veh.Driver != Game.LocalPlayer.Character)
                 {
-                    GameFiber.Sleep(2000);
                     return;
                 }
 
                 int hotBrakes = 0;
                 int oldBrakeValue = -1;
-                if (API.DecorExistOn(veh, "brakeHeat"))
+                if (N.DecorExistOn(veh, "brakeHeat"))
                 {
-                    hotBrakes = API.DecorGetInt(veh, "brakeHeat");
+                    hotBrakes = N.DecorGetInt(veh, "brakeHeat");
                     oldBrakeValue = hotBrakes;
                 }
 
@@ -88,7 +79,7 @@ namespace SimpleCTRL.Threads
                     notified = hotNotify = false;
                 }
 
-                if (veh.Speed > 5f && veh.CurrentGear != 0 && Controls.IsControlPressed(GameControl.VehicleBrake))
+                if (veh.Speed > 5f && veh.CurrentGear != 0 && Game.IsControlPressed(0, GameControl.VehicleBrake))
                 {
                     if (hotBrakes > 10000)
                     {
@@ -99,11 +90,14 @@ namespace SimpleCTRL.Threads
                     {
                         if (hotBrakes % 2 == 0)
                         {
-                            if (!hotNotify)
+                            if (ConfigHandler.BrakeOverheatingNotification == true)
                             {
-                                Game.DisplayNotification("~y~Your brakes are ~r~REALLY ~y~getting hot!");
-                                notified = true;
-                                hotNotify = true;
+                                if (!hotNotify)
+                                {
+                                    Game.DisplayNotification("~y~Your brakes are ~r~REALLY ~y~getting hot!");
+                                    notified = true;
+                                    hotNotify = true;
+                                }
                             }
                             Game.DisableControlAction(0, GameControl.VehicleBrake, true);
                         }
@@ -117,31 +111,34 @@ namespace SimpleCTRL.Threads
                     }
                     else if (hotBrakes > 2500 && hotBrakes % 10 == 0)
                     {
-                        if (!notified)
+                        if (ConfigHandler.BrakeOverheatingNotification == true)
                         {
-                            Game.DisplayNotification("~y~Your brakes are getting hot!");
-                            notified = true;
+                            if (!notified)
+                            {
+                                Game.DisplayNotification("~y~Your brakes are getting hot!");
+                                notified = true;
+                            }
                         }
                         Game.DisableControlAction(0, GameControl.VehicleBrake, true);
                     }
 
-                    hotBrakes += GetBrakePressure(API.GetControlValue(0, 72));
-                    if (Controls.IsControlPressed(GameControl.VehicleAccelerate))
+                    hotBrakes += Extensions.GetBrakePressure(N.GetControlValue(0, 72));
+                    if (Game.IsControlPressed(0, GameControl.VehicleAccelerate))
                     {
                         hotBrakes += 5;
                     }
 
-                    API.SetVehicleBrakeLights(veh, true);
+                    N.SetVehicleBrakeLights(veh, true);
                 }
 
-                if (Controls.IsControlPressed(GameControl.VehicleHandbrake) && veh.Speed > 2f && hotBrakes > 1000 && hotBrakes % 4 == 0)
+                if (Game.IsControlPressed(0, GameControl.VehicleHandbrake) && veh.Speed > 2f && hotBrakes > 1000 && hotBrakes % 4 == 0)
                 {
                     Game.DisableControlAction(0, GameControl.VehicleHandbrake, true);
                 }
 
                 if (veh.Mods.BrakesModIndex > 1)
                 {
-                    hotBrakes -= (int)Math.Round((double)GetBrakePressure(API.GetControlValue(0, 72)) / 3);
+                    hotBrakes -= (int)Math.Round((double)Extensions.GetBrakePressure(N.GetControlValue(0, 72)) / 3);
                 }
 
                 if (veh.IsInWater && hotBrakes < 200)
@@ -166,7 +163,7 @@ namespace SimpleCTRL.Threads
                 // Basically ignores updating the decor if the brakes are cold and unused this tick
                 if (oldBrakeValue != hotBrakes)
                 {
-                    API.DecorSetInt(veh, "brakeHeat", hotBrakes);
+                    N.DecorSetInt(veh, "brakeHeat", hotBrakes);
                 }
             }
             catch (Exception ex)
@@ -175,34 +172,17 @@ namespace SimpleCTRL.Threads
             }
         }
 
-        private static int GetBrakePressure(int pressure)
-        {
-            if (pressure > 230)
-            {
-                return 10;
-            }
-            else if (pressure > 205)
-            {
-                return 8;
-            }
-            else if (pressure > 180)
-            {
-                return 6;
-            }
-            else if (pressure > 155)
-            {
-                return 4;
-            }
-            return 2;
-        }
-        #endregion
-
-        #region Repair Tick
         private static void RepairTick()
         {
-            if (_lastVehicle != null)
+            if (_lastVehicle.Exists())
             {
                 Ped player = Game.LocalPlayer.Character;
+                if (CannotDoAction())
+                {
+                    prompt = false;
+                    return;
+                }
+
                 if (isRepairing || _lastVehicle.EngineHealth > ConfigHandler.DegradingFailureThreshold)
                 {
                     prompt = false;
@@ -212,7 +192,7 @@ namespace SimpleCTRL.Threads
                 if (prompt)
                 {
                     int boneIndex = _lastVehicle.GetBoneIndex("bonnet");
-                    if (player.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) < 1.2f)
+                    if (player.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) < 1.8f)
                     {
                         prompt = false;
                     }
@@ -220,7 +200,7 @@ namespace SimpleCTRL.Threads
                     Text.Draw3D(_lastVehicle.GetBonePosition(boneIndex) + new Vector3(0f, 0f, 0.5f), "Move near here to repair", 0.08f);
                 }
 
-                if (_lastVehicle != _repairedVehicle && !Game.LocalPlayer.Character.IsInAnyVehicle(false))
+                if (_lastVehicle != _repairedVehicle)
                 {
                     int boneIndex = _lastVehicle.GetBoneIndex("bonnet");
                     Text.Draw3D(_lastVehicle.GetBonePosition(boneIndex), "Press [E] to repair", 0.065f);
@@ -229,9 +209,8 @@ namespace SimpleCTRL.Threads
                 if (Game.IsKeyDown(System.Windows.Forms.Keys.E) && !Game.LocalPlayer.Character.IsInAnyVehicle(false))
                 {
                     int boneIndex = _lastVehicle.GetBoneIndex("bonnet");
-                    if (player.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) > 1.6f)
+                    if (player.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) > 2.5f)
                     {
-                        Game.LogTrivial($"Repair key pressed, but distance from engine is too great ({Math.Round(player.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)), 3)}");
                         prompt = true;
                     }
                     else
@@ -239,18 +218,17 @@ namespace SimpleCTRL.Threads
                         prompt = false;
                         if (_lastVehicle.OilLevel() <= 0)
                         {
-                            Game.LogTrivial($"Failed to repair: too damaged. {_lastVehicle.OilLevel()}");
+                            Logging.Debug($"Failed to repair: too damaged. {_lastVehicle.OilLevel()}", "SpecialModesManager");
                             Game.DisplayNotification("~r~Your vehicle was too badly damaged. Unable to repair!");
                             return;
                         }
                         else if (_lastVehicle.EngineHealth > ConfigHandler.CascadingFailureThreshold + 5)
                         {
-                            Game.LogTrivial($"Failed to repair: not enough damage. {_lastVehicle.EngineHealth}");
+                            Logging.Debug($"Failed to repair: not enough damage. {_lastVehicle.EngineHealth}", "SpecialModesManager");
                             Game.DisplayNotification("~y~" + GetRandom(ConfigHandler.NoFixMessages));
                             return;
                         }
 
-                        Game.LogTrivial("Attempting to repair");
                         isRepairing = true;
                         player.Heading = _lastVehicle.Heading - 180f;
 
@@ -267,13 +245,13 @@ namespace SimpleCTRL.Threads
                             isRepairing = false;
                             if (EntityExtensions.Exists(_repairedVehicle) && _repairedVehicle == _lastVehicle)
                             {
-                                Game.LogTrivial("Failed to repair: already repaired this vehicle");
+                                Logging.Debug("Failed to repair: already repaired this vehicle", "SpecialModesManager");
                                 Game.DisplayNotification("~y~" + GetRandom(ConfigHandler.NoFixMessages));
                                 return;
                             }
                             if (_lastVehicle.OilLevel() < 2f)
                             {
-                                Game.LogTrivial("Failed to repair: ran oil pan dry");
+                                Logging.Debug("Failed to repair: ran oil pan dry", "SpecialModesManager");
                                 Game.DisplayNotification("~r~You were unable to repair the vehicle. The oil pan looks all dried up.");
                                 return;
                             }
@@ -283,8 +261,8 @@ namespace SimpleCTRL.Threads
                             }
                             _lastVehicle.EngineHealth = ConfigHandler.CascadingFailureThreshold + 5;
                             healthEngineLast = ConfigHandler.CascadingFailureThreshold + 5;
-                            API.SetVehicleMaxSpeed(_lastVehicle, 500.01f);
-                            Game.LogTrivial($"Vehicle repaired! Engine health now {healthEngineLast}");
+                            N.SetVehicleMaxSpeed(_lastVehicle, 500.01f);
+                            Logging.Debug($"Vehicle repaired! Engine health now {healthEngineLast}", "SpecialModesManager");
                             Game.DisplayNotification("~g~" + GetRandom(ConfigHandler.FixMessages) + ", now get to a mechanic!");
                             _repairedVehicle = _lastVehicle;
                         }
@@ -293,24 +271,32 @@ namespace SimpleCTRL.Threads
             }
         }
 
-        private static bool IsDead() => Game.LocalPlayer.Character.IsDead || API.DecorGetBool(Game.LocalPlayer.Character, "IsDead");
+        private static bool CannotDoAction()
+        {
+            Ped player = Game.LocalPlayer.Character;
+            return !player.IsOnFoot || !EntityExtensions.Exists(_lastVehicle) || player.IsCuffed || Extensions.GetDistance(_lastVehicle.Position, player.Position) > 5f || player.IsDead || NativeFunction.CallByHash<int>(0x83F969AA1EE2A664, _lastVehicle, -1) != player.Handle || _lastVehicle.IsDead || N.DecorGetBool(player, "IsDead") || N.DecorGetBool(player, "IsGrabbed");
+        }
+        private static bool IsDead() => Game.LocalPlayer.Character.IsDead || N.DecorGetBool(Game.LocalPlayer.Character, "IsDead");
         private static string GetRandom(this List<string> list) => list[new Random().Next(list.Count)];
-        #endregion
 
-        #region Flip Tick
         private static void FlipTick()
         {
-            if (_lastVehicle != null)
+            try
             {
-
-                int boneIndex = _lastVehicle.GetBoneIndex("bonnet");
-                if (isRepairing && (Game.IsPaused || IsDead() || Game.LocalPlayer.Character.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) > 1.5f))
+                if (_lastVehicle != null)
                 {
-                    isRepairing = false;
-                    Game.LocalPlayer.Character.Tasks.Clear();
-                    _lastVehicle.Doors[4].Close(true);
-                    return;
+                    int boneIndex = _lastVehicle.GetBoneIndex("engine");
+                    if (isRepairing && (Game.IsPaused || IsDead() || Game.LocalPlayer.Character.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) > 1.5f))
+                    {
+                        isRepairing = false;
+                        Game.LocalPlayer.Character.Tasks.Clear();
+                        _lastVehicle.Doors[4].Close(true);
+                        return;
+                    }
                 }
+            }
+            catch (Exception)
+            {
             }
 
             if (Game.LocalPlayer.Character.IsInAnyVehicle(false))
@@ -322,12 +308,12 @@ namespace SimpleCTRL.Threads
                     {
                         Vehicle veh = Game.LocalPlayer.Character.CurrentVehicle;
 
-                        if (NativeFunction.CallByHash<Vector3>(0x9A8D700A51CB7B0D, veh, true).Y >= 1f && API.GetControlValue(2, 72) > 127)
+                        if (NativeFunction.CallByHash<Vector3>(0x9A8D700A51CB7B0D, veh, true).Y >= 1f && N.GetControlValue(2, 72) > 127)
                         {
                             isBrakingForward = true;
                         }
 
-                        if (NativeFunction.CallByHash<Vector3>(0x9A8D700A51CB7B0D, veh, true).Y <= -1f && API.GetControlValue(2, 71) > 127)
+                        if (NativeFunction.CallByHash<Vector3>(0x9A8D700A51CB7B0D, veh, true).Y <= -1f && N.GetControlValue(2, 71) > 127)
                         {
                             isBrakingReverse = true;
                         }
@@ -337,22 +323,22 @@ namespace SimpleCTRL.Threads
                             if (isBrakingForward)
                             {
                                 Game.DisableControlAction(2, GameControl.VehicleBrake, true);
-                                API.SetVehicleForwardSpeed(veh, veh.Speed * 0.98f);
-                                API.SetVehicleBrakeLights(veh, true);
+                                N.SetVehicleForwardSpeed(veh, veh.Speed * 0.98f);
+                                N.SetVehicleBrakeLights(veh, true);
                             }
                             if (isBrakingReverse)
                             {
                                 Game.DisableControlAction(2, GameControl.VehicleAccelerate, true);
-                                API.SetVehicleForwardSpeed(veh, veh.Speed * 0.98f);
-                                API.SetVehicleBrakeLights(veh, true);
+                                N.SetVehicleForwardSpeed(veh, veh.Speed * 0.98f);
+                                N.SetVehicleBrakeLights(veh, true);
                             }
 
                             // We let go of brake
-                            if (isBrakingForward && API.GetDisabledControlNormal(2, 72) == 0)
+                            if (isBrakingForward && N.GetDisabledControlNormal(2, 72) == 0)
                             {
                                 isBrakingForward = false;
                             }
-                            if (isBrakingReverse && API.GetDisabledControlNormal(2, 71) == 0)
+                            if (isBrakingReverse && N.GetDisabledControlNormal(2, 71) == 0)
                             {
                                 isBrakingReverse = false;
                             }
@@ -395,15 +381,13 @@ namespace SimpleCTRL.Threads
                 if (ConfigHandler.LimpMode && healthEngineNew < (ConfigHandler.EngineSafeGuard + 5))
                 {
                     factor = ConfigHandler.LimpModeMultiplier;
-                    API.SetVehicleMaxSpeed(_currentVehicle, 20f);
+                    N.SetVehicleMaxSpeed(_currentVehicle, 20f);
                 }
 
                 _currentVehicle.EngineTorqueMultiplier(factor);
             }
         }
-        #endregion
 
-        #region Main Tick
         private static void MainTick()
         {
             if (!Game.LocalPlayer.Character.IsInAnyVehicle(false))
@@ -452,7 +436,7 @@ namespace SimpleCTRL.Threads
                 healthEngineDelta = healthEngineLast - healthEngineCurrent;
                 healthEngineDeltaScaled = healthEngineDelta * ConfigHandler.DamageFactorEngine * classMultiplier;
 
-                healthBodyCurrent = API.GetVehicleBodyHealth(veh);
+                healthBodyCurrent = N.GetVehicleBodyHealth(veh);
                 if (healthBodyCurrent == 1000f)
                 {
                     healthBodyLast = 1000f;
@@ -475,7 +459,7 @@ namespace SimpleCTRL.Threads
                     veh.IsDriveable = true;
                 }
 
-                if (healthEngineCurrent <= ConfigHandler.EngineSafeGuard && (!ConfigHandler.LimpMode || veh.OilLevel() < 3f) && !API.IsVehicleTyreBurst(veh, 1, true))
+                if (healthEngineCurrent <= ConfigHandler.EngineSafeGuard && (!ConfigHandler.LimpMode || veh.OilLevel() < 3f) && !N.IsVehicleTyreBurst(veh, 1, true))
                 {
                     veh.IsDriveable = false;
                     NativeFunction.CallByHash<int>(0xEC6A202EE4960385, veh, 1, true, 1000f); // SET_VEHICLE_TYRE_BURST
@@ -538,7 +522,7 @@ namespace SimpleCTRL.Threads
                     {
                         // Vehicle is fixed?
                         _repairedVehicle = null;
-                        API.SetVehicleMaxSpeed(_currentVehicle, 500.01f);
+                        N.SetVehicleMaxSpeed(_currentVehicle, 500.01f);
                     }
                 }
                 else
@@ -595,52 +579,52 @@ namespace SimpleCTRL.Threads
                 _lastVehicle = _currentVehicle;
             }
         }
-        #endregion
 
-        #region CreateMechanicBlips
-        private static void CreateMechanicBlips()
+        private static void ShopInteraction()
         {
-            foreach (RepairShop repairShop in ConfigHandler.RepairShops)
+            RepairShop shop = Extensions.IsNearMechanic();
+            if (shop != null)
             {
-                try
+                Game.DisplayHelp("Press ~INPUT_CONTEXT~ to repair.");
+                if (Game.IsControlPressed(0, GameControl.Context))
                 {
-                    Blip blip = new Blip(repairShop.Position);
-                    blip.Sprite = (BlipSprite)446;
-                    blip.Scale = 1f;
-                    NativeFunction.CallByHash<int>(0xBE8BE4FE60E27B72, blip, true); // SET_BLIP_AS_SHORT_RANGE
-                    blip.Name = "Repair Shop";
-
-                    mechanicBlips.Add(blip);
-                }
-                catch (Exception ex)
-                {
-                    Game.LogTrivial("Error creating reapir shop blips: " + ex.Message);
-                    Game.LogTrivial(ex.StackTrace);
+                    Game.DisplaySubtitle("The mechanics are taking a look at your vehicle", 5000);
+                    if (Game.LocalPlayer.Character.IsInAnyVehicle(false))
+                    {
+                        Vehicle _currentVehicle = Game.LocalPlayer.Character.CurrentVehicle;
+                        if (_currentVehicle.EngineHealth < 200f)
+                        {
+                            Game.DisplaySubtitle("The mechanics are repairing your vehicle");
+                            GameFiber.Sleep(3000);
+                        }
+                        if (_currentVehicle.FuelLevel > 1f)
+                        {
+                            _currentVehicle.IsDriveable = true;
+                        }
+                        _currentVehicle.Repair();
+                        healthBodyLast = healthEngineLast = healthPetrolTankLast = 1000f;
+                        _currentVehicle.IsEngineOn = true;
+                        _repairedVehicle = null;
+                        NativeFunction.CallByHash<int>(0xBAA045B4E42F3C06, _currentVehicle, 0.0f); // SET_VEHICLE_MAX_SPEED
+                        Game.DisplayNotification("~g~The mechanic repaired your car!");
+                    }
+                    else
+                    {
+                        Game.DisplayNotification("You must be in your vehicle for the mechanics to repair it!");
+                    }
                 }
             }
         }
         #endregion
 
-        #region IsNearMechanic
-        public static RepairShop IsNearMechanic()
+        public static void Start()
         {
-            foreach (RepairShop repairShop in ConfigHandler.RepairShops)
-            {
-                if (Game.LocalPlayer.Character.DistanceTo(repairShop.Position) < repairShop.UseRange)
-                {
-                    return repairShop;
-                }
-            }
-            return null;
+            Logging.Info("starting...", "SpecialModesManagers");
+            GameFiber.StartNew(delegate { Run(); });
         }
-        #endregion
 
-        #region ProccessPlayer
-        public static void ProcessPlayer()
+        public static void Run()
         {
-            RegisterDecor();
-            CreateMechanicBlips();
-
             while (true)
             {
                 GameFiber.Yield();
@@ -650,24 +634,8 @@ namespace SimpleCTRL.Threads
                 RepairTick();
                 FlipTick();
                 MainTick();
+                ShopInteraction();
             }
         }
-        #endregion
-
-        #region Models
-        public class RepairShop
-        {
-            public string Location { get; set; }
-            public Vector3 Position { get; set; }
-            public float UseRange { get; set; }
-
-            public RepairShop(float x, float y, float z, float t, string description)
-            {
-                Location = description;
-                Position = new Vector3(x, y, z);
-                UseRange = t;
-            }
-        }
-        #endregion
     }
 }

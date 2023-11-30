@@ -1,14 +1,35 @@
-﻿using Rage;
+﻿using Common;
+using Common.Models;
+using Newtonsoft.Json;
+using Rage;
+using SimpleCTRL.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
-using static SimpleCTRL.Threads.SpecialModesManager;
 
 namespace SimpleCTRL.Handlers
 {
     internal static class ConfigHandler
     {
-        #region Variables
+        public static int DeformationMultiplier = -1;
+        public static float DeformationExponent = 1f;
+        public static float CollisionDamageExponent = 1f;
+        public static float DamageFactorEngine = 5.1f;
+        public static float DamageFactorBody = 5.1f;
+        public static float DamageFactorPetrolTank = 61f;
+        public static float EngineDamageExponent = 1f;
+        public static float WeaponsDamageMultiplier = 0.124f;
+        public static float DegradingHealthSpeedFactor = 3.0f;
+        public static float CascadingFailureSpeedFactor = 1.5f;
+        public static float DegradingFailureThreshold = 677f;
+        public static float CascadingFailureThreshold = 310f;
+        public static float EngineSafeGuard = 100f;
+        public static bool TorqueMultiplierEnable = true;
+        public static bool LimpMode = true;
+        public static float LimpModeMultiplier = 0.15f;
         public static int LogLevel = 0;
 
         public static string PluginPath = AppDomain.CurrentDomain.BaseDirectory + "/plugins/SimpleCTRL";
@@ -19,37 +40,31 @@ namespace SimpleCTRL.Handlers
         public static Keys LeftBlinkerKey = Keys.None;
         public static Keys RightBlinkerKey = Keys.None;
         public static Keys BlinkerModifierKey = Keys.None;
-        public static bool BlinkersEnabled = true;
-
         public static Keys EngineKey = Keys.None;
         public static Keys EngineModifierKey = Keys.None;
+
+        public static ControllerButtons HazardControllerButton = (ControllerButtons)0;
+        public static ControllerButtons LeftBlinkerControllerButton = (ControllerButtons)0;
+        public static ControllerButtons RightBlinkerControllerButton = (ControllerButtons)0;
+        public static ControllerButtons BlinkerModifierControllerButton = (ControllerButtons)0;
+        public static ControllerButtons EngineControllerButton = (ControllerButtons)0;
+        public static ControllerButtons EngineModifierControllerButton = (ControllerButtons)0;
+
+        public static bool BlinkersEnabled = true;
         public static bool EngineEnabled = true;
-
-        public static bool TireRentainment = true;
-        public static bool PreventVehicleFlip = true;
-        public static bool PreventAutomaticReversing = true;
-        public static bool TorqueMultiplierEnable = true;
-        public static bool LimpMode = true;
-
         public static bool SpeedometerEnabled = true;
 
-        public static int DeformationMultiplier { get; set; }  // How much should the vehicle visually deform from a collision. Range 0.0 to 10.0 Where 0.0 is no deformation and 10.0 is 10x deformation. -1 = Don't touch
-        public static float DeformationExponent { get; set; }  //How much should the handling file deformation setting be compressed toward 1.0. (Make cars more similar). A value of 1=no change. Lower values will compress more, values above 1 it will expand. Dont set to zero or negative.
-        public static float CollisionDamageExponent { get; set; }  // How much should the handling file deformation setting be compressed toward 1.0. (Make cars more similar). A value of 1=no change. Lower values will compress more, values above 1 it will expand. Dont set to zero or negative.
+        public static bool PreventAutomaticReversing = true;
+        public static bool PreventVehicleFlip = true;
+        public static bool TireRentainment = true;
 
-        public static float DamageFactorEngine { get; set; } // Sane values are 1 to 100. Higher values means more damage to vehicle. A good starting point is 10
-        public static float DamageFactorBody { get; set; }   // Sane values are 1 to 100. Higher values means more damage to vehicle. A good starting point is 10
-        public static float DamageFactorPetrolTank { get; set; }  // Sane values are 1 to 100. Higher values means more damage to vehicle. A good starting point is 64
-        public static float EngineDamageExponent { get; set; } // How much should the handling file engine damage setting be compressed toward 1.0. (Make cars more similar). A value of 1 = no change. Lower values will compress more, values above 1 it will expand. Dont set to zero or negative.
-        public static float WeaponsDamageMultiplier { get; set; }  // How much damage should the vehicle get from weapons fire. Range 0.0 to 10.0, where 0.0 is no damage and 10.0 is 10x damage. -1 = don't touch
-        public static float DegradingHealthSpeedFactor { get; set; } // Speed of slowly degrading health, but not failure. Value of 10 means that it will take about 0.25 second per health point, so degradation from 800 to 305 will take about 2 minutes of clean driving. Higher values means faster degradation
-        public static float CascadingFailureSpeedFactor { get; set; }    // Sane values are 1 to 100. When vehicle health drops below a certain point, cascading failure sets in, and the health drops rapidly until the vehicle dies. Higher values means faster failure. A good starting point is 8
+        public static bool LeaveEngineOnNotification = true;
+        public static bool BrakeOverheatingNotification = true;
 
-        public static float DegradingFailureThreshold { get; set; }  // Below this value, slow health degradation will set in
-        public static float CascadingFailureThreshold { get; set; }  // Below this value, slow health cascading will set in
-        public static float EngineSafeGuard { get; set; }    // Final failure value. Set it too high, and the vehicle won't smoke when disabled. Set too low, and the car will catch fire from a single bullet to the engine. At health 100 a typical car can take 3-4 bullets to the engine before catching fire.
-
-        public static float LimpModeMultiplier { get; set; }    // The torque multiplier to use when vehicle is limping. Sane values are 0.05 to 0.25
+        public static float AircraftLowFuelWarning = 25f;
+        public static bool AircraftUseAirportPumps = true;
+        public static bool AircraftUseFuelTankers = false;
+        public static List<string> AircraftFuelTankers;
 
         public static List<float> ClassDamageMultiplier { get; set; }
 
@@ -59,11 +74,17 @@ namespace SimpleCTRL.Handlers
         public static List<string> FixMessages { get; set; }
 
         public static List<string> NoFixMessages { get; set; }
-        #endregion
 
         public static void Initialize()
         {
+            Logging.Debug("initializing...", "ConfigHandler");
             LoadINI("SimpleCTRL");
+            LoadVehicleData();
+            LoadStations();
+            LoadLocalStations();
+            LoadAircraftFuelPumps();
+            LoadPumps();
+            LogConfig();
         }
 
         private static bool LoadINI(string filename)
@@ -77,36 +98,38 @@ namespace SimpleCTRL.Handlers
                     return false;
                 }
             }
-            LogLevel = val.ReadInt32("Advanced", "LogLevel", LogLevel);
-            HazardKey = GetKeysFromString(val.ReadString("BLINKERS", "HazardKey", ""), HazardKey);
-            LeftBlinkerKey = GetKeysFromString(val.ReadString("BLINKERS", "LeftBlinkerKey", ""), LeftBlinkerKey);
-            RightBlinkerKey = GetKeysFromString(val.ReadString("BLINKERS", "RightBlinkerKey", ""), RightBlinkerKey);
-            BlinkerModifierKey = GetKeysFromString(val.ReadString("BLINKERS", "BlinkerModifierKey", ""), BlinkerModifierKey);
-            BlinkersEnabled = val.ReadBoolean("BLINKERS", "BlinkersEnabled", BlinkersEnabled);
-            EngineKey = GetKeysFromString(val.ReadString("ENGINE", "EngineKey", ""), EngineKey);
-            EngineModifierKey = GetKeysFromString(val.ReadString("ENGINE", "EngineModifierKey", ""), EngineModifierKey);
-            EngineEnabled = val.ReadBoolean("ENGINE", "EngineEnabled", EngineEnabled);
-            TireRentainment = val.ReadBoolean("GENERAL", "TireRentainment", TireRentainment);
-            PreventVehicleFlip = val.ReadBoolean("GENERAL", "PreventVehicleFlip", PreventVehicleFlip);
-            PreventAutomaticReversing = val.ReadBoolean("GENERAL", "PreventAutomaticReversing", PreventAutomaticReversing);
-            TorqueMultiplierEnable = val.ReadBoolean("GENERAL", "TorqueMultiplierEnable", TorqueMultiplierEnable);
-            LimpMode = val.ReadBoolean("GENERAL", "LimpMode", LimpMode);
-            SpeedometerEnabled = val.ReadBoolean("SPEEDOMETER", "SpeedometerEnabled", SpeedometerEnabled);
+            LogLevel = val.ReadInt32("ADVANCED", "LogLevel", LogLevel);
 
-            DeformationMultiplier = -1;
-            DeformationExponent = 1f;
-            CollisionDamageExponent = 1f;
-            DamageFactorEngine = 5.1f;
-            DamageFactorBody = 5.1f;
-            DamageFactorPetrolTank = 61f;
-            EngineDamageExponent = 1f;
-            WeaponsDamageMultiplier = 0.124f;
-            DegradingHealthSpeedFactor = 3.0f;
-            CascadingFailureSpeedFactor = 1.5f;
-            DegradingFailureThreshold = 677f;
-            CascadingFailureThreshold = 310f;
-            EngineSafeGuard = 100f;
-            LimpModeMultiplier = 0.15f;
+            HazardKey = GetKeysFromString(val.ReadString("CONTROLS", "HazardKey", ""), HazardKey);
+            LeftBlinkerKey = GetKeysFromString(val.ReadString("CONTROLS", "LeftBlinkerKey", ""), LeftBlinkerKey);
+            RightBlinkerKey = GetKeysFromString(val.ReadString("CONTROLS", "RightBlinkerKey", ""), RightBlinkerKey);
+            BlinkerModifierKey = GetKeysFromString(val.ReadString("CONTROLS", "BlinkerModifierKey", ""), BlinkerModifierKey);
+            EngineKey = GetKeysFromString(val.ReadString("CONTROLS", "EngineKey", ""), EngineKey);
+            EngineModifierKey = GetKeysFromString(val.ReadString("CONTROLS", "EngineModifierKey", ""), EngineModifierKey);
+
+            HazardControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "HazardControllerButton", HazardControllerButton);
+            LeftBlinkerControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "LeftBlinkerControllerButton", LeftBlinkerControllerButton);
+            RightBlinkerControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "RightBlinkerControllerButton", RightBlinkerControllerButton);
+            BlinkerModifierControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "BlinkerModifierControllerButton", BlinkerModifierControllerButton);
+            EngineControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "EngineControllerButton", EngineControllerButton);
+            EngineModifierControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "EngineModifierControllerButton", EngineModifierControllerButton);
+
+            BlinkersEnabled = val.ReadBoolean("GENERAL", "BlinkersEnabled", BlinkersEnabled);
+            EngineEnabled = val.ReadBoolean("GENERAL", "EngineEnabled", EngineEnabled);;
+            SpeedometerEnabled = val.ReadBoolean("GENERAL", "SpeedometerEnabled", SpeedometerEnabled);
+
+            PreventAutomaticReversing = val.ReadBoolean("IMMERSION", "PreventAutomaticReversing", PreventAutomaticReversing);
+            PreventVehicleFlip = val.ReadBoolean("IMMERSION", "PreventVehicleFlip", PreventVehicleFlip);
+            TireRentainment = val.ReadBoolean("GENERAL", "TireRentainment", TireRentainment);
+
+            LeaveEngineOnNotification = val.ReadBoolean("NOTIFICATIONS", "LeaveEngineOnNotification", LeaveEngineOnNotification);
+            BrakeOverheatingNotification = val.ReadBoolean("NOTIFICATIONS", "BrakeOverheatingNotification", BrakeOverheatingNotification);
+
+            AircraftLowFuelWarning = Calc.Clamp(Convert.ToSingle(val.ReadDouble("OTHER", "AircraftLowFuelWarning", (double)AircraftLowFuelWarning)), 1f, 100f);
+            AircraftUseAirportPumps = val.ReadBoolean("OTHER", "AircraftUseAirportPumps", AircraftUseAirportPumps);
+            AircraftUseFuelTankers = val.ReadBoolean("OTHER", "AircraftUseFuelTankers", AircraftUseFuelTankers);
+            AircraftFuelTankers = new List<string>(); // figure out how to read a list inside ini file
+
             ClassDamageMultiplier = new List<float>
             {
                 1.0f, 1.0f, 1.0f, 0.95f, 1.0f, 0.95f, 0.95f, 0.95f, 0.27f, 0.7f, 0.25f, 0.35f, 0.85f, 1.0f, 0.4f, 0.7f, 0.7f, 0.75f, 0.05f, 0.67f, 0.43f, 1.0f
@@ -157,6 +180,120 @@ namespace SimpleCTRL.Handlers
                 "Never fix something that ain't broken they said. You didn't listen. At least it didn't get worse."
             };
             return true;
+        }
+
+        private static void LoadVehicleData()
+        {
+            string json = null;
+            try
+            {
+                json = File.ReadAllText("plugins/SimpleCTRL/AircraftSpecs.json") ?? "[]";
+
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    VehicleProperties.AircraftSpecs = JsonConvert.DeserializeObject<List<AircraftFuelSpecs>>(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        private static void LoadStations()
+        {
+            string json = null;
+            try
+            {
+                json = File.ReadAllText("plugins/SimpleCTRL/GasStations.json") ?? "[]";
+
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    Globals.GasStations.AddRange(JsonConvert.DeserializeObject<List<GasStation>>(json));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        private static void LoadPumps()
+        {
+            string json = null;
+            try
+            {
+                json = File.ReadAllText("plugins/SimpleCTRL/DepartmentPumps.json") ?? "[]";
+
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    List<GasStation> stations = JsonConvert.DeserializeObject<List<GasStation>>(json);
+                    Globals.GasStations.AddRange(stations);
+                    {
+                        foreach (GasStation station in stations)
+                        {
+                            Globals.DepartmentPumps.AddRange(station.Pumps);
+                        }
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        private static void LoadLocalStations()
+        {
+            string json = null;
+            try
+            {
+                json = File.ReadAllText("plugins/SimpleCTRL/GasStations.Local.json") ?? "[]";
+
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    List<GasStation> local = JsonConvert.DeserializeObject<List<GasStation>>(json);
+                    Globals.GasStations.AddRange(local);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        private static void LoadAircraftFuelPumps()
+        {
+            string json = null;
+            try
+            {
+                json = File.ReadAllText("plugins/SimpleCTRL/GasStations.Aircraft.json") ?? "[]";
+
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    List<AirportFuelPump> list = JsonConvert.DeserializeObject<List<AirportFuelPump>>(json);
+                    Globals.AirportFuelPumps.AddRange(list);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        private static void LogConfig()
+        {
+            Logging.Info("================================================================================", "ConfigHandler");
+            Logging.Info("                             SimpleCTRL Settings", "ConfigHandler");
+            Logging.Info("================================================================================", "ConfigHandler");
+            FieldInfo[] fields = typeof(ConfigHandler).GetFields(BindingFlags.Static | BindingFlags.Public);
+            foreach (FieldInfo fieldInfo in fields)
+            {
+                object value = fieldInfo.GetValue(null);
+                Logging.Info($"{fieldInfo.Name,-30} = {value}", "ConfigHandler");
+            }
+            Logging.Info("================================================================================", "ConfigHandler");
         }
 
         private static Keys GetKeysFromString(string keyString, Keys defaultKeys)
