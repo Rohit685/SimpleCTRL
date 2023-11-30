@@ -1,110 +1,188 @@
-﻿using Common.Client.Elements;
-using Common.Client.Native;
-using Common.Client.UI;
+﻿using Common.Native;
+using LemonUI.TinyTween;
 using Rage;
-using SimpleCTRL.Handlers;
+using Rage.Native;
+using RAGENativeUI.Elements;
 using System;
 using System.Drawing;
+using System.Xml.Serialization;
 
 namespace SimpleCTRL.UI
 {
-    internal static class CustomUI
-    {
-        private static Vehicle _playerVehicle = null;
+	[XmlRoot("UI")]
+	public class CustomUI
+	{
+		#region Fields
+		[XmlElement("SWidth")]
+		public string SWidth { get; set; } = "403";
 
-        private static void UpdateCache()
+		[XmlElement("SHeight")]
+		public string SHeight { get; set; } = "619";
+
+		public int Width { get; set; }
+
+		public int Height { get; set; }
+
+		public static Scaleform buttons = new Scaleform();
+
+		public static float fuelBarWidth = GetBarWidth();
+
+		public static float fuelBarHeight = 6f;
+
+		public static PointF basePosition = new PointF(0f, 584f);
+
+		public static PointF fuelBarBackdropPosition = basePosition;
+
+		public static PointF fuelBarBackPosition = new PointF(fuelBarBackdropPosition.X, fuelBarBackdropPosition.Y + 3f);
+
+		public static PointF fuelBarPosition = fuelBarBackPosition;
+
+		public static SizeF fuelBarBackdropSize = new SizeF(fuelBarWidth, 12f);
+
+		public static SizeF fuelBarBackSize = new SizeF(fuelBarWidth, fuelBarHeight);
+
+		public static SizeF fuelBarSize = fuelBarBackSize;
+
+		public static Color fuelBarBackdropColour = Color.FromArgb(100, 0, 0, 0);
+
+		public static Color fuelBarBackColour = Color.FromArgb(50, 255, 179, 0);
+
+		public static Color fuelBarColourNormal = Color.FromArgb(150, 255, 179, 0);
+
+		public static Color fuelBarColourWarning = Color.FromArgb(255, 255, 245, 220);
+
+		public static Color fuelBarElectricColourNormal = Color.FromArgb(255, 12, 110, 201);
+
+		public static Color fuelBarElectricColourWarning = Color.FromArgb(255, 187, 231, 237);
+
+		public static Tween<float> fuelBarColorTween = new FloatTween();
+
+		public static bool fuelBarAnimationDir = true;
+
+		public static Common.Elements.Rectangle fuelBarBackdrop = new Common.Elements.Rectangle(fuelBarBackdropPosition, fuelBarBackdropSize, fuelBarBackdropColour);
+
+		public static Common.Elements.Rectangle fuelBarBack = new Common.Elements.Rectangle(fuelBarBackPosition, fuelBarBackSize, fuelBarBackColour);
+
+		public static Common.Elements.Rectangle fuelBar = new Common.Elements.Rectangle(fuelBarPosition, fuelBarSize, fuelBarColourNormal);
+
+		public static PointF Position
+		{
+			set
+			{
+				fuelBarBackdrop.Position = value;
+				fuelBarBack.Position = new PointF(value.X, value.Y + 3f);
+				fuelBar.Position = fuelBarBack.Position;
+			}
+		}
+		#endregion
+
+		public static void RenderBar(float currentFuelLevel, float maxFuelLevel, bool isElectric)
+		{
+			float fuelLevelPercentage = currentFuelLevel / maxFuelLevel * 100f;
+			PointF safeZone = GetSafezoneBounds();
+			Position = new PointF(basePosition.X + safeZone.X, basePosition.Y - safeZone.Y);
+			fuelBar.SizeF = new SizeF(fuelBarWidth / 100f * fuelLevelPercentage, fuelBarHeight);
+			if (maxFuelLevel > 0f && fuelLevelPercentage < 15f)
+			{
+				if (fuelBarColorTween.State == TweenState.Stopped)
+				{
+					fuelBarAnimationDir = !fuelBarAnimationDir;
+					fuelBarColorTween.Start(fuelBarAnimationDir ? 100f : 255f, fuelBarAnimationDir ? 255f : 100f, 0.5f, ScaleFuncs.QuarticEaseOut);
+				}
+				fuelBarColorTween.Update(NativeFunction.CallByHash<float>(0x15C40837039FFAF7));
+				fuelBar.Color = Color.FromArgb((int)Math.Floor(fuelBarColorTween.CurrentValue), isElectric ? fuelBarElectricColourWarning : fuelBarColourWarning);
+			}
+			else
+			{
+				fuelBar.Color = (isElectric ? fuelBarElectricColourNormal : fuelBarColourNormal);
+				if (fuelBarColorTween.State != TweenState.Stopped)
+				{
+					fuelBarColorTween.Stop(StopBehavior.ForceComplete);
+				}
+			}
+			fuelBarBackdrop.Draw();
+			fuelBarBack.Draw();
+			fuelBar.Draw();
+		}
+
+		#region Utilities
+		public static PointF GetSafezoneBounds()
+		{
+			float t = N.GetSafeZoneSize();
+			float w = 1280f;
+			float h = 720f;
+			return new PointF((int)Math.Round((w - w * t) / 2f + 1f), (int)Math.Round((h - h * t) / 2f - 2f));
+		}
+
+		public static float GetBarWidth()
+		{
+			double aspect = N.GetAspectRatio(false);
+			if (aspect <= 1.3333333730697632)
+			{
+				if (aspect == 1.25)
+				{
+					return 255f;
+				}
+				if (aspect == 1.3333333730697632)
+				{
+					return 240f;
+				}
+			}
+			else
+			{
+				if (aspect == 1.5)
+				{
+					return 212f;
+				}
+				if (aspect == 1.600000023841858)
+				{
+					return 200f;
+				}
+				if (aspect == 1.6666666269302368)
+				{
+					return 191f;
+				}
+			}
+			return 180f;
+		}
+		#endregion
+
+		public static void InstructToggleEngine()
         {
-            _playerVehicle = Game.LocalPlayer.Character.CurrentVehicle;
-        }
+			buttons.Load("instructional_buttons");
+			buttons.CallFunction("CLEAR_ALL");
+			buttons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
+			buttons.CallFunction("CREATE_CONTAINER");
+			buttons.CallFunction("SET_DATA_SLOT", 0, NativeFunction.CallByHash(0x0499D7B09FC9B407, typeof(string), 2, 183, 0), "Toggle engine");
+			buttons.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
+		}
 
-        private static void DrawHud()
+		public static void InstructRefuel(GameControl control)
+		{
+			buttons.Load("instructional_buttons");
+			buttons.CallFunction("CLEAR_ALL");
+			buttons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
+			buttons.CallFunction("CREATE_CONTAINER");
+			buttons.CallFunction("SET_DATA_SLOT", 0, NativeFunction.CallByHash(0x0499D7B09FC9B407, typeof(string), 2, (int)control, 0), "Refuel");
+			buttons.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
+		}
+
+		public static void InstructFullOrEmpty(string fuel)
         {
-            API.HideHudComponentThisFrame(6);
-            API.HideHudComponentThisFrame(8);
+			buttons.Load("instructional_buttons");
+			buttons.CallFunction("CLEAR_ALL");
+			buttons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
+			buttons.CallFunction("CREATE_CONTAINER");
+			buttons.CallFunction("SET_DATA_SLOT", 0, NativeFunction.CallByHash(0x0499D7B09FC9B407, typeof(string), 2, 0, 0), fuel);
+			buttons.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
+		}
 
-            #region Car Hud
-            if (_playerVehicle != null && !API.IsHudHidden())
+		public static void RenderInstructions()
+        {
+			if (!N.IsHudHidden())
             {
-                string vehPlate = _playerVehicle.LicensePlate;
-
-                bool vehBurnout = _playerVehicle.IsInBurnout;
-                bool vehEngineRunning = _playerVehicle.IsEngineOn;
-
-                float vehEngineHealth = _playerVehicle.EngineHealth;
-                float vehBodyHealth = API.GetVehicleBodyHealth(_playerVehicle);
-                float vehSpeedMph = _playerVehicle.Speed * 2.236936f;
-
-                float speedPanelWidth = 0.046f;
-                float speedPanelHeight = 0.03f;
-
-                if (ConfigHandler.SpeedometerEnabled == true)
-                {
-                    Rect.Draw(0.095f, 0.0475f, speedPanelWidth, speedPanelHeight, 0, 0, 0, 100); // UI: MPH Panel
-                    Text.Draw(.87f, -0.125f, .6f, $"~w~{Math.Ceiling(vehSpeedMph)}", Color.White, Alignment.Right); // INT: Speed Value)
-                    Text.Draw(0.875f, -0.135f, .4f, $"~w~mph", Color.White); // TXT: Speed Unit
-                }
-
-                if (IsAircraft(_playerVehicle) || _playerVehicle.IsBlimp)
-                {
-                    Rect.Draw(0.095f, 0.17f, speedPanelWidth, speedPanelHeight, 0, 0, 0, 100); // UI: Altitude Panel
-                    Text.Draw(.87f, 0f, .6f, $"~w~{Math.Ceiling(_playerVehicle.HeightAboveGround * 3.2808f)}", Color.White, Alignment.Right); // INT: Altitude Value
-                    Text.Draw(0.875f, -0.01f, .4f, $"~w~feet", Color.White); // TXT: Altitude Unit
-                }
-
-                Text.Draw(.5f, .045f, 0.55f, $"~w~{vehPlate}", Color.White, Alignment.Center); // TXT: Plate
-                Text.Draw(1f, .065f, .45f, vehEngineRunning ? "~g~ENG" : "~r~ENG", Color.White, Alignment.Right); // TXT: Engine
-
-                Text.Draw(.15f, .04f, .45f, vehBurnout ? "~r~DSC" : "DSC", Color.White); // TXT: DSC
-
-                if (vehBodyHealth < 310)
-                {
-                    Text.Draw(1f, .04f, .45f, "~r~AC", Color.White, Alignment.Right); // TXT: AC Damaged
-                }
-                else if (vehBodyHealth < 900)
-                {
-                    Text.Draw(1f, .04f, .45f, "~y~AC", Color.White, Alignment.Right); // TXT: AC Slightly Damaged
-                }
-                else
-                {
-                    Text.Draw(1f, .04f, .45f, "AC", Color.White, Alignment.Right); // TXT: AC 
-                }
-
-                if (vehEngineHealth < 110)
-                {
-                    Text.Draw(.75f, .04f, .45f, "~r~Fluid", Color.White); // TXT: Fluid Damaged
-                    Text.Draw(.01f, .04f, .45f, "~r~Oil", Color.White); // TXT : Oil Damaged
-                }
-                else if (vehEngineHealth < 315)
-                {
-                    Text.Draw(.75f, .04f, .45f, "~r~Fluid", Color.White); // TXT: Fluid Damaged
-                    Text.Draw(.01f, .04f, .45f, "~y~Oil", Color.White); // TXT : Oil Slightly Damaged
-                }
-                else if (vehEngineHealth < 900)
-                {
-                    Text.Draw(.75f, .04f, .45f, "~y~Fluid", Color.White); // TXT: Fluid Slightly Damaged
-                    Text.Draw(.01f, .04f, .45f, "Oil", Color.White); // TXT : Oil 
-                }
-                else
-                {
-                    Text.Draw(.75f, .04f, .45f, "Fluid", Color.White); // TXT: Fluid
-                    Text.Draw(.01f, .04f, .45f, "Oil", Color.White); // TXT: Oil 
-                }
+				buttons.Render2D();
             }
-            #endregion
-        }
-
-        private static bool IsAircraft(Vehicle vehicle) => vehicle.Model.IsHelicopter || vehicle.Model.IsPlane;
-
-        internal static void Process()
-        {
-
-            while (true)
-            {
-                GameFiber.Yield();
-
-                UpdateCache();
-                DrawHud();
-            }
-        }
-    }
+		}
+	}
 }

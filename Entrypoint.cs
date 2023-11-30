@@ -1,34 +1,85 @@
-﻿using Rage.Attributes;
+﻿using Common;
 using Rage;
-using SimpleCTRL.Threads;
+using Rage.Attributes;
+using SimpleCTRL.API;
 using SimpleCTRL.Handlers;
-using static SimpleCTRL.Threads.SpecialModesManager;
-using SimpleCTRL.UI;
+using SimpleCTRL.Threads;
+using SimpleCTRL.Utils;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
-[assembly: Plugin("SimpleCTRL", Author = "Venoxity Development")]
+[assembly: Plugin("SimpleCTRL", Author = "Venoxity Development", PrefersSingleInstance = true, ShouldTickInPauseMenu = false, SupportUrl = "https://discord.gg/jCEdAF8AQz")]
 namespace SimpleCTRL
 {
-    internal class Entrypoint
+    internal class Entrypoint 
     {
+        private static readonly Dictionary<string, DecoratorType> decorators = new Dictionary<string, DecoratorType>()
+        {
+            { "_Fuel_Level", DecoratorType.Float },
+            { "brakeHeat", DecoratorType.Int },
+        };
+
         public static void Main()
         {
-            ConfigHandler.Initialize();
-
-            GameFiber.StartNew(delegate { PlayerController.Process(); }, "SimpleCTRL - Player Controller");
-
-            GameFiber.StartNew(delegate { ProcessPlayer(); }, "SimpleCTRL - Special Modes Player Manager");
-
-            CustomUI.Process();
+            if (CheckDependencies())
+            {
+                Logging.Info("starting...", "SimpleCTRL");
+                ConfigHandler.Initialize();
+                Decorators.Initialize();
+                Decorators.Register(decorators);
+                AnimationHandler.Initialize();
+                PlayerController.Start();
+                SpecialModesManager.Start();
+                FobHandler.Start();
+                UIHandler.Start();
+                Current.LastWorldTime = DateTime.UtcNow;
+                Functions.CreateDepartmentPumps();
+                Functions.CreateBlips();
+            }
+            else
+            {
+                Game.DisplayNotification("new_editor", "warningtriangle", "SimpleCTRL", "~r~Initialization Failure", "~y~SimpleCTRL could not start.  You are missing required libraries.");
+            }
         }
 
-        private static void OnUnload(bool isTerminating)
+        private static void OnUnload()
         {
-            foreach (Blip b in mechanicBlips)
+            Logging.Info("stopping SimpleCTRL", "SimpleCTRL");
+            Functions.RemoveBlips();
+        }
+
+        private static bool CheckDependencies()
+        {
+            foreach (var dependency in Constants.Dependencies)
             {
-                b.Delete();
+                if (!IsAssemblyAvailable(dependency.Name, dependency.Version))
+                {
+                    return false;
+                }
             }
-            Game.LogTrivial("Clearing all repair blips");
-            mechanicBlips.Clear();
+            return true;
+        }
+
+        private static bool IsAssemblyAvailable(string assemblyName, string version)
+        {
+            try
+            {
+                AssemblyName assemblyName2 = AssemblyName.GetAssemblyName(AppDomain.CurrentDomain.BaseDirectory + "/" + assemblyName);
+                if (assemblyName2.Version >= new Version(version))
+                {
+                    Game.LogTrivial($"SimpleCTRL dependency {assemblyName} is available ({assemblyName2.Version}).");
+                    return true;
+                }
+                Game.LogTrivial($"SimpleCTRL dependency {assemblyName} does not meet minimum requirements ({assemblyName2.Version} < {version}).");
+                return false;
+            }
+            catch (Exception ex) when (ex is FileNotFoundException || ex is BadImageFormatException)
+            {
+                Game.LogTrivial("SimpleCTRL dependency " + assemblyName + " is not available.");
+                return false;
+            }
         }
     }
 }
