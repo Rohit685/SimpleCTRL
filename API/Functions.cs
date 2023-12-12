@@ -1,5 +1,6 @@
 ﻿using Common;
 using Common.Models;
+using Common.Native;
 using Rage;
 using Rage.Native;
 using SimpleCTRL.Handlers;
@@ -175,8 +176,11 @@ namespace SimpleCTRL.API
 		public static void CreateDepartmentPumps()
 		{
 			Model model = new Model("prop_gas_pump_old2");
-			NativeFunction.CallByHash<int>(0x963D27A58DF860AC, model);
-			if (NativeFunction.CallByHash<bool>(0x98A4EB5D89A0C952, model))
+			// NativeFunction.CallByHash<int>(0x963D27A58DF860AC, model);
+			N.RequestModel(model);
+
+;			// if (NativeFunction.CallByHash<bool>(0x98A4EB5D89A0C952, model))
+			if (N.HasModelLoaded(model))
 			{
 				var MainFiber = new GameFiber(delegate
 				{
@@ -189,12 +193,15 @@ namespace SimpleCTRL.API
 								unsafe
                                 {
 									Vector3 position = Game.LocalPlayer.Character.Position;
-									if (position.DistanceToSquared(pump.Position) <= 50000f && !NativeFunction.CallByHash<bool>(0xBFA48E2FF417213F, pump.Position.X, pump.Position.Y, pump.Position.Z, 2f, Globals.DepartmentPumpObjectHash, false))
+									// if (position.DistanceToSquared(pump.Position) <= 50000f && !NativeFunction.CallByHash<bool>(0xBFA48E2FF417213F, pump.Position.X, pump.Position.Y, pump.Position.Z, 2f, Globals.DepartmentPumpObjectHash, false)
+									if (position.DistanceToSquared(pump.Position) <= 50000f && !N.DoesObjectOfTypeExistAtCoords(pump.Position.X, pump.Position.Y, pump.Position.Z, 2f, Globals.DepartmentPumpObjectHash))
 									{
 										position = pump.Position;
-										float resultArg = 0f;
-										NativeFunction.CallByHash<int>(0x07503F7948F491A7, pump.Position.X, pump.Position.Y, 1000f);
-										NativeFunction.CallByHash<bool>(0xC906A7DAB05C8D2B, pump.Position.X, pump.Position.Y, 1000f, &resultArg, false);
+										// float resultArg = 0f;
+										// NativeFunction.CallByHash<int>(0x07503F7948F491A7, pump.Position.X, pump.Position.Y, 1000f);
+										N.RequestCollisionAtCoord(pump.Position.X, pump.Position.Y, 1000f);
+										// NativeFunction.CallByHash<bool>(0xC906A7DAB05C8D2B, pump.Position.X, pump.Position.Y, 1000f, &resultArg, false);
+										float resultArg = N.GetGroundZFor3DCoord(pump.Position.X, pump.Position.Y, 1000f, false);
 										pump.Position.Z = resultArg;
 										Rage.Object obj = new Rage.Object(model.Hash, pump.Position);
 										// obj.Rotation = Common.API.Math.DirectionToRotation(Common.API.Math.HeadingToDirection(pump.Rotation), 0f).ToRotator();

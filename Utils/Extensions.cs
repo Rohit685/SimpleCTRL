@@ -224,20 +224,20 @@ namespace SimpleCTRL.Utils
             float fuel = GetFuelLevel(vehicle);
             if (fuel > 0f && vehicle.IsEngineOn)
             {
-                if (!Current.TripInfos.ContainsKey((int)vehicle.Handle.Value))
+                if (!Current.TripInfos.ContainsKey(vehicle.Handle.ToInt32()))
                 {
-                    Current.TripInfos[(int)vehicle.Handle.Value] = new TripInfo();
+                    Current.TripInfos[vehicle.Handle.ToInt32()] = new TripInfo();
                 }
-                if (Current.TripInfos[(int)vehicle.Handle.Value].LastPosition == Vector3.Zero)
+                if (Current.TripInfos[vehicle.Handle.ToInt32()].LastPosition == Vector3.Zero)
                 {
-                    Current.TripInfos[(int)vehicle.Handle.Value].LastPosition = vehicle.Position;
+                    Current.TripInfos[vehicle.Handle.ToInt32()].LastPosition = vehicle.Position;
                 }
-                float distance = Vector3.Distance(Current.TripInfos[(int)vehicle.Handle.Value].LastPosition, vehicle.Position);
+                float distance = Vector3.Distance(Current.TripInfos[vehicle.Handle.ToInt32()].LastPosition, vehicle.Position);
                 float kmTravelled = Math.Abs(distance / 1000f) * 5.2f;
                 float fuelUsed = Functions.ConsumeCarFuel(vehicle, kmTravelled);
-                Current.TripInfos[(int)vehicle.Handle.Value].DistanceTraveledKM += kmTravelled;
-                Current.TripInfos[(int)vehicle.Handle.Value].LastPosition = vehicle.Position;
-                Current.TripInfos[(int)vehicle.Handle.Value].FuelConsumed += fuelUsed;
+                Current.TripInfos[vehicle.Handle.ToInt32()].DistanceTraveledKM += kmTravelled;
+                Current.TripInfos[vehicle.Handle.ToInt32()].LastPosition = vehicle.Position;
+                Current.TripInfos[vehicle.Handle.ToInt32()].FuelConsumed += fuelUsed;
                 fuel -= fuelUsed;
                 if (fuel < 0.2f && IsElectric(vehicle) && vehicle.IsDriveable)
                 {
@@ -271,7 +271,7 @@ namespace SimpleCTRL.Utils
                 {
                     if (fuel >= Current.VehicleFuelCapacity)
                     {
-                        CustomUI.InstructFullOrEmpty("Fuel tank full");
+                        // CustomUI.InstructFullOrEmpty("Fuel tank full");
                     }
                     else
                     {
@@ -283,15 +283,18 @@ namespace SimpleCTRL.Utils
                         {
                             fuel += 0.045f;
                             Current.FuelAmountPumped += 0.045f;
-                            //if (!NativeFunction.CallByHash<bool>(0x1F0B79228E461EC9, Game.LocalPlayer.Character, Globals.DictRefueling, Globals.AnimRefueling, 3))
-                            //{
-                            //    NativeFunction.CallByHash<int>(0xEA47FE3719165B94, Game.LocalPlayer.Character, Globals.DictRefueling, Globals.AnimRefueling, 2f, 8f, -1, 49, 0f);
-                            //}
+                            if (!NativeFunction.CallByHash<bool>(0x1F0B79228E461EC9, Game.LocalPlayer.Character, Globals.DictRefueling, Globals.AnimRefueling, 3))
+                            {
+                                NativeFunction.CallByHash<int>(0xEA47FE3719165B94, Game.LocalPlayer.Character, Globals.DictRefueling, Globals.AnimRefueling, 2f, 8f, -1, 49, 0f);
+                            }
                         }
-                        //else if (NativeFunction.CallByHash<bool>(0x1F0B79228E461EC9, Game.LocalPlayer.Character, Globals.DictRefueling, Globals.AnimRefueling, 3))
-                        //{
-                        //    NativeFunction.CallByHash<bool>(0x28004F88151E03E0, Globals.DictRefueling, Globals.AnimRefueling);
-                        //}
+                        else
+                        {
+                            if (NativeFunction.CallByHash<bool>(0x1F0B79228E461EC9, Game.LocalPlayer.Character, Globals.DictRefueling, Globals.AnimRefueling, 3))
+                            {
+                                Game.LocalPlayer.Character.Tasks.ClearSecondary();
+                            }
+                        }
                     }
                     if ((!Globals.RefuelingAllowed || Game.IsControlJustReleased(0, GameControl.Context)) && Current.FuelAmountPumped > 0f)
                     {
@@ -300,30 +303,30 @@ namespace SimpleCTRL.Utils
                             float gallonsPumped = Common.API.Math.ConvertLitresToGallons(Current.FuelAmountPumped);
                             string fuelMsg = $"Pumped {Math.Round(Current.FuelAmountPumped, 1)} L // {Math.Round(gallonsPumped, 1)} gallons";
                             Game.DisplayNotification("~o~[FUEL] ~w~" + fuelMsg);
-                            if (Current.TripInfos.ContainsKey((int)vehicle.Handle.Value))
+                            if (Current.TripInfos.ContainsKey(vehicle.Handle.ToInt32()))
                             {
-                                TripInfo t = Current.TripInfos[(int)vehicle.Handle.Value];
+                                TripInfo t = Current.TripInfos[vehicle.Handle.ToInt32()];
                                 if (t.DistanceTraveledKM > 0f)
                                 {
                                     string fuelEcon = $"Average: {Math.Round(t.FuelEconomyInLPer100Km, 1)} L/100 km // {Math.Round(t.FuelEconomyInMPG, 1)} MPG";
                                     Game.DisplayNotification("~o~[FUEL] ~w~" + fuelEcon);
                                 }
                             }
-                            if (Current.TripInfos.ContainsKey((int)vehicle.Handle.Value))
+                            if (Current.TripInfos.ContainsKey(vehicle.Handle.ToInt32()))
                             {
-                                Current.TripInfos[(int)vehicle.Handle.Value].Reset(((Entity)vehicle).Position);
+                                Current.TripInfos[vehicle.Handle.ToInt32()].Reset(((Entity)vehicle).Position);
                             }
                             Current.FuelAmountPumped = 0f;
                         }
-                        // NativeFunction.CallByHash<bool>(0x28004F88151E03E0, Globals.DictRefueling, Globals.AnimRefueling);
+                        Game.LocalPlayer.Character.Tasks.ClearSecondary();
                     }
                 }
                 else
                 {
-                    //if (NativeFunction.CallByHash<bool>(0x1F0B79228E461EC9, Game.LocalPlayer.Character, Globals.DictRefueling, Globals.AnimRefueling, 3))
-                    //{
-                    //    NativeFunction.CallByHash<bool>(0x28004F88151E03E0, Globals.DictRefueling, Globals.AnimRefueling);
-                    //}
+                    if (NativeFunction.CallByHash<bool>(0x1F0B79228E461EC9, Game.LocalPlayer.Character, Globals.DictRefueling, Globals.AnimRefueling, 3))
+                    {
+                        Game.LocalPlayer.Character.Tasks.ClearSecondary();
+                    }
                     if (!Game.LocalPlayer.Character.IsOnFoot && Game.IsControlJustPressed(0, GameControl.Context) && IsPlayerDriving(vehicle))
                     {
                         Game.DisplayNotification("You must be on foot in order to refuel.");
@@ -372,24 +375,25 @@ namespace SimpleCTRL.Utils
             }
             if (IsVehicleNearAnyTankerOrFuelPump(vehicle))
             {
-                if (Globals.RefuelingAllowed)
+                CustomUI.InstructRefuel(GameControl.Context);
+                if (Game.IsControlPressed(0, GameControl.Context))
                 {
-                    CustomUI.InstructRefuel(GameControl.Context);
-                    if (Game.IsControlPressed(0, GameControl.Context))
+                    float pumpRate = MaxFuelLevel(vehicle) * 0.001f;
+
+                    if (fuel + pumpRate <= MaxFuelLevel(vehicle))
                     {
-                        float pumpRate = MaxFuelLevel(vehicle) * 0.001f;
                         fuel += pumpRate;
                         Current.FuelAmountPumped += pumpRate;
                     }
-                    if (Game.IsControlJustReleased(0, GameControl.Context) && Current.FuelAmountPumped > 0f)
-                    {
-                        float gallonsPumped = Common.API.Math.ConvertLitresToGallons(Current.FuelAmountPumped);
-                        string fuelMsg = $"Pumped {Math.Round(Current.FuelAmountPumped, 1)} L // {Math.Round(gallonsPumped, 1)} gallons";
-                        Game.DisplayNotification("~o~[FUEL] ~w~" + fuelMsg);
-                        Current.FuelAmountPumped = 0f;
-                    }
                 }
-                if (Game.LocalPlayer.Character.CurrentVehicle != null || Globals.RefuelingAllowed)
+                if (Game.IsControlJustReleased(0, GameControl.Context) && Current.FuelAmountPumped > 0f)
+                {
+                    float gallonsPumped = Common.API.Math.ConvertLitresToGallons(Current.FuelAmountPumped);
+                    string fuelMsg = $"Pumped {Math.Round(Current.FuelAmountPumped, 1)} L // {Math.Round(gallonsPumped, 1)} gallons";
+                    Game.DisplayNotification("~o~[FUEL] ~w~" + fuelMsg);
+                    Current.FuelAmountPumped = 0f;
+                }
+                if (Game.LocalPlayer.Character.CurrentVehicle != null)
                 {
                     CustomUI.RenderInstructions();
                     if (!Globals.HudActive) //  Due to fix sound check only being called once per load plugin
@@ -398,7 +402,7 @@ namespace SimpleCTRL.Utils
                     }
                     Globals.HudActive = true;
                 }
-            }
+            } 
             return fuel;
         }
 
@@ -406,6 +410,10 @@ namespace SimpleCTRL.Utils
 
 
 
+        public static int ToInt32(this PoolHandle poolHandle)
+        {
+            return (int)poolHandle.Value;
+        }
 
         #region Ped Extensions
         internal static void ManualRefuel(this Ped playerPed)
@@ -427,11 +435,11 @@ namespace SimpleCTRL.Utils
                 float fuel = vehicle.GetFuelLevel();
                 if (max - fuel < 0.2f)
                 {
-                    CustomUI.InstructFullOrEmpty("Fuel tank full");
+                    // CustomUI.InstructFullOrEmpty("Fuel tank full");
                 }
                 else if (fuel == 0f)
                 {
-                    CustomUI.InstructFullOrEmpty("Fuel tank empty");
+                    // CustomUI.InstructFullOrEmpty("Fuel tank empty");
                 }
                 else
                 {
@@ -492,11 +500,11 @@ namespace SimpleCTRL.Utils
                     // playerPed.Task.ClearAnimation(Globals.DictSiphoning, Globals.AnimSiphoning);
                 }
                 CustomUI.RenderInstructions();
-                if (!Globals.HudActive) //  Due to fix sound check only being called once per load plugin
-                {
-                    NativeFunction.CallByHash<int>(0x67C540AA08E4A6F5, -1, "CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", 1);
-                }
-                Globals.HudActive = true;
+                //if (!Globals.HudActive) //  Due to fix sound check only being called once per load plugin
+                //{
+                //    NativeFunction.CallByHash<int>(0x67C540AA08E4A6F5, -1, "CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", 1);
+                //}
+                //Globals.HudActive = true;
             }
         }
 
@@ -612,18 +620,22 @@ namespace SimpleCTRL.Utils
         private static Vehicle FindNearbyTanker(Vehicle v)
         {
             Vehicle tanker = null;
+
             if (ConfigHandler.AircraftUseFuelTankers)
             {
-                float radius = 100f;
-                uint modelHash = 0u;
-                int flag = 70;
-                int handle = NativeFunction.CallByHash<int>(0xF73EB622C4F1689B, v.Position.X, v.Position.Y, v.Position.Z, radius, modelHash, flag);
-                //  found = new Vehicle(handle);
-                //if ((Entity)(object)found != (Entity)null && found.Exists() && ConfigHandler.AircraftFuelTankers.Any((string x) => x.Equals(found.DisplayName(), StringComparison.OrdinalIgnoreCase)))
-                //{
-                //    tanker = found;
-                //}
+                var nearbyEntities = World.GetEntities(v.Position, 100f, GetEntitiesFlags.ConsiderAllVehicles | GetEntitiesFlags.ExcludePlayerVehicle);
+
+                if (nearbyEntities.Any())
+                {
+                    tanker = nearbyEntities
+                        .OfType<Vehicle>()
+                        .FirstOrDefault(entity => entity != null &&
+                           entity.Exists() &&
+                           ConfigHandler.AircraftFuelTankers
+                               .Any(x => x.Equals(entity.Model.Hash)));
+                }
             }
+
             return tanker;
         }
 

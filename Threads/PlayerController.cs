@@ -19,6 +19,11 @@ namespace SimpleCTRL.Threads
         protected const bool _restrictEmergency = false;    // Only allow this feature for emergency vehicles
         protected const bool _keepDoorsOpen = true;         // Keep the door open when getting out
         protected static bool _doorsNotify = false;                // Show notification first time they get any vehicle after joining
+        private static bool isHeld = false;
+        private static int heldTime = 0;
+        private static int requiredTime = 200;
+        private static int elapsedTime = 0;
+        private static int timeout = 0;
 
         // Vehicle Control
         private static bool _isShuffleDisabled = true;
@@ -57,7 +62,8 @@ namespace SimpleCTRL.Threads
                 return;
             }
 
-            if (_isShuffleDisabled && playerVeh != null && playerVeh.GetPedOnSeat((int)VehicleSeat.Passenger) == player && NativeFunction.CallByHash<bool>(0xB0760331C7AA4155, player, 165))
+            // if (_isShuffleDisabled && playerVeh != null && playerVeh.GetPedOnSeat((int)VehicleSeat.Passenger) == player && NativeFunction.CallByHash<bool>(0xB0760331C7AA4155, player, 165))
+            if (_isShuffleDisabled && playerVeh != null && playerVeh.GetPedOnSeat((int)VehicleSeat.Passenger) == player && N.GetIsTaskActive(player, 165))
             {
                 if (!playerVeh.IsSeatFree((int)VehicleSeat.Driver) && !playerVeh.Driver.IsPlayer)
                 {
@@ -65,15 +71,19 @@ namespace SimpleCTRL.Threads
                 }
                 else
                 {
-                    NativeFunction.CallByHash<int>(0x1913FE4CBF41C463, player, 184, true); // SET_PED_CONFIG_FLAG
+                    // NativeFunction.CallByHash<int>(0x1913FE4CBF41C463, player, 184, true);
+                    N.SetPedConfigFlag(player, 184, true);
                     player.Tasks.ClearImmediately();
-                    NativeFunction.CallByHash<int>(0xF75B0D629E1C063D, player, playerVeh, (int)VehicleSeat.Passenger); // SET_PED_INTO_VEHICLE
+                    // NativeFunction.CallByHash<int>(0xF75B0D629E1C063D, player, playerVeh, (int)VehicleSeat.Passenger);
+                    N.SetPedIntoVehicle(player, playerVeh, (int)VehicleSeat.Passenger);
                 }
             }
             else if (!_isShuffleDisabled && playerVeh != null && playerVeh.IsSeatFree((int)VehicleSeat.Driver))
             {
-                NativeFunction.CallByHash<int>(0xC1E8A365BF3B29F2, player, 184, true); // SET_PED_RESET_FLAG
-                NativeFunction.CallByHash<int>(0xF75B0D629E1C063D, player, playerVeh, (int)VehicleSeat.Driver); // SET_PED_INTO_VEHICLE
+                // NativeFunction.CallByHash<int>(0xC1E8A365BF3B29F2, player, 184, true); 
+                N.SetPedConfigFlag(player, 184, true);
+                // NativeFunction.CallByHash<int>(0xF75B0D629E1C063D, player, playerVeh, (int)VehicleSeat.Driver); 
+                N.SetPedIntoVehicle(player, playerVeh, (int)VehicleSeat.Driver);
                 _isShuffleDisabled = true;
             }
 
@@ -203,37 +213,6 @@ namespace SimpleCTRL.Threads
                 }
             }
             #endregion
-
-            #region Leave Engine Running
-            //Vehicle veh = player.LastVehicle;
-            //bool inVehicle = player.IsInAnyVehicle(false);
-
-            //if (_restrictEmergency && veh.Class != VehicleClass.Emergency)
-            //{
-            //    return;
-            //}
-
-            //if (ConfigHandler.LeaveEngineOnNotification == true)
-            //{
-            //    if (!_doorsNotify && inVehicle && veh.Driver == player && veh.Class != VehicleClass.Helicopter && veh.Class != VehicleClass.Plane)
-            //    {
-            //        Game.DisplayNotification("Hold ~b~F ~w~when exiting to leave engine running.");
-            //        _doorsNotify = true;
-            //    }
-            //}
-
-            //if (inVehicle && Game.IsControlPressed(0, GameControl.VehicleExit) && player.IsAlive && veh.Class != VehicleClass.Helicopter && veh.Class != VehicleClass.Plane)
-            //{
-            //    if (inVehicle && Game.IsControlPressed(0, GameControl.VehicleExit) && player.IsAlive)
-            //    {
-            //        veh.IsEngineOn = true;
-            //        if (_keepDoorsOpen)
-            //        {
-            //            player.Tasks.LeaveVehicle(LeaveVehicleFlags.LeaveDoorOpen);
-            //        }
-            //    }
-            //}
-            #endregion
         }
 
         private static void FuelTick()
@@ -317,7 +296,8 @@ namespace SimpleCTRL.Threads
                     vehicle.ConsumeRoadVehicleFuel();
                 }
             }
-            if (!NativeFunction.CallByHash<bool>(0x157F93B036700462) && (Globals.RefuelingAllowed || vehicle.IsPlayerDriving()))
+            // if (!NativeFunction.CallByHash<bool>(0x157F93B036700462) && (Globals.RefuelingAllowed || vehicle.IsPlayerDriving()))
+            if (!N.IsRadarHidden() && (Globals.RefuelingAllowed || vehicle.IsPlayerDriving()))
             {
                 if (!N.IsHudHidden() || (player.CurrentVehicle != null && player.CurrentVehicle.IsAircraft()))
                 {
@@ -343,10 +323,17 @@ namespace SimpleCTRL.Threads
                 Current.AircraftEngineOn = false;
                 ClientPed.ManualRefuel();
                 Current.VehicleFuelLevelInitialized = false;
-                //foreach (int x in Current.TripInfos.Keys)
-                //{
-                //    Game.LogTrivial(x.ToString());
-                //}
+                foreach (int x in Current.TripInfos.Keys)
+                {
+                    if (Current.TripInfos[x] != null)
+                    {
+                        Vehicle v = World.GetEntityByHandle<Vehicle>(new PoolHandle((uint)x));
+                        if (EntityExtensions.Exists(v) && v.IsEngineOn)
+                        {
+                            v.ConsumeRoadVehicleFuel();
+                        }
+                    }
+                }
             }
             Current.LastWorldTime = DateTime.UtcNow;
             #endregion
@@ -356,11 +343,13 @@ namespace SimpleCTRL.Threads
         {
             Logging.Info("starting...", "PlayerController");
             GameFiber.StartNew(delegate { Run(); });
+            GameFiber.StartNew(delegate { Run2(); });
         }
 
         public static void Run()
         {
-            NativeFunction.CallByHash<int>(0xD3BD40951412FEF6, Globals.DictRefueling); // REQUEST_ANIM_DICT
+            // NativeFunction.CallByHash<int>(0xD3BD40951412FEF6, Globals.DictRefueling); 
+            N.RequestAnimDict(Globals.DictRefueling);
 
             while (true)
             {
@@ -369,6 +358,67 @@ namespace SimpleCTRL.Threads
                 OnTick();
                 FuelTick();
             }
+        }
+
+        private static void Run2()
+        {
+            #region Leave Engine Running
+            while (true)
+            {
+                GameFiber.Yield();
+
+                Vehicle currentVehicle = ClientPed.LastVehicle;
+                bool isInVehicle = ClientPed.IsInAnyVehicle(false);
+
+                if (_restrictEmergency && currentVehicle.Class != VehicleClass.Emergency)
+                {
+                    return;
+                }
+
+                if (ConfigHandler.LeaveEngineOnNotification && !_doorsNotify && isInVehicle &&
+                    currentVehicle.Driver == ClientPed && currentVehicle.Class != VehicleClass.Helicopter &&
+                    currentVehicle.Class != VehicleClass.Plane)
+                {
+                    Game.DisplayNotification("Hold ~b~F ~w~when exiting to leave the engine running.");
+                    _doorsNotify = true;
+                }
+
+                if (isInVehicle && ClientPed.IsAlive && currentVehicle.Class != VehicleClass.Helicopter &&
+    currentVehicle.Class != VehicleClass.Plane)
+                {
+                    Game.DisableControlAction(0, GameControl.VehicleExit, true);
+
+                    if (timeout > 0) timeout--;
+
+                    if (N.IsDisabledControlPressed(0, (int)GameControl.VehicleExit) && timeout <= 0)
+                    {
+                        if (!isHeld)
+                        {
+                            isHeld = true;
+                            heldTime = (int)Game.GameTime;
+                        }
+                        else
+                        {
+                            elapsedTime = (int)(Game.GameTime - heldTime);
+
+                            if (elapsedTime >= requiredTime)
+                            {
+                                currentVehicle.IsEngineOn = true;
+                                ClientPed.Tasks.LeaveVehicle(LeaveVehicleFlags.LeaveDoorOpen); 
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (isHeld && elapsedTime <= requiredTime)
+                        {
+                            ClientPed.Tasks.LeaveVehicle(LeaveVehicleFlags.None);
+                        }
+                        isHeld = false;
+                    }
+                }
+            }
+            #endregion
         }
 
         #region Vehicle Control Handler
@@ -425,7 +475,8 @@ namespace SimpleCTRL.Threads
             }
             else
             {
-                NativeFunction.CallByHash<int>(0x85796B0549DDE156, Game.LocalPlayer.Character.CurrentVehicle); // ROLL_DOWN_WINDOWS
+                // NativeFunction.CallByHash<int>(0x85796B0549DDE156, Game.LocalPlayer.Character.CurrentVehicle);
+                N.RollDownWindows(Game.LocalPlayer.Character.CurrentVehicle);
             }
         }
 
@@ -438,7 +489,8 @@ namespace SimpleCTRL.Threads
             {
                 if (playerVeh.Driver == playerPed)
                 {
-                    NativeFunction.CallByHash<int>(0xF75B0D629E1C063D, playerPed, playerVeh, (int)VehicleSeat.Passenger); // SET_PED_INTO_VEHICLE
+                    // NativeFunction.CallByHash<int>(0xF75B0D629E1C063D, playerPed, playerVeh, (int)VehicleSeat.Passenger);
+                    N.SetPedIntoVehicle(playerPed, playerVeh, (int)VehicleSeat.Passenger);
                 }
                 else
                 {

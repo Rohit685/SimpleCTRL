@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-[assembly: Plugin("SimpleCTRL", Author = "Venoxity Development", PrefersSingleInstance = true, ShouldTickInPauseMenu = false, SupportUrl = "https://discord.gg/jCEdAF8AQz")]
+[assembly: Plugin("SimpleCTRL", Author = "Venoxity Development", PrefersSingleInstance = true, ShouldTickInPauseMenu = true, SupportUrl = "https://discord.gg/jCEdAF8AQz")]
 namespace SimpleCTRL
 {
     internal class Entrypoint 
@@ -29,7 +29,6 @@ namespace SimpleCTRL
                 ConfigHandler.Initialize();
                 Decorators.Initialize();
                 Decorators.Register(decorators);
-                AnimationHandler.Initialize();
                 PlayerController.Start();
                 SpecialModesManager.Start();
                 FobHandler.Start();
@@ -44,7 +43,7 @@ namespace SimpleCTRL
             }
         }
 
-        private static void OnUnload()
+        private static void OnUnload(bool isTerminating)
         {
             Logging.Info("stopping SimpleCTRL", "SimpleCTRL");
             Functions.RemoveBlips();

@@ -1,5 +1,5 @@
 ﻿using Common.Native;
-using LemonUI.TinyTween;
+using RAGENativeUI.TinyTween;
 using Rage;
 using Rage.Native;
 using RAGENativeUI.Elements;
@@ -89,7 +89,8 @@ namespace SimpleCTRL.UI
 					fuelBarAnimationDir = !fuelBarAnimationDir;
 					fuelBarColorTween.Start(fuelBarAnimationDir ? 100f : 255f, fuelBarAnimationDir ? 255f : 100f, 0.5f, ScaleFuncs.QuarticEaseOut);
 				}
-				fuelBarColorTween.Update(NativeFunction.CallByHash<float>(0x15C40837039FFAF7));
+				// fuelBarColorTween.Update(NativeFunction.CallByHash<float>(0x15C40837039FFAF7));
+				fuelBarColorTween.Update(N.GetFrameTime());
 				fuelBar.Color = Color.FromArgb((int)Math.Floor(fuelBarColorTween.CurrentValue), isElectric ? fuelBarElectricColourWarning : fuelBarColourWarning);
 			}
 			else
@@ -153,7 +154,8 @@ namespace SimpleCTRL.UI
 			buttons.CallFunction("CLEAR_ALL");
 			buttons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
 			buttons.CallFunction("CREATE_CONTAINER");
-			buttons.CallFunction("SET_DATA_SLOT", 0, NativeFunction.CallByHash(0x0499D7B09FC9B407, typeof(string), 2, 183, 0), "Toggle engine");
+			// buttons.CallFunction("SET_DATA_SLOT", 0, NativeFunction.CallByHash(0x0499D7B09FC9B407, typeof(string), 2, 183, 0), "Toggle engine
+			buttons.CallFunction("SET_DATA_SLOT", 0, N.Get​Control​Instructional​Buttons​String(2, 183, false), "Toggle engine");
 			buttons.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
 		}
 
@@ -163,7 +165,8 @@ namespace SimpleCTRL.UI
 			buttons.CallFunction("CLEAR_ALL");
 			buttons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
 			buttons.CallFunction("CREATE_CONTAINER");
-			buttons.CallFunction("SET_DATA_SLOT", 0, NativeFunction.CallByHash(0x0499D7B09FC9B407, typeof(string), 2, (int)control, 0), "Refuel");
+			// buttons.CallFunction("SET_DATA_SLOT", 0, NativeFunction.CallByHash(0x0499D7B09FC9B407, typeof(string), 2, (int)control, 0), "Refuel");
+			buttons.CallFunction("SET_DATA_SLOT", 0, N.GetControlInstructionalButtonsString(2, (int)control, false), "Refuel");
 			buttons.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
 		}
 
@@ -173,7 +176,8 @@ namespace SimpleCTRL.UI
 			buttons.CallFunction("CLEAR_ALL");
 			buttons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
 			buttons.CallFunction("CREATE_CONTAINER");
-			buttons.CallFunction("SET_DATA_SLOT", 0, NativeFunction.CallByHash(0x0499D7B09FC9B407, typeof(string), 2, 0, 0), fuel);
+			// buttons.CallFunction("SET_DATA_SLOT", 0, NativeFunction.CallByHash(0x0499D7B09FC9B407, typeof(string), 2, 0, 0), fuel);
+			buttons.CallFunction("SET_DATA_SLOT", 0, N.GetControlInstructionalButtonsString(2, 0, false), fuel);
 			buttons.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
 		}
 

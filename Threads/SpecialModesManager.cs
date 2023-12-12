@@ -236,7 +236,8 @@ namespace SimpleCTRL.Threads
                         _lastVehicle.Doors[4].Open(true);
                         player.Tasks.PlayAnimation(repairAnimDict, repairAnimString, 5f, AnimationFlags.UpperBodyOnly);
                         Game.DisplaySubtitle("Attempting to repair vehicle", 6000);
-                        NativeFunction.CallByHash<int>(0x6E13FC662B882D1D, _lastVehicle, 1); // SET_VEHICLE_TYRE_FIXED
+                        // NativeFunction.CallByHash<int>(0x6E13FC662B882D1D, _lastVehicle, 1); // SET_VEHICLE_TYRE_FIXED
+                        N.SetVehicleTyreFixed(_lastVehicle, 1);
                         GameFiber.Wait(6000);
                         if (isRepairing)
                         {
@@ -274,7 +275,8 @@ namespace SimpleCTRL.Threads
         private static bool CannotDoAction()
         {
             Ped player = Game.LocalPlayer.Character;
-            return !player.IsOnFoot || !EntityExtensions.Exists(_lastVehicle) || player.IsCuffed || Extensions.GetDistance(_lastVehicle.Position, player.Position) > 5f || player.IsDead || NativeFunction.CallByHash<int>(0x83F969AA1EE2A664, _lastVehicle, -1) != player.Handle || _lastVehicle.IsDead || N.DecorGetBool(player, "IsDead") || N.DecorGetBool(player, "IsGrabbed");
+            // return !player.IsOnFoot || !EntityExtensions.Exists(_lastVehicle) || player.IsCuffed || Extensions.GetDistance(_lastVehicle.Position, player.Position) > 5f || player.IsDead || NativeFunction.CallByHash<int>(0x83F969AA1EE2A664, _lastVehicle, -1) != player.Handle || _lastVehicle.IsDead || N.DecorGetBool(player, "IsDead") || N.DecorGetBool(player, "IsGrabbed");
+            return !player.IsOnFoot || !EntityExtensions.Exists(_lastVehicle) || player.IsCuffed || Extensions.GetDistance(_lastVehicle.Position, player.Position) > 5f || player.IsDead || N.GetLastPedInVehicleSeat(_lastVehicle, -1) != player.Handle || _lastVehicle.IsDead || N.DecorGetBool(player, "IsDead") || N.DecorGetBool(player, "IsGrabbed");
         }
         private static bool IsDead() => Game.LocalPlayer.Character.IsDead || N.DecorGetBool(Game.LocalPlayer.Character, "IsDead");
         private static string GetRandom(this List<string> list) => list[new Random().Next(list.Count)];
@@ -350,7 +352,8 @@ namespace SimpleCTRL.Threads
                 #region Prevent Vehicle Flip
                 if (ConfigHandler.PreventVehicleFlip == true)
                 {
-                    float roll = NativeFunction.CallByHash<float>(0x831E0242595560DF, Game.LocalPlayer.Character.CurrentVehicle); // GET_ENTITY_ROLL
+                    // float roll = NativeFunction.CallByHash<float>(0x831E0242595560DF, Game.LocalPlayer.Character.CurrentVehicle); 
+                    float roll = N.GetEntityRoll(Game.LocalPlayer.Character.CurrentVehicle);
                     if ((roll > 75f || roll < -75f) && Game.LocalPlayer.Character.CurrentVehicle.Speed < 2f)
                     {
                         Game.DisableControlAction(2, GameControl.VehicleMoveLeftRight, true);
@@ -462,7 +465,8 @@ namespace SimpleCTRL.Threads
                 if (healthEngineCurrent <= ConfigHandler.EngineSafeGuard && (!ConfigHandler.LimpMode || veh.OilLevel() < 3f) && !N.IsVehicleTyreBurst(veh, 1, true))
                 {
                     veh.IsDriveable = false;
-                    NativeFunction.CallByHash<int>(0xEC6A202EE4960385, veh, 1, true, 1000f); // SET_VEHICLE_TYRE_BURST
+                    // NativeFunction.CallByHash<int>(0xEC6A202EE4960385, veh, 1, true, 1000f); 
+                    N.SetVehicleTyreBurst(veh, 1, true, 1000f);
                 }
 
                 if (_currentVehicle != _lastVehicle)
@@ -565,7 +569,8 @@ namespace SimpleCTRL.Threads
                 }
                 if (healthBodyNew != healthBodyCurrent)
                 {
-                    NativeFunction.CallByHash<int>(0xB77D05AC8C78AADB, veh, healthBodyNew); // SET_VEHICLE_BODY_HEALTH
+                    // NativeFunction.CallByHash<int>(0xB77D05AC8C78AADB, veh, healthBodyNew); 
+                    N.SetVehicleBodyHealth(veh, healthBodyNew);
                 }
                 if (healthPetrolTankNew != healthPetrolTankCurrent)
                 {

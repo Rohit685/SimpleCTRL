@@ -2,7 +2,7 @@
 using System;
 using NAudio.Wave;
 using System.IO;
-using Rage.Native;
+using Common.Native;
 
 namespace SimpleCTRL.Handlers
 {
@@ -23,7 +23,8 @@ namespace SimpleCTRL.Handlers
                     output.Stop();
                 }
 
-                output.Volume = NativeFunction.CallByHash<int>(0xC488FF2356EA7791, 300) / 20f;
+                // output.Volume = NativeFunction.CallByHash<int>(0xC488FF2356EA7791, 300) / 20f;
+                output.Volume = N.GetProfileSetting(300) / 20f;
                 output.Init(reader);
                 output.Play();
             }

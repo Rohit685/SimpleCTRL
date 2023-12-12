@@ -54,10 +54,7 @@
   <ItemGroup>
     <Reference Include="Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Venoxity Development\Programming\SP\Common\bin\x64\Debug\Common.dll</HintPath>
-    </Reference>
-    <Reference Include="LemonUI.RagePluginHook">
-      <HintPath>..\..\New folder\bin\Debug\RPH\LemonUI.RagePluginHook.dll</HintPath>
+      <HintPath>..\..\..\..\Venoxity Development\Programming\SP\Common\bin\x64\Release\Common.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NAudio, Version=1.10.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -67,7 +64,8 @@
       <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="RAGENativeUI, Version=1.9.2.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>packages\RAGENativeUI.1.9.2\lib\net472\RAGENativeUI.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\JakeE\source\repos\RAGENativeUI\Source\bin\Debug\RAGENativeUI.dll</HintPath>
     </Reference>
     <Reference Include="RagePluginHook, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>packages\RagePluginHook.1.98.0\lib\net472\RagePluginHook.dll</HintPath>
@@ -85,7 +83,6 @@
   <ItemGroup>
     <Compile Include="API\Functions.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Handlers\AnimationHandler.cs" />
     <Compile Include="Handlers\FobHandler.cs" />
     <Compile Include="Handlers\SoundHandler.cs" />
     <Compile Include="Handlers\TextureHandler.cs" />

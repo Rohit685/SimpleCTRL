@@ -14,22 +14,27 @@ namespace SimpleCTRL.Handlers
 {
     internal static class ConfigHandler
     {
-        public static int DeformationMultiplier = -1;
-        public static float DeformationExponent = 1f;
-        public static float CollisionDamageExponent = 1f;
-        public static float DamageFactorEngine = 5.1f;
-        public static float DamageFactorBody = 5.1f;
-        public static float DamageFactorPetrolTank = 61f;
-        public static float EngineDamageExponent = 1f;
-        public static float WeaponsDamageMultiplier = 0.124f;
-        public static float DegradingHealthSpeedFactor = 3.0f;
-        public static float CascadingFailureSpeedFactor = 1.5f;
-        public static float DegradingFailureThreshold = 677f;
-        public static float CascadingFailureThreshold = 310f;
-        public static float EngineSafeGuard = 100f;
-        public static bool TorqueMultiplierEnable = true;
-        public static bool LimpMode = true;
-        public static float LimpModeMultiplier = 0.15f;
+        public static int DeformationMultiplier { get; set; }  // How much should the vehicle visually deform from a collision. Range 0.0 to 10.0 Where 0.0 is no deformation and 10.0 is 10x deformation. -1 = Don't touch
+        public static float DeformationExponent { get; set; }  //How much should the handling file deformation setting be compressed toward 1.0. (Make cars more similar). A value of 1=no change. Lower values will compress more, values above 1 it will expand. Dont set to zero or negative.
+        public static float CollisionDamageExponent { get; set; }  // How much should the handling file deformation setting be compressed toward 1.0. (Make cars more similar). A value of 1=no change. Lower values will compress more, values above 1 it will expand. Dont set to zero or negative.
+
+        public static float DamageFactorEngine { get; set; } // Sane values are 1 to 100. Higher values means more damage to vehicle. A good starting point is 10
+        public static float DamageFactorBody { get; set; }   // Sane values are 1 to 100. Higher values means more damage to vehicle. A good starting point is 10
+        public static float DamageFactorPetrolTank { get; set; }  // Sane values are 1 to 100. Higher values means more damage to vehicle. A good starting point is 64
+        public static float EngineDamageExponent { get; set; } // How much should the handling file engine damage setting be compressed toward 1.0. (Make cars more similar). A value of 1 = no change. Lower values will compress more, values above 1 it will expand. Dont set to zero or negative.
+        public static float WeaponsDamageMultiplier { get; set; }  // How much damage should the vehicle get from weapons fire. Range 0.0 to 10.0, where 0.0 is no damage and 10.0 is 10x damage. -1 = don't touch
+        public static float DegradingHealthSpeedFactor { get; set; } // Speed of slowly degrading health, but not failure. Value of 10 means that it will take about 0.25 second per health point, so degradation from 800 to 305 will take about 2 minutes of clean driving. Higher values means faster degradation
+        public static float CascadingFailureSpeedFactor { get; set; }    // Sane values are 1 to 100. When vehicle health drops below a certain point, cascading failure sets in, and the health drops rapidly until the vehicle dies. Higher values means faster failure. A good starting point is 8
+
+        public static float DegradingFailureThreshold { get; set; }  // Below this value, slow health degradation will set in
+        public static float CascadingFailureThreshold { get; set; }  // Below this value, slow health cascading will set in
+        public static float EngineSafeGuard { get; set; }    // Final failure value. Set it too high, and the vehicle won't smoke when disabled. Set too low, and the car will catch fire from a single bullet to the engine. At health 100 a typical car can take 3-4 bullets to the engine before catching fire.
+
+        public static bool TorqueMultiplierEnable { get; set; }  // Decrease engine torge as engine gets more and more damaged
+
+        public static bool LimpMode { get; set; }   // If true, the engine never fails completely, so you will always be able to get to a mechanic unless you flip your vehicle and preventVehicleFlip is set to true
+        public static float LimpModeMultiplier { get; set; }    // The torque multiplier to use when vehicle is limping. Sane values are 0.05 to 0.25
+
         public static int LogLevel = 0;
 
         public static string PluginPath = AppDomain.CurrentDomain.BaseDirectory + "/plugins/SimpleCTRL";
@@ -64,7 +69,7 @@ namespace SimpleCTRL.Handlers
         public static float AircraftLowFuelWarning = 25f;
         public static bool AircraftUseAirportPumps = true;
         public static bool AircraftUseFuelTankers = false;
-        public static List<string> AircraftFuelTankers;
+        public static List<uint> AircraftFuelTankers;
 
         public static List<float> ClassDamageMultiplier { get; set; }
 
@@ -78,7 +83,8 @@ namespace SimpleCTRL.Handlers
         public static void Initialize()
         {
             Logging.Debug("initializing...", "ConfigHandler");
-            LoadINI("SimpleCTRL");
+            LoadINI("default");
+            LoadINI("custom");
             LoadVehicleData();
             LoadStations();
             LoadLocalStations();
@@ -89,15 +95,34 @@ namespace SimpleCTRL.Handlers
 
         private static bool LoadINI(string filename)
         {
+            Logging.Info("loading " + filename + " settings...", "ConfigHandler");
             InitializationFile val = new InitializationFile("plugins/SimpleCTRL/" + filename + ".ini");
             if (!val.Exists())
             {
                 val = new InitializationFile("plugins/SimpleCTRL/" + filename + ".ini.ini");
                 if (!val.Exists())
                 {
+                    Logging.Warning("cannot find file for " + filename + " settings, skipping", "ConfigHandler");
                     return false;
                 }
             }
+
+            DeformationMultiplier = -1;
+            DeformationExponent = 1f;
+            CollisionDamageExponent = 1f;
+            DamageFactorEngine = 5.1f;
+            DamageFactorBody = 5.1f;
+            DamageFactorPetrolTank = 61f;
+            EngineDamageExponent = 1f;
+            WeaponsDamageMultiplier = 0.124f;
+            DegradingHealthSpeedFactor = 3.0f;
+            CascadingFailureSpeedFactor = 1.5f;
+            DegradingFailureThreshold = 677f;
+            CascadingFailureThreshold = 310f;
+            EngineSafeGuard = 100f;
+            TorqueMultiplierEnable = true;
+            LimpMode = true;
+            LimpModeMultiplier = 0.15f;
             LogLevel = val.ReadInt32("ADVANCED", "LogLevel", LogLevel);
 
             HazardKey = GetKeysFromString(val.ReadString("CONTROLS", "HazardKey", ""), HazardKey);
@@ -128,7 +153,15 @@ namespace SimpleCTRL.Handlers
             AircraftLowFuelWarning = Calc.Clamp(Convert.ToSingle(val.ReadDouble("OTHER", "AircraftLowFuelWarning", (double)AircraftLowFuelWarning)), 1f, 100f);
             AircraftUseAirportPumps = val.ReadBoolean("OTHER", "AircraftUseAirportPumps", AircraftUseAirportPumps);
             AircraftUseFuelTankers = val.ReadBoolean("OTHER", "AircraftUseFuelTankers", AircraftUseFuelTankers);
-            AircraftFuelTankers = new List<string>(); // figure out how to read a list inside ini file
+
+            List<string> tempAircraftFuelTankers = val.ReadString("OTHER", "AircraftFuelTankers", "")
+                .Split(',')
+                .Select(s => s.Trim())
+                .ToList();
+
+            AircraftFuelTankers = tempAircraftFuelTankers
+                .Select(modelName => Game.GetHashKey(modelName))
+                .ToList();
 
             ClassDamageMultiplier = new List<float>
             {
