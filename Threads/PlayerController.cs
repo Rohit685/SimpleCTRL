@@ -90,7 +90,7 @@ namespace SimpleCTRL.Threads
                 _isShuffleDisabled = true;
             }
 
-            if (ConfigHandler.BlinkersEnabled == true)
+            if (ConfigHandler.VehicleIndicators == true)
             {
                 if (Controls.IsControlDownWithModifier(Controls.SimpleControls.LIGHT_INDR))
                 {

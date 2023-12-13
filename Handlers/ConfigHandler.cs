@@ -55,12 +55,12 @@ namespace SimpleCTRL.Handlers
         public static ControllerButtons EngineControllerButton = (ControllerButtons)0;
         public static ControllerButtons EngineModifierControllerButton = (ControllerButtons)0;
 
-        public static bool BlinkersEnabled = true;
         public static bool SpeedometerEnabled = true;
 
         public static bool PreventAutomaticReversing = true;
         public static bool GlobalPositioningSystem = false;
         public static bool PreventVehicleFlip = true;
+        public static bool VehicleIndicators = true;
         public static bool TireRentainment = true;
         public static bool FuelSystem = true;
 
@@ -141,12 +141,12 @@ namespace SimpleCTRL.Handlers
             EngineControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "EngineControllerButton", EngineControllerButton);
             EngineModifierControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "EngineModifierControllerButton", EngineModifierControllerButton);
 
-            BlinkersEnabled = val.ReadBoolean("GENERAL", "BlinkersEnabled", BlinkersEnabled);
-            SpeedometerEnabled = val.ReadBoolean("GENERAL", "SpeedometerEnabled", SpeedometerEnabled);
+            SpeedometerEnabled = val.ReadBoolean("DISPLAY", "SpeedometerEnabled", SpeedometerEnabled);
 
             PreventAutomaticReversing = val.ReadBoolean("IMMERSION", "PreventAutomaticReversing", PreventAutomaticReversing);
             GlobalPositioningSystem = val.ReadBoolean("IMMERSION", "GlobalPositioningSystem", GlobalPositioningSystem);
             PreventVehicleFlip = val.ReadBoolean("IMMERSION", "PreventVehicleFlip", PreventVehicleFlip);
+            VehicleIndicators = val.ReadBoolean("IMMERSION", "VehicleIndicators", VehicleIndicators);
             TireRentainment = val.ReadBoolean("IMMERSION", "TireRentainment", TireRentainment);
             FuelSystem = val.ReadBoolean("IMMERSION", "FuelSystem", FuelSystem);
 
