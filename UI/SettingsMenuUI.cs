@@ -1,5 +1,6 @@
 ﻿using Rage;
 using RAGENativeUI;
+using SimpleCTRL.Handlers;
 using System.Drawing;
 
 namespace SimpleCTRL.UI
@@ -8,18 +9,24 @@ namespace SimpleCTRL.UI
     {
         #region Fields
         private static MenuPool MenuPool;
-        private static UIMenu SettingsMenu;
+        private static UIMenu mainMenu;
         #endregion
 
         internal static void Initialize()
         {
             MenuPool = new MenuPool();
 
-            SettingsMenu = new UIMenu("", "Main Menu");
+            mainMenu = new UIMenu("", "MAIN MENU");
 
-            SettingsMenu.SetBannerType(new RAGENativeUI.Elements.Sprite("simplemenu", "SimpleCTRLBanner", Point.Empty, Size.Empty));
+            if (ConfigHandler.DisableMenuMouse)
+            {
+                mainMenu.MouseControlsEnabled = false;
+                mainMenu.AllowCameraMovement = true;
+            }
 
-            MenuPool.Add(SettingsMenu);
+            mainMenu.SetBannerType(new RAGENativeUI.Elements.Sprite("simplemenu", "SimpleCTRLBanner", Point.Empty, Size.Empty));
+
+            MenuPool.Add(mainMenu);
         }
 
         internal static void ProcessMenus()
@@ -28,7 +35,7 @@ namespace SimpleCTRL.UI
 
             if (Game.IsKeyDown(System.Windows.Forms.Keys.F8))
             {
-                SettingsMenu.Visible = true;
+                mainMenu.Visible = true;
             }
         }
     }
