@@ -35,6 +35,7 @@ namespace SimpleCTRL.Handlers
         public static bool LimpMode { get; set; }   // If true, the engine never fails completely, so you will always be able to get to a mechanic unless you flip your vehicle and preventVehicleFlip is set to true
         public static float LimpModeMultiplier { get; set; }    // The torque multiplier to use when vehicle is limping. Sane values are 0.05 to 0.25
 
+        public static bool DisableMenuMouse = true;
         public static int LogLevel = 0;
 
         public static string PluginPath = AppDomain.CurrentDomain.BaseDirectory + "/plugins/SimpleCTRL";
@@ -123,6 +124,7 @@ namespace SimpleCTRL.Handlers
             TorqueMultiplierEnable = true;
             LimpMode = true;
             LimpModeMultiplier = 0.15f;
+            DisableMenuMouse = val.ReadBoolean("ADVANCED", "DisableMenuMouse", DisableMenuMouse);
             LogLevel = val.ReadInt32("ADVANCED", "LogLevel", LogLevel);
 
             HazardKey = GetKeysFromString(val.ReadString("CONTROLS", "HazardKey", ""), HazardKey);

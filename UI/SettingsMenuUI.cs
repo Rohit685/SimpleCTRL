@@ -1,5 +1,6 @@
 ﻿using Rage;
 using RAGENativeUI;
+using System.Drawing;
 
 namespace SimpleCTRL.UI
 {
@@ -14,7 +15,9 @@ namespace SimpleCTRL.UI
         {
             MenuPool = new MenuPool();
 
-            SettingsMenu = new UIMenu("SimpleCTRL", "SimpleCTRL");
+            SettingsMenu = new UIMenu("", "Main Menu");
+
+            SettingsMenu.SetBannerType(new RAGENativeUI.Elements.Sprite("simplemenu", "SimpleCTRLBanner", Point.Empty, Size.Empty));
 
             MenuPool.Add(SettingsMenu);
         }
