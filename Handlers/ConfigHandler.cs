@@ -40,7 +40,6 @@ namespace SimpleCTRL.Handlers
 
         public static string PluginPath = AppDomain.CurrentDomain.BaseDirectory + "/plugins/SimpleCTRL";
         public static string AudioPath = PluginPath + "/audio";
-        public static string TexturePath = PluginPath + "/textures";
 
         public static Keys HazardKey = Keys.None;
         public static Keys LeftBlinkerKey = Keys.None;

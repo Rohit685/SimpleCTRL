@@ -31,6 +31,10 @@ namespace SimpleCTRL.Threads
         protected static float _steeringAngle;
         protected static Vehicle _steeringVeh = null;
 
+        // GPS System
+        private static bool first = true;
+        private static bool waypoint = false;
+
         // Instances
         private static ControlHandler leaveEngineRunning = new ControlHandler();
         private static ControlHandler turnEngineOn = new ControlHandler();
@@ -343,6 +347,43 @@ namespace SimpleCTRL.Threads
             #endregion
         }
 
+        private static void GPSTick()
+        {
+            GameFiber.StartNew(delegate
+            {
+                Ped player = Game.LocalPlayer.Character;
+
+                #region GPS System
+                if (!player.IsInAnyVehicle(false))
+                {
+                    first = true;
+                }
+                if (!player.IsInAnyVehicle(false) || player.CurrentVehicle.IsHelicopter || player.CurrentVehicle.IsPlane)
+                {
+                    return;
+                }
+                if (!NativeFunction.CallByHash<bool>(0x1DD1F58F493F1DA5) && waypoint)
+                {
+                    waypoint = false;
+                    first = true;
+                    SoundHandler.PlayAudio(SoundHandler.Audio.Arrived);
+                }
+                if (!NativeFunction.CallByHash<bool>(0x1DD1F58F493F1DA5))
+                {
+                    return;
+                }
+                if (first)
+                {
+                    waypoint = true;
+                    first = false;
+                    string[] audioFiles = { "TONE.WAV", "CALCULATINROUTE.WAV", "HIGHLIGHTEDROUTE.WAV" };
+                    int[] delays = { 1378, 1980, 2497 };
+                    SoundHandler.PlayAudioSequence(audioFiles, delays);
+                }
+                #endregion
+            }, "Player Controller - GPS System");
+        }
+
         public static void Start()
         {
             Logging.Info("starting...", "PlayerController");
@@ -361,6 +402,7 @@ namespace SimpleCTRL.Threads
 
                 OnTick();
                 FuelTick();
+                GPSTick();
             }
         }
 

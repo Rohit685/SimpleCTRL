@@ -180,14 +180,6 @@ namespace SimpleCTRL.Utils
             return afs;
         }
 
-        public static void ControlCarEngine(this Vehicle vehicle)
-        {
-            if (Game.IsControlJustPressed(0, (GameControl)183))
-            {
-                ToggleEngine(vehicle);
-            }
-        }
-
         public static void ControlAircraftEngine(this Vehicle vehicle)
         {
             if (Game.IsControlJustPressed(0, GameControl.VehicleFlyUnderCarriage))
@@ -248,10 +240,6 @@ namespace SimpleCTRL.Utils
         {
             if (Current.GasStation != null && IsVehicleNearAnyPump(vehicle))
             {
-                if (vehicle.Speed < 0.1f)
-                {
-                    ControlCarEngine(vehicle);
-                }
                 if (Game.LocalPlayer.Character.CurrentVehicle != null && IsPlayerDriving(vehicle))
                 {
                     CustomUI.InstructToggleEngine();
