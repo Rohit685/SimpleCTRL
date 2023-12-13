@@ -62,6 +62,7 @@ namespace SimpleCTRL.Handlers
         public static bool GlobalPositioningSystem = false;
         public static bool PreventVehicleFlip = true;
         public static bool TireRentainment = true;
+        public static bool FuelSystem = true;
 
         public static bool LeaveEngineOnNotification = true;
         public static bool BrakeOverheatingNotification = true;
@@ -146,7 +147,8 @@ namespace SimpleCTRL.Handlers
             PreventAutomaticReversing = val.ReadBoolean("IMMERSION", "PreventAutomaticReversing", PreventAutomaticReversing);
             GlobalPositioningSystem = val.ReadBoolean("IMMERSION", "GlobalPositioningSystem", GlobalPositioningSystem);
             PreventVehicleFlip = val.ReadBoolean("IMMERSION", "PreventVehicleFlip", PreventVehicleFlip);
-            TireRentainment = val.ReadBoolean("GENERAL", "TireRentainment", TireRentainment);
+            TireRentainment = val.ReadBoolean("IMMERSION", "TireRentainment", TireRentainment);
+            FuelSystem = val.ReadBoolean("IMMERSION", "FuelSystem", FuelSystem);
 
             LeaveEngineOnNotification = val.ReadBoolean("NOTIFICATIONS", "LeaveEngineOnNotification", LeaveEngineOnNotification);
             BrakeOverheatingNotification = val.ReadBoolean("NOTIFICATIONS", "BrakeOverheatingNotification", BrakeOverheatingNotification);

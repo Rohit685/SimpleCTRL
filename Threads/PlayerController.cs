@@ -401,7 +401,10 @@ namespace SimpleCTRL.Threads
                 GameFiber.Yield();
 
                 OnTick();
-                FuelTick();
+                if (ConfigHandler.FuelSystem == true)
+                {
+                    FuelTick();
+                }
                 if (ConfigHandler.GlobalPositioningSystem == true)
                 {
                     GPSTick();

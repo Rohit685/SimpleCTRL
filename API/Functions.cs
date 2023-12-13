@@ -123,15 +123,18 @@ namespace SimpleCTRL.API
 		public static void CreateBlips()
         {
             #region Gas Stations
-            foreach (GasStation x in Globals.GasStations)
-			{
-				Blip blip = new Blip(x.Position);
-				blip.Sprite = (BlipSprite)361;
-				blip.Color = System.Drawing.Color.White;
-				blip.Scale = 1f;
-				NativeFunction.CallByHash<int>(0xBE8BE4FE60E27B72, blip, true); // SET_BLIP_AS_SHORT_RANGE
-				blip.Name = "Gas Station";
-				Globals.Blips.Add(blip);
+			if (ConfigHandler.FuelSystem == true)
+            {
+				foreach (GasStation x in Globals.GasStations)
+				{
+					Blip blip = new Blip(x.Position);
+					blip.Sprite = (BlipSprite)361;
+					blip.Color = System.Drawing.Color.White;
+					blip.Scale = 1f;
+					NativeFunction.CallByHash<int>(0xBE8BE4FE60E27B72, blip, true); // SET_BLIP_AS_SHORT_RANGE
+					blip.Name = "Gas Station";
+					Globals.Blips.Add(blip);
+				}
 			}
 			#endregion
 
@@ -152,7 +155,7 @@ namespace SimpleCTRL.API
         {
 			#region Gas Stations
 			if (Globals.Blips.Count > 0)
-            {
+			{
 				foreach (Blip blip in Globals.Blips)
 				{
 					if (blip.Exists())
@@ -162,10 +165,10 @@ namespace SimpleCTRL.API
 				}
 				Globals.Blips.Clear();
 			}
-            #endregion
+			#endregion
 
-            #region Repair Shops
-            foreach (Blip b in RepairShop.mechanicBlips)
+			#region Repair Shops
+			foreach (Blip b in RepairShop.mechanicBlips)
 			{
 				b.Delete();
 			}
@@ -175,53 +178,56 @@ namespace SimpleCTRL.API
 
 		public static void CreateDepartmentPumps()
 		{
-			Model model = new Model("prop_gas_pump_old2");
-			// NativeFunction.CallByHash<int>(0x963D27A58DF860AC, model);
-			N.RequestModel(model);
+			if (ConfigHandler.FuelSystem == true)
+            {
+				Model model = new Model("prop_gas_pump_old2");
+				// NativeFunction.CallByHash<int>(0x963D27A58DF860AC, model);
+				N.RequestModel(model);
 
-;			// if (NativeFunction.CallByHash<bool>(0x98A4EB5D89A0C952, model))
-			if (N.HasModelLoaded(model))
-			{
-				var MainFiber = new GameFiber(delegate
+				;           // if (NativeFunction.CallByHash<bool>(0x98A4EB5D89A0C952, model))
+				if (N.HasModelLoaded(model))
 				{
-					while (true)
-                    {
-						foreach (GasPump pump in Globals.DepartmentPumps)
-                        {
-							if (pump != null && Game.LocalPlayer.Character != null)
-                            {
-								unsafe
-                                {
-									Vector3 position = Game.LocalPlayer.Character.Position;
-									// if (position.DistanceToSquared(pump.Position) <= 50000f && !NativeFunction.CallByHash<bool>(0xBFA48E2FF417213F, pump.Position.X, pump.Position.Y, pump.Position.Z, 2f, Globals.DepartmentPumpObjectHash, false)
-									if (position.DistanceToSquared(pump.Position) <= 50000f && !N.DoesObjectOfTypeExistAtCoords(pump.Position.X, pump.Position.Y, pump.Position.Z, 2f, Globals.DepartmentPumpObjectHash))
+					var MainFiber = new GameFiber(delegate
+					{
+						while (true)
+						{
+							foreach (GasPump pump in Globals.DepartmentPumps)
+							{
+								if (pump != null && Game.LocalPlayer.Character != null)
+								{
+									unsafe
 									{
-										position = pump.Position;
-										// float resultArg = 0f;
-										// NativeFunction.CallByHash<int>(0x07503F7948F491A7, pump.Position.X, pump.Position.Y, 1000f);
-										N.RequestCollisionAtCoord(pump.Position.X, pump.Position.Y, 1000f);
-										// NativeFunction.CallByHash<bool>(0xC906A7DAB05C8D2B, pump.Position.X, pump.Position.Y, 1000f, &resultArg, false);
-										float resultArg = N.GetGroundZFor3DCoord(pump.Position.X, pump.Position.Y, 1000f, false);
-										pump.Position.Z = resultArg;
-										Rage.Object obj = new Rage.Object(model.Hash, pump.Position);
-										// obj.Rotation = Common.API.Math.DirectionToRotation(Common.API.Math.HeadingToDirection(pump.Rotation), 0f).ToRotator();
-										if (EntityExtensions.Exists(obj))
+										Vector3 position = Game.LocalPlayer.Character.Position;
+										// if (position.DistanceToSquared(pump.Position) <= 50000f && !NativeFunction.CallByHash<bool>(0xBFA48E2FF417213F, pump.Position.X, pump.Position.Y, pump.Position.Z, 2f, Globals.DepartmentPumpObjectHash, false)
+										if (position.DistanceToSquared(pump.Position) <= 50000f && !N.DoesObjectOfTypeExistAtCoords(pump.Position.X, pump.Position.Y, pump.Position.Z, 2f, Globals.DepartmentPumpObjectHash))
 										{
-											obj.IsInvincible = true;
-											obj.IsPositionFrozen = true;
-											obj.IsExplosionProof = true;
-											obj.IsFireProof = true;
-											obj.IsCollisionProof = true;
+											position = pump.Position;
+											// float resultArg = 0f;
+											// NativeFunction.CallByHash<int>(0x07503F7948F491A7, pump.Position.X, pump.Position.Y, 1000f);
+											N.RequestCollisionAtCoord(pump.Position.X, pump.Position.Y, 1000f);
+											// NativeFunction.CallByHash<bool>(0xC906A7DAB05C8D2B, pump.Position.X, pump.Position.Y, 1000f, &resultArg, false);
+											float resultArg = N.GetGroundZFor3DCoord(pump.Position.X, pump.Position.Y, 1000f, false);
+											pump.Position.Z = resultArg;
+											Rage.Object obj = new Rage.Object(model.Hash, pump.Position);
+											// obj.Rotation = Common.API.Math.DirectionToRotation(Common.API.Math.HeadingToDirection(pump.Rotation), 0f).ToRotator();
+											if (EntityExtensions.Exists(obj))
+											{
+												obj.IsInvincible = true;
+												obj.IsPositionFrozen = true;
+												obj.IsExplosionProof = true;
+												obj.IsFireProof = true;
+												obj.IsCollisionProof = true;
+											}
 										}
 									}
 								}
-							}
 
+							}
+							GameFiber.Yield();
 						}
-						GameFiber.Yield();
-                    }
-				});
-				MainFiber.Start();
+					});
+					MainFiber.Start();
+				}
 			}
 		}
 
