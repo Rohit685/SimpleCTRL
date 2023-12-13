@@ -66,6 +66,7 @@ namespace SimpleCTRL.Handlers
 
         public static bool LeaveEngineOnNotification = true;
         public static bool BrakeOverheatingNotification = true;
+        public static bool RefuelNotification = false;
 
         public static float AircraftLowFuelWarning = 25f;
         public static bool AircraftUseAirportPumps = true;
@@ -152,6 +153,7 @@ namespace SimpleCTRL.Handlers
 
             LeaveEngineOnNotification = val.ReadBoolean("NOTIFICATIONS", "LeaveEngineOnNotification", LeaveEngineOnNotification);
             BrakeOverheatingNotification = val.ReadBoolean("NOTIFICATIONS", "BrakeOverheatingNotification", BrakeOverheatingNotification);
+            RefuelNotification = val.ReadBoolean("NOTIFICATIONS", "RefuelNotification", RefuelNotification);
 
             AircraftLowFuelWarning = Calc.Clamp(Convert.ToSingle(val.ReadDouble("OTHER", "AircraftLowFuelWarning", (double)AircraftLowFuelWarning)), 1f, 100f);
             AircraftUseAirportPumps = val.ReadBoolean("OTHER", "AircraftUseAirportPumps", AircraftUseAirportPumps);

@@ -277,16 +277,22 @@ namespace SimpleCTRL.Utils
                     {
                         if (!IsElectric(vehicle))
                         {
-                            float gallonsPumped = Common.API.Math.ConvertLitresToGallons(Current.FuelAmountPumped);
-                            string fuelMsg = $"Pumped {Math.Round(Current.FuelAmountPumped, 1)} L // {Math.Round(gallonsPumped, 1)} gallons";
-                            Game.DisplayNotification("~o~[FUEL] ~w~" + fuelMsg);
+                            if (ConfigHandler.RefuelNotification == true)
+                            {
+                                float gallonsPumped = Common.API.Math.ConvertLitresToGallons(Current.FuelAmountPumped);
+                                string fuelMsg = $"Pumped {Math.Round(Current.FuelAmountPumped, 1)} L // {Math.Round(gallonsPumped, 1)} gallons";
+                                Game.DisplayNotification("~o~[FUEL] ~w~" + fuelMsg);
+                            }
                             if (Current.TripInfos.ContainsKey(vehicle.Handle.ToInt32()))
                             {
                                 TripInfo t = Current.TripInfos[vehicle.Handle.ToInt32()];
                                 if (t.DistanceTraveledKM > 0f)
                                 {
-                                    string fuelEcon = $"Average: {Math.Round(t.FuelEconomyInLPer100Km, 1)} L/100 km // {Math.Round(t.FuelEconomyInMPG, 1)} MPG";
-                                    Game.DisplayNotification("~o~[FUEL] ~w~" + fuelEcon);
+                                    if (ConfigHandler.RefuelNotification == true)
+                                    {
+                                        string fuelEcon = $"Average: {Math.Round(t.FuelEconomyInLPer100Km, 1)} L/100 km // {Math.Round(t.FuelEconomyInMPG, 1)} MPG";
+                                        Game.DisplayNotification("~o~[FUEL] ~w~" + fuelEcon);
+                                    }
                                 }
                             }
                             if (Current.TripInfos.ContainsKey(vehicle.Handle.ToInt32()))
@@ -365,9 +371,12 @@ namespace SimpleCTRL.Utils
                 }
                 if (Game.IsControlJustReleased(0, GameControl.Context) && Current.FuelAmountPumped > 0f)
                 {
-                    float gallonsPumped = Common.API.Math.ConvertLitresToGallons(Current.FuelAmountPumped);
-                    string fuelMsg = $"Pumped {Math.Round(Current.FuelAmountPumped, 1)} L // {Math.Round(gallonsPumped, 1)} gallons";
-                    Game.DisplayNotification("~o~[FUEL] ~w~" + fuelMsg);
+                    if (ConfigHandler.RefuelNotification == true)
+                    {
+                        float gallonsPumped = Common.API.Math.ConvertLitresToGallons(Current.FuelAmountPumped);
+                        string fuelMsg = $"Pumped {Math.Round(Current.FuelAmountPumped, 1)} L // {Math.Round(gallonsPumped, 1)} gallons";
+                        Game.DisplayNotification("~o~[FUEL] ~w~" + fuelMsg);
+                    }
                     Current.FuelAmountPumped = 0f;
                 }
                 if (Game.LocalPlayer.Character.CurrentVehicle != null)

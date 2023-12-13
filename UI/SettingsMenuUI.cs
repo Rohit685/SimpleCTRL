@@ -1,4 +1,5 @@
 ﻿using Rage;
+using Rage.Attributes;
 using RAGENativeUI;
 using SimpleCTRL.Handlers;
 using System.Drawing;
@@ -33,10 +34,12 @@ namespace SimpleCTRL.UI
         {
             MenuPool.ProcessMenus();
 
-            if (Game.IsKeyDown(System.Windows.Forms.Keys.F8))
-            {
-                mainMenu.Visible = true;
-            }
+        }
+
+        [ConsoleCommand]
+        private static void Command_SettingsMenu()
+        { 
+            mainMenu.Visible = true;
         }
     }
 }
