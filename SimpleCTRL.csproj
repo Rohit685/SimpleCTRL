@@ -84,7 +84,6 @@
     <Compile Include="API\Functions.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Handlers\ControlHandler.cs" />
-    <Compile Include="Handlers\FobHandler.cs" />
     <Compile Include="Handlers\SoundHandler.cs" />
     <Compile Include="Handlers\UIHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
