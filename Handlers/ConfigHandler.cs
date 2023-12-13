@@ -56,7 +56,6 @@ namespace SimpleCTRL.Handlers
         public static ControllerButtons EngineModifierControllerButton = (ControllerButtons)0;
 
         public static bool BlinkersEnabled = true;
-        public static bool EngineEnabled = true;
         public static bool SpeedometerEnabled = true;
 
         public static bool PreventAutomaticReversing = true;
@@ -142,7 +141,6 @@ namespace SimpleCTRL.Handlers
             EngineModifierControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "EngineModifierControllerButton", EngineModifierControllerButton);
 
             BlinkersEnabled = val.ReadBoolean("GENERAL", "BlinkersEnabled", BlinkersEnabled);
-            EngineEnabled = val.ReadBoolean("GENERAL", "EngineEnabled", EngineEnabled);;
             SpeedometerEnabled = val.ReadBoolean("GENERAL", "SpeedometerEnabled", SpeedometerEnabled);
 
             PreventAutomaticReversing = val.ReadBoolean("IMMERSION", "PreventAutomaticReversing", PreventAutomaticReversing);

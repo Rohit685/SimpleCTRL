@@ -402,7 +402,10 @@ namespace SimpleCTRL.Threads
 
                 OnTick();
                 FuelTick();
-                GPSTick();
+                if (ConfigHandler.GlobalPositioningSystem == true)
+                {
+                    GPSTick();
+                }
             }
         }
 
