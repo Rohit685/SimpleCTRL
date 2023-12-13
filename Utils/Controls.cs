@@ -16,22 +16,22 @@ namespace SimpleCTRL.Utils
             {
                 case SimpleControls.LIGHT_INDL:
                     return (ConfigHandler.BlinkerModifierKey == Keys.None || Game.IsKeyDownRightNow(ConfigHandler.BlinkerModifierKey))
-                        && Game.IsKeyDownRightNow(ConfigHandler.LeftBlinkerKey)
+                        && Game.IsKeyDown(ConfigHandler.LeftBlinkerKey)
                         || (ConfigHandler.BlinkerModifierControllerButton == ControllerButtons.None || Game.IsControllerButtonDownRightNow(ConfigHandler.BlinkerModifierControllerButton))
                         && Game.IsControllerButtonDownRightNow(ConfigHandler.LeftBlinkerControllerButton);
                 case SimpleControls.LIGHT_INDR:
                     return (ConfigHandler.BlinkerModifierKey == Keys.None || Game.IsKeyDownRightNow(ConfigHandler.BlinkerModifierKey))
-                        && Game.IsKeyDownRightNow(ConfigHandler.RightBlinkerKey)
+                        && Game.IsKeyDown(ConfigHandler.RightBlinkerKey)
                         || (ConfigHandler.BlinkerModifierControllerButton == ControllerButtons.None || Game.IsControllerButtonDownRightNow(ConfigHandler.BlinkerModifierControllerButton))
                         && Game.IsControllerButtonDownRightNow(ConfigHandler.RightBlinkerControllerButton);
                 case SimpleControls.LIGHT_HAZRD:
                     return (ConfigHandler.BlinkerModifierKey == Keys.None || Game.IsKeyDownRightNow(ConfigHandler.BlinkerModifierKey))
-                        && Game.IsKeyDownRightNow(ConfigHandler.HazardKey)
+                        && Game.IsKeyDown(ConfigHandler.HazardKey)
                         || (ConfigHandler.BlinkerModifierControllerButton == ControllerButtons.None || Game.IsControllerButtonDownRightNow(ConfigHandler.BlinkerModifierControllerButton))
                         && Game.IsControllerButtonDownRightNow(ConfigHandler.HazardControllerButton);
                 case SimpleControls.ENG_TOGGLE:
                     return (ConfigHandler.EngineModifierKey == Keys.None || Game.IsKeyDownRightNow(ConfigHandler.EngineModifierKey))
-                        && Game.IsKeyDownRightNow(ConfigHandler.EngineKey) && !PlayerController.isDisabled
+                        && Game.IsKeyDown(ConfigHandler.EngineKey) && !PlayerController.isDisabled
                         || (ConfigHandler.EngineModifierControllerButton == ControllerButtons.None || Game.IsControllerButtonDownRightNow(ConfigHandler.EngineModifierControllerButton))
                         && Game.IsControllerButtonDownRightNow(ConfigHandler.EngineControllerButton) && !PlayerController.isDisabled;
                 default:
