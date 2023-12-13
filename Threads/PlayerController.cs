@@ -182,8 +182,6 @@ namespace SimpleCTRL.Threads
                 {
                     if (Game.LocalPlayer.Character.CurrentVehicle.Speed < 5f)
                     {
-                        NativeFunction.CallByHash<int>(0x67C540AA08E4A6F5, -1, "Enter", "Cars_Generic", 1);
-
                         N.SetVehicleEngineOn(Game.LocalPlayer.Character.CurrentVehicle, false, false, true);
                     }
                     isDisabled = true;
