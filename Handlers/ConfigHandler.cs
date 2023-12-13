@@ -60,6 +60,7 @@ namespace SimpleCTRL.Handlers
         public static bool SpeedometerEnabled = true;
 
         public static bool PreventAutomaticReversing = true;
+        public static bool GlobalPositioningSystem = false;
         public static bool PreventVehicleFlip = true;
         public static bool TireRentainment = true;
 
@@ -145,6 +146,7 @@ namespace SimpleCTRL.Handlers
             SpeedometerEnabled = val.ReadBoolean("GENERAL", "SpeedometerEnabled", SpeedometerEnabled);
 
             PreventAutomaticReversing = val.ReadBoolean("IMMERSION", "PreventAutomaticReversing", PreventAutomaticReversing);
+            GlobalPositioningSystem = val.ReadBoolean("IMMERSION", "GlobalPositioningSystem", GlobalPositioningSystem);
             PreventVehicleFlip = val.ReadBoolean("IMMERSION", "PreventVehicleFlip", PreventVehicleFlip);
             TireRentainment = val.ReadBoolean("GENERAL", "TireRentainment", TireRentainment);
 
