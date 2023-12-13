@@ -86,23 +86,15 @@
     <Compile Include="Handlers\ControlHandler.cs" />
     <Compile Include="Handlers\FobHandler.cs" />
     <Compile Include="Handlers\SoundHandler.cs" />
-    <Compile Include="Handlers\TextureHandler.cs" />
     <Compile Include="Handlers\UIHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Decorators.cs" />
     <Compile Include="Entrypoint.cs" />
     <Compile Include="Handlers\ConfigHandler.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Threads\PlayerController.cs" />
     <Compile Include="Threads\SpecialModesManager.cs" />
     <Compile Include="UI\CustomUI.cs" />
-    <Compile Include="UI\Resources.cs" />
     <Compile Include="UI\SettingsMenuUI.cs" />
-    <Compile Include="UI\Sprite.cs" />
     <Compile Include="UI\VehicleUI.cs" />
     <Compile Include="Utils\Calc.cs" />
     <Compile Include="Utils\Controls.cs" />
@@ -110,15 +102,6 @@
     <Compile Include="Utils\Helpers.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\LoggingLevel.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\background.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

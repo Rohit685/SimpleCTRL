@@ -1,28 +1,15 @@
 ﻿using Common.Native;
 using RAGENativeUI.TinyTween;
 using Rage;
-using Rage.Native;
 using RAGENativeUI.Elements;
 using System;
 using System.Drawing;
-using System.Xml.Serialization;
 
 namespace SimpleCTRL.UI
 {
-	[XmlRoot("UI")]
 	public class CustomUI
 	{
 		#region Fields
-		[XmlElement("SWidth")]
-		public string SWidth { get; set; } = "403";
-
-		[XmlElement("SHeight")]
-		public string SHeight { get; set; } = "619";
-
-		public int Width { get; set; }
-
-		public int Height { get; set; }
-
 		public static Scaleform buttons = new Scaleform();
 
 		public static float fuelBarWidth = GetBarWidth();

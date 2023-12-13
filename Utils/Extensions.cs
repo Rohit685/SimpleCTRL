@@ -70,17 +70,6 @@ namespace SimpleCTRL.Utils
             return i;
         }
 
-        internal static void Draw(this Sprite sprite, Rage.Graphics graphics)
-        {
-            Texture texture = sprite.Texture;
-            var origRes = Game.Resolution;
-            float aspectRaidou = origRes.Width / (float)origRes.Height;
-            PointF pos = new PointF(sprite.Position.X / (1080 * aspectRaidou), sprite.Position.Y / 1080f);
-            SizeF siz = new SizeF(sprite.Size.Width / (1080 * aspectRaidou), sprite.Size.Height / 1080f);
-            if (texture != null)
-                graphics.DrawTexture(texture, pos.X * Game.Resolution.Width, pos.Y * Game.Resolution.Height, siz.Width * Game.Resolution.Width, siz.Height * Game.Resolution.Height);
-        }
-
 
 
 
