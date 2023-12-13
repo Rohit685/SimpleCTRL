@@ -31,7 +31,6 @@ namespace SimpleCTRL
                 Decorators.Register(decorators);
                 PlayerController.Start();
                 SpecialModesManager.Start();
-                FobHandler.Start();
                 UIHandler.Start();
                 Current.LastWorldTime = DateTime.UtcNow;
                 Functions.CreateDepartmentPumps();
