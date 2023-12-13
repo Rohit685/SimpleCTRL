@@ -333,10 +333,17 @@ namespace SimpleCTRL.Threads
                 {
                     if (Current.TripInfos[x] != null)
                     {
-                        Vehicle v = World.GetEntityByHandle<Vehicle>(new PoolHandle((uint)x));
-                        if (EntityExtensions.Exists(v) && v.IsEngineOn)
+                        try
                         {
-                            v.ConsumeRoadVehicleFuel();
+                            Vehicle v = World.GetEntityByHandle<Vehicle>(new PoolHandle((uint)x));
+                            if (v.Exists() && v.IsEngineOn)
+                            {
+                                v.ConsumeRoadVehicleFuel();
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            return;
                         }
                     }
                 }
