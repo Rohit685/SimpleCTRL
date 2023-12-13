@@ -19,11 +19,6 @@ namespace SimpleCTRL.Threads
         protected const bool _restrictEmergency = false;    // Only allow this feature for emergency vehicles
         protected const bool _keepDoorsOpen = true;         // Keep the door open when getting out
         protected static bool _doorsNotify = false;                // Show notification first time they get any vehicle after joining
-        private static bool isHeld = false;
-        private static int heldTime = 0;
-        private static int requiredTime = 200;
-        private static int elapsedTime = 0;
-        private static int timeout = 0;
 
         // Vehicle Control
         private static bool _isShuffleDisabled = true;
@@ -35,6 +30,10 @@ namespace SimpleCTRL.Threads
         protected bool _areWindowsDown = false;
         protected static float _steeringAngle;
         protected static Vehicle _steeringVeh = null;
+
+        // Instances
+        private static ControlHandler leaveEngineRunning = new ControlHandler();
+        private static ControlHandler turnEngineOn = new ControlHandler();
 
         public static Vehicle vehicle;
         #endregion
@@ -173,15 +172,18 @@ namespace SimpleCTRL.Threads
 
             if (Game.LocalPlayer.Character.IsInAnyVehicle(false))
             {
-                if (Controls.IsControlDownWithModifier(Controls.SimpleControls.ENG_TOGGLE))
+                Func<bool> controlCondition = () => Controls.IsControlDownWithModifier(Controls.SimpleControls.ENG_TOGGLE);
+
+                turnEngineOn.CheckControlHoldDuration(controlCondition, 1000, () =>
                 {
                     if (Game.LocalPlayer.Character.CurrentVehicle.Speed < 5f)
                     {
                         N.SetVehicleEngineOn(Game.LocalPlayer.Character.CurrentVehicle, false, false, true);
                     }
                     isDisabled = true;
-                }
-                else if (Game.IsControlPressed(0, GameControl.VehicleAccelerate) && isDisabled)
+                });
+
+                if (Game.IsControlPressed(0, GameControl.VehicleAccelerate) && isDisabled)
                 {
                     N.SetVehicleEngineOn(Game.LocalPlayer.Character.CurrentVehicle, true, false, false);
                     isDisabled = false;
@@ -386,36 +388,18 @@ namespace SimpleCTRL.Threads
                 if (isInVehicle && ClientPed.IsAlive && currentVehicle.Class != VehicleClass.Helicopter &&
     currentVehicle.Class != VehicleClass.Plane)
                 {
+                    Func<bool> controlCondition = () => N.IsDisabledControlPressed(0, (int)GameControl.VehicleExit);
+
                     Game.DisableControlAction(0, GameControl.VehicleExit, true);
 
-                    if (timeout > 0) timeout--;
-
-                    if (N.IsDisabledControlPressed(0, (int)GameControl.VehicleExit) && timeout <= 0)
+                    leaveEngineRunning.CheckControlHoldDuration(controlCondition, 200, () => 
                     {
-                        if (!isHeld)
-                        {
-                            isHeld = true;
-                            heldTime = (int)Game.GameTime;
-                        }
-                        else
-                        {
-                            elapsedTime = (int)(Game.GameTime - heldTime);
-
-                            if (elapsedTime >= requiredTime)
-                            {
-                                currentVehicle.IsEngineOn = true;
-                                ClientPed.Tasks.LeaveVehicle(LeaveVehicleFlags.LeaveDoorOpen); 
-                            }
-                        }
-                    }
-                    else
+                        currentVehicle.IsEngineOn = true;
+                        ClientPed.Tasks.LeaveVehicle(LeaveVehicleFlags.LeaveDoorOpen);
+                    }, () =>
                     {
-                        if (isHeld && elapsedTime <= requiredTime)
-                        {
-                            ClientPed.Tasks.LeaveVehicle(LeaveVehicleFlags.None);
-                        }
-                        isHeld = false;
-                    }
+                        ClientPed.Tasks.LeaveVehicle(LeaveVehicleFlags.None);
+                    });
                 }
             }
             #endregion

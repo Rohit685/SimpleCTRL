@@ -8,7 +8,9 @@ namespace SimpleCTRL.Utils
 {
     internal class Controls
     {
+        #region 
         private static Dictionary<SimpleControls, Keys> listKeys = new Dictionary<SimpleControls, Keys>();
+        #endregion
 
         public static bool IsControlDownWithModifier(SimpleControls controls)
         {
@@ -31,7 +33,7 @@ namespace SimpleCTRL.Utils
                         && Game.IsControllerButtonDownRightNow(ConfigHandler.HazardControllerButton);
                 case SimpleControls.ENG_TOGGLE:
                     return (ConfigHandler.EngineModifierKey == Keys.None || Game.IsKeyDownRightNow(ConfigHandler.EngineModifierKey))
-                        && Game.IsKeyDown(ConfigHandler.EngineKey) && !PlayerController.isDisabled
+                        && Game.IsKeyDownRightNow(ConfigHandler.EngineKey) && !PlayerController.isDisabled
                         || (ConfigHandler.EngineModifierControllerButton == ControllerButtons.None || Game.IsControllerButtonDownRightNow(ConfigHandler.EngineModifierControllerButton))
                         && Game.IsControllerButtonDownRightNow(ConfigHandler.EngineControllerButton) && !PlayerController.isDisabled;
                 default:
