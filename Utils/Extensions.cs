@@ -403,9 +403,7 @@ namespace SimpleCTRL.Utils
             return (int)poolHandle.Value;
         }
 
-        public static string FormatKeyBinding(Keys modifierKey, Keys key)
-   => modifierKey == Keys.None ? $"{key.GetInstructionalId()}" :
-                                 $"{modifierKey.GetInstructionalId()} ~+~ {key.GetInstructionalId()}";
+        public static string FormatKeyBinding(Keys key) => $"{key.GetInstructionalId()}";
 
         #region Ped Extensions
         internal static void ManualRefuel(this Ped playerPed)

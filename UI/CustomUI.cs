@@ -64,7 +64,7 @@ namespace SimpleCTRL.UI
 			}
 		}
 
-		private static string EngineKeyFormat { get; set; } = Extensions.FormatKeyBinding(ConfigHandler.EngineModifierKey, ConfigHandler.EngineKey);
+		private static string EngineKeyFormat { get; set; } = Extensions.FormatKeyBinding(ConfigHandler.EngineKey);
 		#endregion
 
 		public static void RenderBar(float currentFuelLevel, float maxFuelLevel, bool isElectric)

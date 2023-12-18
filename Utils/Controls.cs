@@ -32,10 +32,8 @@ namespace SimpleCTRL.Utils
                         || (ConfigHandler.BlinkerModifierControllerButton == ControllerButtons.None || Game.IsControllerButtonDownRightNow(ConfigHandler.BlinkerModifierControllerButton))
                         && Game.IsControllerButtonDownRightNow(ConfigHandler.HazardControllerButton);
                 case SimpleControls.ENG_TOGGLE:
-                    return (ConfigHandler.EngineModifierKey == Keys.None || Game.IsKeyDownRightNow(ConfigHandler.EngineModifierKey))
-                        && Game.IsKeyDownRightNow(ConfigHandler.EngineKey) && !PlayerController.isDisabled
-                        || (ConfigHandler.EngineModifierControllerButton == ControllerButtons.None || Game.IsControllerButtonDownRightNow(ConfigHandler.EngineModifierControllerButton))
-                        && Game.IsControllerButtonDownRightNow(ConfigHandler.EngineControllerButton) && !PlayerController.isDisabled;
+                    return Game.IsKeyDownRightNow(ConfigHandler.EngineKey) && !PlayerController.isDisabled
+                        || Game.IsControllerButtonDownRightNow(ConfigHandler.EngineControllerButton) && !PlayerController.isDisabled;
                 default:
                     return false;
             }
