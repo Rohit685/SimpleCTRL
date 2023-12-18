@@ -47,6 +47,7 @@ namespace SimpleCTRL.Handlers
         public static Keys BlinkerModifierKey = Keys.None;
         public static Keys EngineKey = Keys.None;
         public static Keys EngineModifierKey = Keys.None;
+        public static Keys RefuelKey = Keys.None;
 
         public static ControllerButtons HazardControllerButton = (ControllerButtons)0;
         public static ControllerButtons LeftBlinkerControllerButton = (ControllerButtons)0;
@@ -54,6 +55,7 @@ namespace SimpleCTRL.Handlers
         public static ControllerButtons BlinkerModifierControllerButton = (ControllerButtons)0;
         public static ControllerButtons EngineControllerButton = (ControllerButtons)0;
         public static ControllerButtons EngineModifierControllerButton = (ControllerButtons)0;
+        public static ControllerButtons RefuelControllerButton = (ControllerButtons)0;
 
         public static bool SpeedometerEnabled = true;
 
@@ -134,6 +136,7 @@ namespace SimpleCTRL.Handlers
             BlinkerModifierKey = GetKeysFromString(val.ReadString("CONTROLS", "BlinkerModifierKey", ""), BlinkerModifierKey);
             EngineKey = GetKeysFromString(val.ReadString("CONTROLS", "EngineKey", ""), EngineKey);
             EngineModifierKey = GetKeysFromString(val.ReadString("CONTROLS", "EngineModifierKey", ""), EngineModifierKey);
+            RefuelKey = GetKeysFromString(val.ReadString("CONTROLS", "RefuelKey", ""), RefuelKey);
 
             HazardControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "HazardControllerButton", HazardControllerButton);
             LeftBlinkerControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "LeftBlinkerControllerButton", LeftBlinkerControllerButton);
@@ -141,6 +144,7 @@ namespace SimpleCTRL.Handlers
             BlinkerModifierControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "BlinkerModifierControllerButton", BlinkerModifierControllerButton);
             EngineControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "EngineControllerButton", EngineControllerButton);
             EngineModifierControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "EngineModifierControllerButton", EngineModifierControllerButton);
+            RefuelControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "RefuelControllerButton",RefuelControllerButton);
 
             SpeedometerEnabled = val.ReadBoolean("DISPLAY", "SpeedometerEnabled", SpeedometerEnabled);
 
