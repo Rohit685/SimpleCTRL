@@ -4,6 +4,8 @@ using Rage;
 using RAGENativeUI.Elements;
 using System;
 using System.Drawing;
+using SimpleCTRL.Handlers;
+using SimpleCTRL.Utils;
 
 namespace SimpleCTRL.UI
 {
@@ -61,6 +63,8 @@ namespace SimpleCTRL.UI
 				fuelBar.Position = fuelBarBack.Position;
 			}
 		}
+
+		private static string EngineKeyFormat { get; set; } = Extensions.FormatKeyBinding(ConfigHandler.EngineModifierKey, ConfigHandler.EngineKey);
 		#endregion
 
 		public static void RenderBar(float currentFuelLevel, float maxFuelLevel, bool isElectric)
@@ -137,12 +141,12 @@ namespace SimpleCTRL.UI
 
 		public static void InstructToggleEngine()
         {
+			Game.LogTrivial(EngineKeyFormat);
 			buttons.Load("instructional_buttons");
 			buttons.CallFunction("CLEAR_ALL");
 			buttons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
 			buttons.CallFunction("CREATE_CONTAINER");
-			// buttons.CallFunction("SET_DATA_SLOT", 0, NativeFunction.CallByHash(0x0499D7B09FC9B407, typeof(string), 2, 183, 0), "Toggle engine
-			buttons.CallFunction("SET_DATA_SLOT", 0, N.Get​Control​Instructional​Buttons​String(2, 183, false), "Toggle engine");
+			buttons.CallFunction("SET_DATA_SLOT", 0, EngineKeyFormat, "Toggle engine");
 			buttons.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
 		}
 

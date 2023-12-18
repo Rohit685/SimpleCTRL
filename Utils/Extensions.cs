@@ -3,6 +3,7 @@ using Common.Models;
 using Common.Native;
 using Rage;
 using Rage.Native;
+using RAGENativeUI;
 using SimpleCTRL.API;
 using SimpleCTRL.Handlers;
 using SimpleCTRL.UI;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows.Forms;
 
 namespace SimpleCTRL.Utils
 {
@@ -400,6 +402,10 @@ namespace SimpleCTRL.Utils
         {
             return (int)poolHandle.Value;
         }
+
+        public static string FormatKeyBinding(Keys modifierKey, Keys key)
+   => modifierKey == Keys.None ? $"{key.GetInstructionalId()}" :
+                                 $"{modifierKey.GetInstructionalId()} ~+~ {key.GetInstructionalId()}";
 
         #region Ped Extensions
         internal static void ManualRefuel(this Ped playerPed)
