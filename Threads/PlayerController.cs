@@ -19,7 +19,6 @@ namespace SimpleCTRL.Threads
         protected const bool _restrictEmergency = false;    // Only allow this feature for emergency vehicles
         protected const bool _keepDoorsOpen = true;         // Keep the door open when getting out
         protected static bool _doorsNotify = false;                // Show notification first time they get any vehicle after joining
-        protected static bool _seatBeltOn = Game.LocalPlayer.Character.CanFlyThroughWindshields;
             
         // Vehicle Control
         private static bool _isShuffleDisabled = true;
@@ -427,6 +426,7 @@ namespace SimpleCTRL.Threads
 
                 Vehicle currentVehicle = ClientPed.LastVehicle;
                 bool isInVehicle = ClientPed.IsInAnyVehicle(false);
+                bool _seatBeltOn = ClientPed.CanFlyThroughWindshields;
 
                 if (_restrictEmergency && currentVehicle.Class != VehicleClass.Emergency)
                 {
@@ -441,10 +441,11 @@ namespace SimpleCTRL.Threads
                     _doorsNotify = true;
                 }
 
-                if (isInVehicle && ClientPed.IsAlive && currentVehicle.Class != VehicleClass.Helicopter &&
-    currentVehicle.Class != VehicleClass.Plane)
+                if (isInVehicle && ClientPed.IsAlive && currentVehicle.Class != VehicleClass.Helicopter && currentVehicle.Class != VehicleClass.Plane)
                 {
-                    Func<bool> controlCondition = () => !_seatBeltOn && N.IsDisabledControlPressed(0, (int)GameControl.VehicleExit);
+                    Func<bool> controlCondition = () =>
+                        N.IsDisabledControlPressed(0, (int)GameControl.VehicleExit) &&
+                        _seatBeltOn; 
 
                     Game.DisableControlAction(0, GameControl.VehicleExit, true);
 
