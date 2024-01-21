@@ -141,12 +141,15 @@ namespace SimpleCTRL.API
 			#region Repair Shops
 			foreach (RepairShop repairShop in ConfigHandler.RepairShops)
             {
-				Blip blip = new Blip(repairShop.Position);
-				blip.Sprite = (BlipSprite)446;
-				blip.Scale = 1f;
-				NativeFunction.CallByHash<int>(0xBE8BE4FE60E27B72, blip, true); // SET_BLIP_AS_SHORT_RANGE
-				blip.Name = "Repair Shop";
-				RepairShop.mechanicBlips.Add(blip);
+				if (repairShop.ShowBlip == true)
+                {
+					Blip blip = new Blip(repairShop.Position);
+					blip.Sprite = (BlipSprite)446;
+					blip.Scale = 1f;
+					NativeFunction.CallByHash<int>(0xBE8BE4FE60E27B72, blip, true); // SET_BLIP_AS_SHORT_RANGE
+					blip.Name = "Repair Shop";
+					RepairShop.mechanicBlips.Add(blip);
+				}
 			}
 			#endregion
 		}
