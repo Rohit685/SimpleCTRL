@@ -45,7 +45,7 @@ namespace SimpleCTRL.Handlers
         public static Keys LeftBlinkerKey = Keys.None;
         public static Keys RightBlinkerKey = Keys.None;
         public static Keys BlinkerModifierKey = Keys.None;
-        public static Keys EngineKey = Keys.None;
+        public static Keys EngineToggleKey = Keys.None;
         public static Keys RefuelKey = Keys.None;
 
         public static ControllerButtons HazardControllerButton = (ControllerButtons)0;
@@ -132,7 +132,7 @@ namespace SimpleCTRL.Handlers
             LeftBlinkerKey = GetKeysFromString(val.ReadString("CONTROLS", "LeftBlinkerKey", ""), LeftBlinkerKey);
             RightBlinkerKey = GetKeysFromString(val.ReadString("CONTROLS", "RightBlinkerKey", ""), RightBlinkerKey);
             BlinkerModifierKey = GetKeysFromString(val.ReadString("CONTROLS", "BlinkerModifierKey", ""), BlinkerModifierKey);
-            EngineKey = GetKeysFromString(val.ReadString("CONTROLS", "EngineKey", ""), EngineKey);
+            EngineToggleKey = GetKeysFromString(val.ReadString("CONTROLS", "EngineToggleKey", ""), EngineToggleKey);
             RefuelKey = GetKeysFromString(val.ReadString("CONTROLS", "RefuelKey", ""), RefuelKey);
 
             HazardControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "HazardControllerButton", HazardControllerButton);

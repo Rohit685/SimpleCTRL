@@ -32,8 +32,11 @@ namespace SimpleCTRL.Utils
                         || (ConfigHandler.BlinkerModifierControllerButton == ControllerButtons.None || Game.IsControllerButtonDownRightNow(ConfigHandler.BlinkerModifierControllerButton))
                         && Game.IsControllerButtonDownRightNow(ConfigHandler.HazardControllerButton);
                 case SimpleControls.ENG_TOGGLE:
-                    return Game.IsKeyDownRightNow(ConfigHandler.EngineKey) && !PlayerController.isDisabled
+                    return Game.IsKeyDownRightNow(ConfigHandler.EngineToggleKey) && !PlayerController.isDisabled
                         || Game.IsControllerButtonDownRightNow(ConfigHandler.EngineControllerButton) && !PlayerController.isDisabled;
+                case SimpleControls.REFUEL:
+                    return Game.IsKeyDownRightNow(ConfigHandler.RefuelKey)
+                        || Game.IsControllerButtonDownRightNow(ConfigHandler.RefuelControllerButton);
                 default:
                     return false;
             }
@@ -45,6 +48,7 @@ namespace SimpleCTRL.Utils
             LIGHT_INDR,
             LIGHT_HAZRD,
             ENG_TOGGLE,
+            REFUEL,
         }
     }
 }

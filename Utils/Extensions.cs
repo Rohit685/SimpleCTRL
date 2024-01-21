@@ -250,13 +250,15 @@ namespace SimpleCTRL.Utils
                 {
                     if (fuel >= Current.VehicleFuelCapacity)
                     {
-                        // CustomUI.InstructFullOrEmpty("Fuel tank full");
+                        // CustomUI.InstructFullOrEmpty("Fuel tank full")
+                        CustomUI.HideRefuel();
                     }
                     else
                     {
-                        CustomUI.InstructRefuel(GameControl.Context);
+                        CustomUI.InstructRefuel();
                     }
-                    if (Game.IsControlPressed(0, GameControl.Context))
+                    // if (Game.IsControlPressed(0, GameControl.Context))
+                    if (Controls.IsControlDownWithModifier(Controls.SimpleControls.REFUEL))
                     {
                         if (fuel < Current.VehicleFuelCapacity)
                         {
@@ -360,7 +362,7 @@ namespace SimpleCTRL.Utils
             }
             if (IsVehicleNearAnyTankerOrFuelPump(vehicle))
             {
-                CustomUI.InstructRefuel(GameControl.Context);
+                CustomUI.InstructRefuel();
                 if (Game.IsControlPressed(0, GameControl.Context))
                 {
                     float pumpRate = MaxFuelLevel(vehicle) * 0.001f;
@@ -402,6 +404,8 @@ namespace SimpleCTRL.Utils
         {
             return (int)poolHandle.Value;
         }
+
+        public static string FormatKeyBinding(ControllerButtons key) => $"{key.GetInstructionalId()}";
 
         public static string FormatKeyBinding(Keys key) => $"{key.GetInstructionalId()}";
 

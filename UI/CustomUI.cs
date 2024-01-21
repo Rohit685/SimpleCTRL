@@ -6,6 +6,7 @@ using System;
 using System.Drawing;
 using SimpleCTRL.Handlers;
 using SimpleCTRL.Utils;
+using Rage.Native;
 
 namespace SimpleCTRL.UI
 {
@@ -64,7 +65,12 @@ namespace SimpleCTRL.UI
 			}
 		}
 
-		private static string EngineKeyFormat { get; set; } = Extensions.FormatKeyBinding(ConfigHandler.EngineKey);
+		private static string EngineKeyFormat { get; set; } = Extensions.FormatKeyBinding(ConfigHandler.EngineToggleKey);
+		private static string EngineButtonFormat { get; set; } = Extensions.FormatKeyBinding(ConfigHandler.EngineControllerButton);
+		private static string RefuelKeyFormat { get; set; } = Extensions.FormatKeyBinding(ConfigHandler.RefuelKey);
+		private static string RefuelButtonFormat { get; set; } = Extensions.FormatKeyBinding(ConfigHandler.RefuelControllerButton);
+
+		private static bool IsUsingController => !NativeFunction.Natives.xA571D46727E2B718<bool>(2);
 		#endregion
 
 		public static void RenderBar(float currentFuelLevel, float maxFuelLevel, bool isElectric)
@@ -141,23 +147,35 @@ namespace SimpleCTRL.UI
 
 		public static void InstructToggleEngine()
         {
-			Game.LogTrivial(EngineKeyFormat);
 			buttons.Load("instructional_buttons");
 			buttons.CallFunction("CLEAR_ALL");
 			buttons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
 			buttons.CallFunction("CREATE_CONTAINER");
-			buttons.CallFunction("SET_DATA_SLOT", 0, EngineKeyFormat, "Toggle engine");
+			if (IsUsingController)
+            {
+				buttons.CallFunction("SET_DATA_SLOT", 0, EngineButtonFormat, "Toggle engine");
+			} 
+			else
+            {
+				buttons.CallFunction("SET_DATA_SLOT", 0, EngineKeyFormat, "Toggle engine");
+			}
 			buttons.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
 		}
 
-		public static void InstructRefuel(GameControl control)
+		public static void InstructRefuel()
 		{
 			buttons.Load("instructional_buttons");
 			buttons.CallFunction("CLEAR_ALL");
 			buttons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
 			buttons.CallFunction("CREATE_CONTAINER");
-			// buttons.CallFunction("SET_DATA_SLOT", 0, NativeFunction.CallByHash(0x0499D7B09FC9B407, typeof(string), 2, (int)control, 0), "Refuel");
-			buttons.CallFunction("SET_DATA_SLOT", 0, N.GetControlInstructionalButtonsString(2, (int)control, false), "Refuel");
+			if (IsUsingController)
+            {
+				buttons.CallFunction("SET_DATA_SLOT", 0, RefuelButtonFormat, "Refuel");
+			}
+			else
+            {
+				buttons.CallFunction("SET_DATA_SLOT", 0, RefuelKeyFormat, "Refuel");
+			}
 			buttons.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
 		}
 
@@ -170,6 +188,12 @@ namespace SimpleCTRL.UI
 			// buttons.CallFunction("SET_DATA_SLOT", 0, NativeFunction.CallByHash(0x0499D7B09FC9B407, typeof(string), 2, 0, 0), fuel);
 			buttons.CallFunction("SET_DATA_SLOT", 0, N.GetControlInstructionalButtonsString(2, 0, false), fuel);
 			buttons.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
+		}
+
+		// possibly change in future but fine for now should use instructfull or empty
+		public static void HideRefuel()
+        {
+			buttons.CallFunction("CLEAR_ALL");
 		}
 
 		public static void RenderInstructions()
