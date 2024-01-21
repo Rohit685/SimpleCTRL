@@ -9,7 +9,6 @@ using SimpleCTRL.Handlers;
 using SimpleCTRL.UI;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;

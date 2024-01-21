@@ -1,6 +1,7 @@
 ﻿using Common;
 using Common.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Rage;
 using SimpleCTRL.Utils;
 using System;
@@ -92,6 +93,7 @@ namespace SimpleCTRL.Handlers
             LoadLocalStations();
             LoadAircraftFuelPumps();
             LoadPumps();
+            LoadRepairShops();
             LogConfig();
         }
 
@@ -173,29 +175,7 @@ namespace SimpleCTRL.Handlers
                 1.0f, 1.0f, 1.0f, 0.95f, 1.0f, 0.95f, 0.95f, 0.95f, 0.27f, 0.7f, 0.25f, 0.35f, 0.85f, 1.0f, 0.4f, 0.7f, 0.7f, 0.75f, 0.05f, 0.67f, 0.43f, 1.0f
             };
 
-            RepairShops = new List<RepairShop> {
-                new RepairShop(-337f, -135f, 39f, 25f, "LSC Burton"),
-                new RepairShop(-1155f, -2007f, 13f, 25f, "LSC by airport"),
-                new RepairShop(734f, -1085f, 22f, 25f, "LSC La Mesa"),
-                new RepairShop(1177f, 2649f, 37f, 25f, "LSC Harmony"),
-                new RepairShop(108f, 6624f, 31f, 25f, "LSC Paleto Bay"),
-                new RepairShop(538f, -183f, 54f, 18f, "Mechanic Hawic"),
-                new RepairShop(1774f, 3333f, 41f, 15f, "Mechanic Sandy Shores Airfield"),
-                new RepairShop(1143f, -776f, 57f, 15f, "Mechanic Mirror Park"),
-                new RepairShop(2508f, 4103f, 38f, 30f, "Mechanic East Joshua Rd."),
-                new RepairShop(2006f, 3792f, 32f, 16f, "Mechanic Sandy SHores Gas Station"),
-                new RepairShop(484f, -1316f, 29f, 25f, "Hayes Auto, Little Bighorn Ave."),
-                new RepairShop(-1419, -450f, 36f, 33f, "Hayes Auto Body Shop, Del Perro"),
-                new RepairShop(268f, -1810f, 27f, 33f, "Hayes Auto Body Shop, Davis"),
-                new RepairShop(1915f, 3729f, 32f, 27f, "Otto's Auto Parts, Sandy Shores"),
-                new RepairShop(-29f, -1665f, 29f, 45f, "Mosley Auto Service, Strawberry"),
-                new RepairShop(-212f, -1378f, 31f, 44f, "Glass Heroes, Strawberry"),
-                new RepairShop(258f, 2594f, 44f, 33f, "Mechanic Harmony"),
-                new RepairShop(-32f, -1090f, 26f, 18f, "Simeons"),
-                new RepairShop(-211f, -1325f, 31f, 25f, "Bennys"),
-                new RepairShop(903f, 3563f, 34f, 25f, "Auto Repair, Grand Senora Desert"),
-                new RepairShop(437f, 3568f, 38f, 25f, "Auto Shop, Grand Senora Desert"),
-            };
+            RepairShops = new List<RepairShop>();
 
             FixMessages = new List<string>
             {
@@ -225,7 +205,7 @@ namespace SimpleCTRL.Handlers
             string json = null;
             try
             {
-                json = File.ReadAllText("plugins/SimpleCTRL/AircraftSpecs.json") ?? "[]";
+                json = File.ReadAllText("plugins/SimpleCTRL/data/AircraftSpecs.json") ?? "[]";
 
                 if (!string.IsNullOrWhiteSpace(json))
                 {
@@ -243,7 +223,7 @@ namespace SimpleCTRL.Handlers
             string json = null;
             try
             {
-                json = File.ReadAllText("plugins/SimpleCTRL/GasStations.json") ?? "[]";
+                json = File.ReadAllText("plugins/SimpleCTRL/data/GasStations.json") ?? "[]";
 
                 if (!string.IsNullOrWhiteSpace(json))
                 {
@@ -261,7 +241,7 @@ namespace SimpleCTRL.Handlers
             string json = null;
             try
             {
-                json = File.ReadAllText("plugins/SimpleCTRL/DepartmentPumps.json") ?? "[]";
+                json = File.ReadAllText("plugins/SimpleCTRL/data/DepartmentPumps.json") ?? "[]";
 
                 if (!string.IsNullOrWhiteSpace(json))
                 {
@@ -287,7 +267,7 @@ namespace SimpleCTRL.Handlers
             string json = null;
             try
             {
-                json = File.ReadAllText("plugins/SimpleCTRL/GasStations.Local.json") ?? "[]";
+                json = File.ReadAllText("plugins/SimpleCTRL/data/GasStations.Local.json") ?? "[]";
 
                 if (!string.IsNullOrWhiteSpace(json))
                 {
@@ -306,12 +286,45 @@ namespace SimpleCTRL.Handlers
             string json = null;
             try
             {
-                json = File.ReadAllText("plugins/SimpleCTRL/GasStations.Aircraft.json") ?? "[]";
+                json = File.ReadAllText("plugins/SimpleCTRL/data/GasStations.Aircraft.json") ?? "[]";
 
                 if (!string.IsNullOrWhiteSpace(json))
                 {
                     List<AirportFuelPump> list = JsonConvert.DeserializeObject<List<AirportFuelPump>>(json);
                     Globals.AirportFuelPumps.AddRange(list);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        private static void LoadRepairShops()
+        {
+            string json = null;
+            try
+            {
+                json = File.ReadAllText("plugins/SimpleCTRL/data/RepairShops.json") ?? "[]";
+
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    JObject repairShopData = JsonConvert.DeserializeObject<JObject>(json);
+
+                    foreach (var property in repairShopData.Properties())
+                    {
+                        if (property.Value is JObject propertyObject)
+                        {
+                            int x = propertyObject.Value<int>("X");
+                            int y = propertyObject.Value<int>("Y");
+                            int z = propertyObject.Value<int>("Z");
+                            int useRange = propertyObject.Value<int>("UseRange");
+
+                            RepairShops.Add(new RepairShop(
+                                x, y, z, useRange, property.Name
+                            ));
+                        }
+                    }
                 }
             }
             catch (Exception ex)
