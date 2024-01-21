@@ -318,10 +318,11 @@ namespace SimpleCTRL.Handlers
                             int x = propertyObject.Value<int>("X");
                             int y = propertyObject.Value<int>("Y");
                             int z = propertyObject.Value<int>("Z");
+                            bool blip = propertyObject.Value<bool>("Blip");
                             int useRange = propertyObject.Value<int>("UseRange");
 
                             RepairShops.Add(new RepairShop(
-                                x, y, z, useRange, property.Name
+                                x, y, z, useRange, blip, property.Name
                             ));
                         }
                     }
