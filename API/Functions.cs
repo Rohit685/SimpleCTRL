@@ -1,5 +1,4 @@
 ﻿using Common;
-using Common.Models;
 using Common.Native;
 using Rage;
 using Rage.Native;
@@ -177,7 +176,21 @@ namespace SimpleCTRL.API
 			}
 			RepairShop.mechanicBlips.Clear();
             #endregion
-        }
+
+            #region Parked Vehicle
+            if (Globals.isParked)
+            {
+				Vehicle playerVeh = Game.LocalPlayer.Character.CurrentVehicle;
+
+				if (!EntityExtensions.Exists(playerVeh))
+				{
+					return;
+				}
+
+				Extensions.DeleteVehicleBlip(playerVeh);
+			}
+            #endregion
+		}
 
 		public static void CreateDepartmentPumps()
 		{
