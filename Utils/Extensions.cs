@@ -329,11 +329,20 @@ namespace SimpleCTRL.Utils
 
         public static float RandomizeFuelLevel(this Vehicle veh, float fuelCapacity)
         {
-            float min = fuelCapacity / 4f;
-            float max = fuelCapacity / 2f;
-            float randomizedFuelLevel = (float)(new Random().NextDouble() * (double)(max - min) + (double)min);
+            float randomizedFuelLevel;
+            if (new Random().Next(0, 4) != 0) 
+            {
+                float min = fuelCapacity / 4f;
+                float max = fuelCapacity / 2f;
+                randomizedFuelLevel = (float)(new Random().NextDouble() * (double)(max - min) + (double)min);
+            }
+            else
+            {
+                randomizedFuelLevel = fuelCapacity; 
+            }
             return randomizedFuelLevel;
         }
+
 
         public static void SetFuelLevel(this Vehicle vehicle, float fuelLevel)
         {
