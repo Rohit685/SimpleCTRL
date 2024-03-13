@@ -26,7 +26,7 @@ namespace SimpleCTRL.Handlers
                     output.Stop();
                 }
 
-                output.Volume = N.GetProfileSetting(300) / 20f;
+                reader.Volume = N.GetProfileSetting(300) / 20f;
                 output.Init(reader);
                 output.Play();
             }
@@ -87,7 +87,13 @@ namespace SimpleCTRL.Handlers
             switch (audio)
             {
                 case Audio.LowFuel:
-                    return "lowfuel.wav";
+                    return "LOW_FUEL.wav";
+                case Audio.Indicator:
+                    return "INDICATOR.wav";
+                case Audio.ShiftParkPull:
+                    return "SHIFT_PARK_PULL_01.wav";
+                case Audio.ShiftParkRelease:
+                    return "SHIFT_PARK_RELEASE_01.wav";
                 case Audio.Arrived:
                     return "UHAVEARRIVED.wav";
                 default:
@@ -99,6 +105,9 @@ namespace SimpleCTRL.Handlers
         public enum Audio
         {
             LowFuel,
+            Indicator,
+            ShiftParkPull,
+            ShiftParkRelease,
             Arrived
         }
     }

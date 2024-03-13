@@ -24,7 +24,7 @@ namespace SimpleCTRL.UI
             N.HideHudComponentThisFrame(8);
 
             #region Car Hud
-            if (_playerVehicle != null && !N.IsHudHidden())
+            if (_playerVehicle != null && _playerVehicle.Class != VehicleClass.Cycle && !N.IsHudHidden())
             {
                 string vehPlate = _playerVehicle.LicensePlate;
 
@@ -52,8 +52,19 @@ namespace SimpleCTRL.UI
                     Text.Draw(0.875f, -0.01f, .4f, $"~w~feet", Color.White); // TXT: Altitude Unit
                 }
 
-                Text.Draw(.5f, .045f, 0.55f, $"~w~{vehPlate}", Color.White, Alignment.Center); // TXT: Plate
-                Text.Draw(1f, .065f, .45f, vehEngineRunning ? "~g~ENG" : "~r~ENG", Color.White, Alignment.Right); // TXT: Engine
+                if (ConfigHandler.LicensePlateEnabled) Text.Draw(.5f, .045f, 0.55f, $"~w~{vehPlate}", Color.White, Alignment.Center);  // TXT: Plate
+
+                if (ConfigHandler.EngStatusEnabled)
+                {
+                    if (ConfigHandler.ParkIndicatorEnabled && !Globals.disallowedClasses.Contains(_playerVehicle.Class))
+                    {
+                        Text.Draw(0.87f, .065f, .45f, vehEngineRunning ? "~g~ENG" : "~r~ENG", Color.White, Alignment.Right); // TXT: Engine
+                    }
+                    else
+                    {
+                        Text.Draw(1f, .065f, .45f, vehEngineRunning ? "~g~ENG" : "~r~ENG", Color.White, Alignment.Right); // TXT: Engine
+                    }
+                }
 
                 Text.Draw(.15f, .04f, .45f, vehBurnout ? "~r~DSC" : "DSC", Color.White); // TXT: DSC
 
@@ -68,6 +79,11 @@ namespace SimpleCTRL.UI
                 else
                 {
                     Text.Draw(1f, .04f, .45f, "AC", Color.White, Alignment.Right); // TXT: AC 
+                }
+
+                if (ConfigHandler.ParkIndicatorEnabled)
+                {
+                    Text.Draw(0.99f, .065f, .45f, Globals.isParked ? "~r~P" : "", Color.White, Alignment.Right); // TXT: Current Gear
                 }
 
                 if (vehEngineHealth < 110)

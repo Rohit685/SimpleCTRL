@@ -1,6 +1,5 @@
 ﻿using Common;
 using Common.Elements;
-using Common.Models;
 using Common.Native;
 using Rage;
 using Rage.Native;
@@ -45,11 +44,25 @@ namespace SimpleCTRL.Threads
 
                 if (currentVehicle.Exists() && currentVehicle.Speed < 0.1)
                 {
-                    N.SetVehicleBrakeLights(currentVehicle, true);
+                    if (Globals.isParked)
+                    {
+                        N.SetVehicleBrakeLights(currentVehicle, false);
+                    }
+                    else
+                    {
+                        N.SetVehicleBrakeLights(currentVehicle, true);
+                    }
                 }
                 else if (lastVehicle.Exists() && lastVehicle.Speed < 0.1)
                 {
-                    N.SetVehicleBrakeLights(currentVehicle, true);
+                    if (Globals.isParked)
+                    {
+                        N.SetVehicleBrakeLights(lastVehicle, false);
+                    }
+                    else
+                    {
+                        N.SetVehicleBrakeLights(lastVehicle, true);
+                    }
                 }
             }
         }
@@ -206,69 +219,72 @@ namespace SimpleCTRL.Threads
                     Text.Draw3D(_lastVehicle.GetBonePosition(boneIndex), "Press [E] to repair", 0.065f);
                 }
 
-                if (Game.IsKeyDown(System.Windows.Forms.Keys.E) && !Game.LocalPlayer.Character.IsInAnyVehicle(false))
+                if (_lastVehicle != _repairedVehicle)
                 {
-                    int boneIndex = _lastVehicle.GetBoneIndex("bonnet");
-                    if (player.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) > 2.5f)
+                    if (Game.IsKeyDown(System.Windows.Forms.Keys.E) && !Game.LocalPlayer.Character.IsInAnyVehicle(false))
                     {
-                        prompt = true;
-                    }
-                    else
-                    {
-                        prompt = false;
-                        if (_lastVehicle.OilLevel() <= 0)
+                        int boneIndex = _lastVehicle.GetBoneIndex("bonnet");
+                        if (player.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) > 2.5f)
                         {
-                            Logging.Debug($"Failed to repair: too damaged. {_lastVehicle.OilLevel()}", "SpecialModesManager");
-                            Game.DisplayNotification("~r~Your vehicle was too badly damaged. Unable to repair!");
-                            return;
+                            prompt = true;
                         }
-                        else if (_lastVehicle.EngineHealth > ConfigHandler.CascadingFailureThreshold + 5)
+                        else
                         {
-                            Logging.Debug($"Failed to repair: not enough damage. {_lastVehicle.EngineHealth}", "SpecialModesManager");
-                            Game.DisplayNotification("~y~" + GetRandom(ConfigHandler.NoFixMessages));
-                            return;
-                        }
-
-                        isRepairing = true;
-                        player.Heading = _lastVehicle.Heading - 180f;
-
-                        player.Tasks.ClearImmediately();
-                        _lastVehicle.Doors[4].Open(true);
-                        player.Tasks.PlayAnimation(repairAnimDict, repairAnimString, 5f, AnimationFlags.UpperBodyOnly);
-                        Game.DisplaySubtitle("Attempting to repair vehicle", 6000);
-                        // NativeFunction.CallByHash<int>(0x6E13FC662B882D1D, _lastVehicle, 1); // SET_VEHICLE_TYRE_FIXED
-                        N.SetVehicleTyreFixed(_lastVehicle, 1);
-                        GameFiber.Wait(6000);
-                        if (isRepairing)
-                        {
-                            player.Tasks.ClearImmediately();
-                            _lastVehicle.Doors[4].Close(true);
-                            isRepairing = false;
-                            if (EntityExtensions.Exists(_repairedVehicle) && _repairedVehicle == _lastVehicle)
+                            prompt = false;
+                            if (_lastVehicle.OilLevel() <= 0)
                             {
-                                Logging.Debug("Failed to repair: already repaired this vehicle", "SpecialModesManager");
+                                Logging.Debug($"Failed to repair: too damaged. {_lastVehicle.OilLevel()}", "SpecialModesManager");
+                                Game.DisplayNotification("~r~Your vehicle was too badly damaged. Unable to repair!");
+                                return;
+                            }
+                            else if (_lastVehicle.EngineHealth > ConfigHandler.CascadingFailureThreshold + 5)
+                            {
+                                Logging.Debug($"Failed to repair: not enough damage. {_lastVehicle.EngineHealth}", "SpecialModesManager");
                                 Game.DisplayNotification("~y~" + GetRandom(ConfigHandler.NoFixMessages));
                                 return;
                             }
-                            if (_lastVehicle.OilLevel() < 2f)
+
+                            isRepairing = true;
+                            player.Heading = _lastVehicle.Heading - 180f;
+
+                            player.Tasks.ClearImmediately();
+                            _lastVehicle.Doors[4].Open(true);
+                            player.Tasks.PlayAnimation(repairAnimDict, repairAnimString, 5f, AnimationFlags.UpperBodyOnly);
+                            Game.DisplaySubtitle("Attempting to repair vehicle", 6000);
+                            // NativeFunction.CallByHash<int>(0x6E13FC662B882D1D, _lastVehicle, 1); // SET_VEHICLE_TYRE_FIXED
+                            N.SetVehicleTyreFixed(_lastVehicle, 1);
+                            GameFiber.Wait(6000);
+                            if (isRepairing)
                             {
-                                Logging.Debug("Failed to repair: ran oil pan dry", "SpecialModesManager");
-                                Game.DisplayNotification("~r~You were unable to repair the vehicle. The oil pan looks all dried up.");
-                                return;
+                                player.Tasks.ClearImmediately();
+                                _lastVehicle.Doors[4].Close(true);
+                                isRepairing = false;
+                                if (EntityExtensions.Exists(_repairedVehicle) && _repairedVehicle == _lastVehicle)
+                                {
+                                    Logging.Debug("Failed to repair: already repaired this vehicle", "SpecialModesManager");
+                                    Game.DisplayNotification("~y~" + GetRandom(ConfigHandler.NoFixMessages));
+                                    return;
+                                }
+                                if (_lastVehicle.OilLevel() < 2f)
+                                {
+                                    Logging.Debug("Failed to repair: ran oil pan dry", "SpecialModesManager");
+                                    Game.DisplayNotification("~r~You were unable to repair the vehicle. The oil pan looks all dried up.");
+                                    return;
+                                }
+                                if (_lastVehicle.FuelLevel > 1f)
+                                {
+                                    _lastVehicle.IsDriveable = true;
+                                }
+                                _lastVehicle.EngineHealth = ConfigHandler.CascadingFailureThreshold + 5;
+                                healthEngineLast = ConfigHandler.CascadingFailureThreshold + 5;
+                                N.SetVehicleMaxSpeed(_lastVehicle, 500.01f);
+                                Logging.Debug($"Vehicle repaired! Engine health now {healthEngineLast}", "SpecialModesManager");
+                                Game.DisplayNotification("~g~" + GetRandom(ConfigHandler.FixMessages) + ", now get to a mechanic!");
+                                _repairedVehicle = _lastVehicle;
                             }
-                            if (_lastVehicle.FuelLevel > 1f)
-                            {
-                                _lastVehicle.IsDriveable = true;
-                            }
-                            _lastVehicle.EngineHealth = ConfigHandler.CascadingFailureThreshold + 5;
-                            healthEngineLast = ConfigHandler.CascadingFailureThreshold + 5;
-                            N.SetVehicleMaxSpeed(_lastVehicle, 500.01f);
-                            Logging.Debug($"Vehicle repaired! Engine health now {healthEngineLast}", "SpecialModesManager");
-                            Game.DisplayNotification("~g~" + GetRandom(ConfigHandler.FixMessages) + ", now get to a mechanic!");
-                            _repairedVehicle = _lastVehicle;
                         }
                     }
-                }
+                } 
             }
         }
 
@@ -393,6 +409,7 @@ namespace SimpleCTRL.Threads
 
         private static void MainTick()
         {
+            // check if certain car is here aka open wheel
             if (!Game.LocalPlayer.Character.IsInAnyVehicle(false))
             {
                 if (pedInSameVehicleLast)
@@ -587,15 +604,19 @@ namespace SimpleCTRL.Threads
 
         private static void ShopInteraction()
         {
-            RepairShop shop = Extensions.IsNearMechanic();
-            if (shop != null)
+            RepairShop repairShop = Extensions.IsNearMechanic();
+            if (repairShop != null)
             {
-                Game.DisplayHelp("Press ~INPUT_CONTEXT~ to repair.");
+                if (Game.LocalPlayer.Character.IsInAnyVehicle(false))
+                {
+                    Game.DisplayHelp("Press ~INPUT_CONTEXT~ to repair.");
+                }
                 if (Game.IsControlPressed(0, GameControl.Context))
                 {
-                    Game.DisplaySubtitle("The mechanics are taking a look at your vehicle", 5000);
                     if (Game.LocalPlayer.Character.IsInAnyVehicle(false))
                     {
+                        Game.DisplaySubtitle("The mechanics are taking a look at your vehicle", 5000);
+
                         Vehicle _currentVehicle = Game.LocalPlayer.Character.CurrentVehicle;
                         if (_currentVehicle.EngineHealth < 200f)
                         {

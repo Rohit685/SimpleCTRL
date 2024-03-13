@@ -1,5 +1,4 @@
 ﻿using Common;
-using Common.Models;
 using Common.Native;
 using Rage;
 using Rage.Native;
@@ -90,7 +89,206 @@ namespace SimpleCTRL.Utils
 
 
 
+        public static void LockTransmission(Vehicle playerVeh, bool toggle)
+        {
+            NativeFunction.CallByHash<int>(0x684785568EF26A22, playerVeh, toggle); // SET_VEHICLE_HANDBRAKE
+        }
 
+        public static void CreateVehicleBlip(Vehicle playerVeh)
+        {
+            int parkedVehicleBlip = NativeFunction.CallByHash<int>(0xBC8DBDCA2436F7E8, playerVeh); // GET_BLIP_FROM_ENTITY
+            if (!NativeFunction.CallByHash<bool>(0xA6DB27D19ECBB7DA, parkedVehicleBlip)) // DOES_BLIP_EXIST
+            {
+                parkedVehicleBlip = NativeFunction.CallByHash<int>(0x5CDE92C702A8FCE7, playerVeh); // ADD_BLIP_FOR_ENTITY
+
+                if (NativeFunction.CallByHash<bool>(0xA6DB27D19ECBB7DA, parkedVehicleBlip)) // DOES_BLIP_EXIST
+                {
+                    NativeFunction.CallByHash<int>(0xDF735600A4696DAF, parkedVehicleBlip, 326); // SET_BLIP_SPRITE
+                    NativeFunction.CallByHash<int>(0xD38744167B2FA257, parkedVehicleBlip, 0.7f); // SET_BLIP_SCALE
+                    NativeFunction.CallByHash<int>(0xF9113A30DE5C6670, "STRING"); // BEGIN_TEXT_COMMAND_SET_BLIP_NAME
+                    NativeFunction.CallByHash<int>(0x6C188BE134E074AA, "Personal Vehicle"); // ADD_​TEXT_​COMPONENT_​SUBSTRING_​PLAYER_​NAME
+                    NativeFunction.CallByHash<int>(0xBC38B49BCB83BC9B, parkedVehicleBlip); // END_TEXT_COMMAND_SET_BLIP_NAME
+                    NativeFunction.CallByHash<int>(0x6F6F290102C02AB4, parkedVehicleBlip, true); // SET_BLIP_AS_FRIENDLY
+                }
+            }
+        }
+
+        public static void DeleteVehicleBlip(Vehicle playerVeh)
+        {
+            int parkedVehicleBlip = NativeFunction.CallByHash<int>(0xBC8DBDCA2436F7E8, playerVeh); // GET_BLIP_FROM_ENTITY
+            if (NativeFunction.CallByHash<bool>(0xA6DB27D19ECBB7DA, parkedVehicleBlip)) // DOES_BLIP_EXIST 
+            {
+                unsafe
+                {
+                    NativeFunction.CallByHash<int>(0x86A652570E5F25DD, &parkedVehicleBlip); // REMOVE_BLIP
+                }
+            }
+        }
+
+
+
+        #region Indicator Modes
+        public static void HandleNormalMode(ref VehicleIndicatorLightsStatus intendedStatus, ref VehicleIndicatorLightsStatus status)
+        {
+            try
+            {
+                Vehicle currentVehicle = Game.LocalPlayer.Character.CurrentVehicle;
+                if (EntityExtensions.Exists((IHandleable)(object)currentVehicle))
+                {
+                    if ((int)intendedStatus == 1 && currentVehicle.IsEngineOn)
+                    {
+                        if ((int)status == 1)
+                        {
+                            status = (VehicleIndicatorLightsStatus)0;
+                        }
+                        else
+                        {
+                            status = (VehicleIndicatorLightsStatus)1;
+                        }
+                        currentVehicle.IndicatorLightsStatus = status;
+                    }
+                    else if ((int)intendedStatus == 2 && currentVehicle.IsEngineOn)
+                    {
+                        if ((int)status == 2)
+                        {
+                            status = (VehicleIndicatorLightsStatus)0;
+                        }
+                        else
+                        {
+                            status = (VehicleIndicatorLightsStatus)2;
+                        }
+                        currentVehicle.IndicatorLightsStatus = status;
+                    }
+                    else if ((int)intendedStatus == 3)
+                    {
+                        if ((int)status == 3)
+                        {
+                            status = (VehicleIndicatorLightsStatus)0;
+                        }
+                        else
+                        {
+                            status = (VehicleIndicatorLightsStatus)3;
+                        }
+                        currentVehicle.IndicatorLightsStatus = status;
+                    }
+                }
+                intendedStatus = (VehicleIndicatorLightsStatus)0;
+            }
+            catch (Exception ex)
+            {
+                Game.LogTrivial($"An exception occurred: {ex.Message}");
+            }
+        }
+
+        public static void HandleTurnOffAtTurnMode(ref VehicleIndicatorLightsStatus intendedStatus, ref uint turnOffAt, ref VehicleIndicatorLightsStatus status, ref float initialHeading)
+        {
+            try
+            {
+                Vehicle currentVehicle = Game.LocalPlayer.Character.CurrentVehicle;
+                if (EntityExtensions.Exists((IHandleable)(object)currentVehicle))
+                {
+                    if ((int)intendedStatus == 1 && currentVehicle.IsEngineOn)
+                    {
+                        turnOffAt = 0u;
+                        if ((int)status == 1)
+                        {
+                            status = (VehicleIndicatorLightsStatus)0;
+                        }
+                        else
+                        {
+                            status = (VehicleIndicatorLightsStatus)1;
+                            initialHeading = ((Entity)currentVehicle).Heading;
+                        }
+                        currentVehicle.IndicatorLightsStatus = status;
+                    }
+                    else if ((int)intendedStatus == 2 && currentVehicle.IsEngineOn)
+                    {
+                        turnOffAt = 0u;
+                        if ((int)status == 2)
+                        {
+                            status = (VehicleIndicatorLightsStatus)0;
+                        }
+                        else
+                        {
+                            status = (VehicleIndicatorLightsStatus)2;
+                            initialHeading = ((Entity)currentVehicle).Heading;
+                        }
+                        currentVehicle.IndicatorLightsStatus = status;
+                    }
+                    else if ((int)intendedStatus == 3)
+                    {
+                        if ((int)status == 3)
+                        {
+                            status = (VehicleIndicatorLightsStatus)0;
+                        }
+                        else
+                        {
+                            status = (VehicleIndicatorLightsStatus)3;
+                        }
+                        currentVehicle.IndicatorLightsStatus = status;
+                    }
+                    if ((int)status != 3)
+                    {
+                        if (turnOffAt == 0)
+                        {
+                            if ((int)status != 0 && Math.Abs(((Entity)currentVehicle).Heading - initialHeading) > 60f)
+                            {
+                                turnOffAt = Game.GameTime + 1500;
+                            }
+                        }
+                        else if (Game.GameTime >= turnOffAt)
+                        {
+                            status = (VehicleIndicatorLightsStatus)0;
+                            currentVehicle.IndicatorLightsStatus = status;
+                        }
+                    }
+                }
+                intendedStatus = (VehicleIndicatorLightsStatus)0;
+            }
+            catch (Exception ex)
+            {
+                Game.LogTrivial($"An exception occurred: {ex.Message}");
+            }
+        }
+
+        // WIP Function
+
+        public static void HandleAutomaticTurnMode(float initialHeading)
+        {
+            try
+            {
+                Vehicle currentVehicle = Game.LocalPlayer.Character.CurrentVehicle;
+                if (EntityExtensions.Exists((IHandleable)(object)currentVehicle))
+                {
+                    initialHeading = ((Entity)currentVehicle).Heading;
+
+                    Game.LogTrivial("initialHeading: " + initialHeading);
+
+                    float headingChange = Math.Abs(((Entity)currentVehicle).Heading - initialHeading);
+
+                    Game.LogTrivial("headingChange: " + headingChange);
+
+                    float turnThreshold = 10f; 
+
+                    if (headingChange > turnThreshold)
+                    {
+                        if (currentVehicle.SteeringAngle < 0)
+                        {
+                            Game.LogTrivial("Turn detected: Left turn");
+                        }
+                        else if (currentVehicle.SteeringAngle > 0)
+                        {
+                            Game.LogTrivial("Turn detected: Right turn");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Game.LogTrivial($"An exception occurred: {ex.Message}");
+            }
+        }
+        #endregion
 
         public static void InitFuel(this Vehicle vehicle)
         {
@@ -133,7 +331,8 @@ namespace SimpleCTRL.Utils
         {
             float min = fuelCapacity / 4f;
             float max = fuelCapacity / 2f;
-            return (float)(new Random().NextDouble() * (double)(max - min) + (double)min);
+            float randomizedFuelLevel = (float)(new Random().NextDouble() * (double)(max - min) + (double)min);
+            return randomizedFuelLevel;
         }
 
         public static void SetFuelLevel(this Vehicle vehicle, float fuelLevel)

@@ -1,6 +1,4 @@
-﻿using Common;
-using Common.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Rage;
 using SimpleCTRL.Utils;
@@ -42,12 +40,16 @@ namespace SimpleCTRL.Handlers
         public static string PluginPath = AppDomain.CurrentDomain.BaseDirectory + "/plugins/SimpleCTRL";
         public static string AudioPath = PluginPath + "/audio";
 
+        public static Keys ELSKey = Keys.None;
         public static Keys HazardKey = Keys.None;
         public static Keys LeftBlinkerKey = Keys.None;
         public static Keys RightBlinkerKey = Keys.None;
         public static Keys BlinkerModifierKey = Keys.None;
         public static Keys EngineToggleKey = Keys.None;
+        public static Keys ShuffleKey = Keys.None;
         public static Keys RefuelKey = Keys.None;
+        public static Keys ParkKey = Keys.None;
+        public static Keys ParkModifierKey = Keys.None;
 
         public static ControllerButtons HazardControllerButton = (ControllerButtons)0;
         public static ControllerButtons LeftBlinkerControllerButton = (ControllerButtons)0;
@@ -56,19 +58,28 @@ namespace SimpleCTRL.Handlers
         public static ControllerButtons EngineControllerButton = (ControllerButtons)0;
         public static ControllerButtons RefuelControllerButton = (ControllerButtons)0;
 
+        public static bool ParkIndicatorEnabled = true;
+        public static bool LicensePlateEnabled = true;
         public static bool SpeedometerEnabled = true;
+        public static bool EngStatusEnabled = true;
 
         public static bool PreventAutomaticReversing = true;
         public static bool GlobalPositioningSystem = false;
         public static bool PreventVehicleFlip = true;
         public static bool VehicleIndicators = true;
         public static bool TireRentainment = true;
+        public static bool AllowShuffle = true;
+        public static bool ParkingMode = true;
         public static bool FuelSystem = true;
 
         public static bool LeaveEngineOnNotification = true;
         public static bool BrakeOverheatingNotification = true;
         public static bool RefuelNotification = false;
 
+        public static bool LeaveDoorOpenWhenEngineOn = true;
+        public static string VehicleIndicatorMode = "Normal";
+        public static bool VehicleIndicatorSounds = true;
+        public static bool VehicleParkSirenKill = true;
         public static float AircraftLowFuelWarning = 25f;
         public static bool AircraftUseAirportPumps = true;
         public static bool AircraftUseFuelTankers = false;
@@ -130,33 +141,46 @@ namespace SimpleCTRL.Handlers
             DisableMenuMouse = val.ReadBoolean("ADVANCED", "DisableMenuMouse", DisableMenuMouse);
             LogLevel = val.ReadInt32("ADVANCED", "LogLevel", LogLevel);
 
+            ELSKey = GetKeysFromString(val.ReadString("CONTROLS", "ELSKey", ""), ELSKey);
             HazardKey = GetKeysFromString(val.ReadString("CONTROLS", "HazardKey", ""), HazardKey);
             LeftBlinkerKey = GetKeysFromString(val.ReadString("CONTROLS", "LeftBlinkerKey", ""), LeftBlinkerKey);
             RightBlinkerKey = GetKeysFromString(val.ReadString("CONTROLS", "RightBlinkerKey", ""), RightBlinkerKey);
             BlinkerModifierKey = GetKeysFromString(val.ReadString("CONTROLS", "BlinkerModifierKey", ""), BlinkerModifierKey);
             EngineToggleKey = GetKeysFromString(val.ReadString("CONTROLS", "EngineToggleKey", ""), EngineToggleKey);
+            ShuffleKey = GetKeysFromString(val.ReadString("CONTROLS", "ShuffleKey", ""), ShuffleKey);
             RefuelKey = GetKeysFromString(val.ReadString("CONTROLS", "RefuelKey", ""), RefuelKey);
+            ParkKey = GetKeysFromString(val.ReadString("CONTROLS", "ParkKey", ""), ParkKey);
+            ParkModifierKey = GetKeysFromString(val.ReadString("CONTROLS", "ParkModifierKey", ""), ParkModifierKey);
 
             HazardControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "HazardControllerButton", HazardControllerButton);
             LeftBlinkerControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "LeftBlinkerControllerButton", LeftBlinkerControllerButton);
             RightBlinkerControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "RightBlinkerControllerButton", RightBlinkerControllerButton);
             BlinkerModifierControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "BlinkerModifierControllerButton", BlinkerModifierControllerButton);
             EngineControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "EngineControllerButton", EngineControllerButton);
-            RefuelControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "RefuelControllerButton",RefuelControllerButton);
+            RefuelControllerButton = val.ReadEnum<ControllerButtons>("BUTTONS", "RefuelControllerButton", RefuelControllerButton);
 
+            ParkIndicatorEnabled = val.ReadBoolean("DISPLAY", "ParkIndicatorEnabled", ParkIndicatorEnabled);
+            LicensePlateEnabled = val.ReadBoolean("DISPLAY", "LicensePlateEnabled", LicensePlateEnabled);
             SpeedometerEnabled = val.ReadBoolean("DISPLAY", "SpeedometerEnabled", SpeedometerEnabled);
+            EngStatusEnabled = val.ReadBoolean("DISPLAY", "EngStatusEnabled", EngStatusEnabled);
 
             PreventAutomaticReversing = val.ReadBoolean("IMMERSION", "PreventAutomaticReversing", PreventAutomaticReversing);
             GlobalPositioningSystem = val.ReadBoolean("IMMERSION", "GlobalPositioningSystem", GlobalPositioningSystem);
             PreventVehicleFlip = val.ReadBoolean("IMMERSION", "PreventVehicleFlip", PreventVehicleFlip);
             VehicleIndicators = val.ReadBoolean("IMMERSION", "VehicleIndicators", VehicleIndicators);
             TireRentainment = val.ReadBoolean("IMMERSION", "TireRentainment", TireRentainment);
+            AllowShuffle = val.ReadBoolean("IMMERSION", "AllowShuffle", AllowShuffle);
+            ParkingMode = val.ReadBoolean("IMMERSION", "ParkingMode", ParkingMode);
             FuelSystem = val.ReadBoolean("IMMERSION", "FuelSystem", FuelSystem);
 
             LeaveEngineOnNotification = val.ReadBoolean("NOTIFICATIONS", "LeaveEngineOnNotification", LeaveEngineOnNotification);
             BrakeOverheatingNotification = val.ReadBoolean("NOTIFICATIONS", "BrakeOverheatingNotification", BrakeOverheatingNotification);
             RefuelNotification = val.ReadBoolean("NOTIFICATIONS", "RefuelNotification", RefuelNotification);
 
+            LeaveDoorOpenWhenEngineOn = val.ReadBoolean("OTHER", "LeaveDoorOpenWhenEngineOn", LeaveDoorOpenWhenEngineOn);
+            VehicleIndicatorMode = val.ReadString("OTHER", "VehicleIndicatorMode", VehicleIndicatorMode);
+            VehicleIndicatorSounds = val.ReadBoolean("OTHER", "VehicleIndicatorSounds", VehicleIndicatorSounds);
+            VehicleParkSirenKill = val.ReadBoolean("OTHER", "VehicleParkSirenKill", VehicleParkSirenKill);
             AircraftLowFuelWarning = Calc.Clamp(Convert.ToSingle(val.ReadDouble("OTHER", "AircraftLowFuelWarning", (double)AircraftLowFuelWarning)), 1f, 100f);
             AircraftUseAirportPumps = val.ReadBoolean("OTHER", "AircraftUseAirportPumps", AircraftUseAirportPumps);
             AircraftUseFuelTankers = val.ReadBoolean("OTHER", "AircraftUseFuelTankers", AircraftUseFuelTankers);

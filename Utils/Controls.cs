@@ -37,6 +37,8 @@ namespace SimpleCTRL.Utils
                 case SimpleControls.REFUEL:
                     return Game.IsKeyDownRightNow(ConfigHandler.RefuelKey)
                         || Game.IsControllerButtonDownRightNow(ConfigHandler.RefuelControllerButton);
+                case SimpleControls.PARK:
+                    return (ConfigHandler.ParkModifierKey == Keys.None || Game.IsKeyDownRightNow(ConfigHandler.ParkModifierKey)) && Game.IsKeyDown(ConfigHandler.ParkKey);
                 default:
                     return false;
             }
@@ -49,6 +51,7 @@ namespace SimpleCTRL.Utils
             LIGHT_HAZRD,
             ENG_TOGGLE,
             REFUEL,
+            PARK
         }
     }
 }

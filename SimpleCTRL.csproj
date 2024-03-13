@@ -52,9 +52,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Venoxity Development\Programming\SP\Common\bin\x64\Release\Common.dll</HintPath>
+    <Reference Include="InputManager">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\InputManager.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NAudio, Version=1.10.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -79,13 +78,25 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Venoxity.Common">
+      <HintPath>..\..\..\..\Venoxity Development\Programming\SP\Common\bin\x64\Release\Venoxity.Common.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\Functions.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Current.cs" />
+    <Compile Include="Globals.cs" />
     <Compile Include="Handlers\ControlHandler.cs" />
     <Compile Include="Handlers\SoundHandler.cs" />
     <Compile Include="Handlers\UIHandler.cs" />
+    <Compile Include="Models\AircraftFuelSpecs.cs" />
+    <Compile Include="Models\AirportFuelPump.cs" />
+    <Compile Include="Models\GasPump.cs" />
+    <Compile Include="Models\GasStation.cs" />
+    <Compile Include="Models\RepairShop.cs" />
+    <Compile Include="Models\TripInfo.cs" />
+    <Compile Include="Models\VehicleFuelSpecs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Decorators.cs" />
     <Compile Include="Entrypoint.cs" />
@@ -101,6 +112,7 @@
     <Compile Include="Utils\Helpers.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\LoggingLevel.cs" />
+    <Compile Include="VehicleProperties.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
