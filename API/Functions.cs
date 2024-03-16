@@ -36,28 +36,24 @@ namespace SimpleCTRL.API
 			if (EntityExtensions.Exists(v))
 			{
 				float fuelUsed = 0f;
+
 				if (Math.Abs(timeElapsed.TotalHours) > 1.0)
 				{
 					return 0f;
 				}
+
 				AircraftFuelSpecs afs = v.GetAircraftFuelSpecs();
 				if (afs == null)
 				{
 					afs = new AircraftFuelSpecs();
 					afs.Models.Add(v.DisplayName());
 				}
-				float baseLitresPerHour = afs.LitresPerHour * 30f;
-				float rpmFactor = 0f;
-				if (v.CurrentRPM() > 0.3f)
-				{
-					rpmFactor = v.CurrentRPM() * 0.5f;
-				}
-				float altitudeDelta = ((Entity)v).HeightAboveGround - Current.LastAircraftAltitude;
-				float climbRateFactor = altitudeDelta * 2.5f;
-				float normalizedLitresPerHour = baseLitresPerHour + baseLitresPerHour * rpmFactor + climbRateFactor;
-				normalizedLitresPerHour = SafeFloat(normalizedLitresPerHour, baseLitresPerHour);
-				fuelUsed = baseLitresPerHour * (float)timeElapsed.TotalHours;
+
+				float baseLitresPerHour = afs.LitresPerHour;
+				float fuelConsumptionMultiplier = 4f; 
+				fuelUsed = baseLitresPerHour * fuelConsumptionMultiplier * (float)timeElapsed.TotalHours;
 				fuelUsed = SafeFloat(fuelUsed, 0f);
+
 				return Math.Abs(fuelUsed);
 			}
 			return 0f;
