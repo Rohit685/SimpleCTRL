@@ -484,7 +484,8 @@ namespace SimpleCTRL.Utils
                             }
                         }
                     }
-                    if ((!Globals.RefuelingAllowed || Game.IsControlJustReleased(0, GameControl.Context)) && Current.FuelAmountPumped > 0f)
+                    // Game.IsControlJustReleased(0, GameControl.Context)
+                    if ((!Globals.RefuelingAllowed || !Controls.IsControlDownWithModifier(Controls.SimpleControls.REFUEL)) && Current.FuelAmountPumped > 0f)
                     {
                         if (!IsElectric(vehicle))
                         {
@@ -521,7 +522,8 @@ namespace SimpleCTRL.Utils
                     {
                         Game.LocalPlayer.Character.Tasks.ClearSecondary();
                     }
-                    if (!Game.LocalPlayer.Character.IsOnFoot && Game.IsControlJustPressed(0, GameControl.Context) && IsPlayerDriving(vehicle))
+                    // Game.IsControlJustPressed(0, GameControl.Context)
+                    if (!Game.LocalPlayer.Character.IsOnFoot && Controls.IsControlDownWithModifier(Controls.SimpleControls.REFUEL) && IsPlayerDriving(vehicle))
                     {
                         Game.DisplayNotification("You must be on foot in order to refuel.");
                     }
@@ -570,7 +572,8 @@ namespace SimpleCTRL.Utils
             if (IsVehicleNearAnyTankerOrFuelPump(vehicle))
             {
                 CustomUI.InstructRefuel();
-                if (Game.IsControlPressed(0, GameControl.Context))
+                // Game.IsControlPressed(0, GameControl.Context)
+                if (Controls.IsControlDownWithModifier(Controls.SimpleControls.REFUEL))
                 {
                     float pumpRate = MaxFuelLevel(vehicle) * 0.001f;
 
@@ -580,7 +583,8 @@ namespace SimpleCTRL.Utils
                         Current.FuelAmountPumped += pumpRate;
                     }
                 }
-                if (Game.IsControlJustReleased(0, GameControl.Context) && Current.FuelAmountPumped > 0f)
+                // Game.IsControlJustReleased(0, GameControl.Context)
+                if (!Controls.IsControlDownWithModifier(Controls.SimpleControls.REFUEL) && Current.FuelAmountPumped > 0f)
                 {
                     if (ConfigHandler.RefuelNotification == true)
                     {
