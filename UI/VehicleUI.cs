@@ -58,53 +58,53 @@ namespace SimpleCTRL.UI
                 {
                     if (ConfigHandler.ParkIndicatorEnabled && !Globals.disallowedClasses.Contains(_playerVehicle.Class))
                     {
-                        Text.Draw(0.87f, .065f, .45f, vehEngineRunning ? "~g~ENG" : "~r~ENG", Color.White, Alignment.Right); // TXT: Engine
+                        Text.Draw(0.87f, .065f, .45f, vehEngineRunning ? "~g~ENG" : "~r~ENG", Color.LightGray, Alignment.Right); // TXT: Engine
                     }
                     else
                     {
-                        Text.Draw(1f, .065f, .45f, vehEngineRunning ? "~g~ENG" : "~r~ENG", Color.White, Alignment.Right); // TXT: Engine
+                        Text.Draw(1f, .065f, .45f, vehEngineRunning ? "~g~ENG" : "~r~ENG", Color.LightGray, Alignment.Right); // TXT: Engine
                     }
                 }
 
-                Text.Draw(.15f, .04f, .45f, vehBurnout ? "~r~DSC" : "DSC", Color.White); // TXT: DSC
+                Text.Draw(.15f, .04f, .45f, vehBurnout ? "~r~DSC" : "DSC", Color.LightGray); // TXT: DSC
 
                 if (vehBodyHealth < 310)
                 {
-                    Text.Draw(1f, .04f, .45f, "~r~AC", Color.White, Alignment.Right); // TXT: AC Damaged
+                    Text.Draw(1f, .04f, .45f, "~r~AC", Color.LightGray, Alignment.Right); // TXT: AC Damaged
                 }
                 else if (vehBodyHealth < 900)
                 {
-                    Text.Draw(1f, .04f, .45f, "~y~AC", Color.White, Alignment.Right); // TXT: AC Slightly Damaged
+                    Text.Draw(1f, .04f, .45f, "~y~AC", Color.LightGray, Alignment.Right); // TXT: AC Slightly Damaged
                 }
                 else
                 {
-                    Text.Draw(1f, .04f, .45f, "AC", Color.White, Alignment.Right); // TXT: AC 
+                    Text.Draw(1f, .04f, .45f, "AC", Color.LightGray, Alignment.Right); // TXT: AC 
                 }
 
                 if (ConfigHandler.ParkIndicatorEnabled)
                 {
-                    Text.Draw(0.99f, .065f, .45f, Globals.isParked ? "~r~P" : "", Color.White, Alignment.Right); // TXT: Current Gear
+                    Text.Draw(0.99f, .065f, .45f, Globals.isParked ? "~r~P" : "", Color.LightGray, Alignment.Right); // TXT: Current Gear
                 }
 
                 if (vehEngineHealth < 110)
                 {
-                    Text.Draw(.75f, .04f, .45f, "~r~Fluid", Color.White); // TXT: Fluid Damaged
-                    Text.Draw(.01f, .04f, .45f, "~r~Oil", Color.White); // TXT : Oil Damaged
+                    Text.Draw(.75f, .04f, .45f, "~r~Fluid", Color.LightGray); // TXT: Fluid Damaged
+                    Text.Draw(.01f, .04f, .45f, "~r~Oil", Color.LightGray); // TXT : Oil Damaged
                 }
                 else if (vehEngineHealth < 315)
                 {
-                    Text.Draw(.75f, .04f, .45f, "~r~Fluid", Color.White); // TXT: Fluid Damaged
-                    Text.Draw(.01f, .04f, .45f, "~y~Oil", Color.White); // TXT : Oil Slightly Damaged
+                    Text.Draw(.75f, .04f, .45f, "~r~Fluid", Color.LightGray); // TXT: Fluid Damaged
+                    Text.Draw(.01f, .04f, .45f, "~y~Oil", Color.LightGray); // TXT : Oil Slightly Damaged
                 }
                 else if (vehEngineHealth < 900)
                 {
-                    Text.Draw(.75f, .04f, .45f, "~y~Fluid", Color.White); // TXT: Fluid Slightly Damaged
-                    Text.Draw(.01f, .04f, .45f, "Oil", Color.White); // TXT : Oil 
+                    Text.Draw(.75f, .04f, .45f, "~y~Fluid", Color.LightGray); // TXT: Fluid Slightly Damaged
+                    Text.Draw(.01f, .04f, .45f, "Oil", Color.LightGray); // TXT : Oil 
                 }
                 else
                 {
-                    Text.Draw(.75f, .04f, .45f, "Fluid", Color.White); // TXT: Fluid
-                    Text.Draw(.01f, .04f, .45f, "Oil", Color.White); // TXT: Oil 
+                    Text.Draw(.75f, .04f, .45f, "Fluid", Color.LightGray); // TXT: Fluid
+                    Text.Draw(.01f, .04f, .45f, "Oil", Color.LightGray); // TXT: Oil 
                 }
             }
             #endregion
