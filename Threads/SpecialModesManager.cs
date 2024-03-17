@@ -14,6 +14,7 @@ namespace SimpleCTRL.Threads
     {
         #region Fields
         private static bool notified, hotNotify;
+        private static readonly List<VehicleClass> cantRepairOnFootClasses = new List<VehicleClass> { VehicleClass.Motorcycle, VehicleClass.Helicopter};
         private static readonly List<VehicleClass> ignoredClasses = new List<VehicleClass> { VehicleClass.Boat, VehicleClass.Helicopter, VehicleClass.Plane, VehicleClass.Cycle, VehicleClass.Military, VehicleClass.Rail, VehicleClass.Utility };
 
         private static bool pedInSameVehicleLast, isBrakingForward, isBrakingReverse, isRepairing, prompt;
@@ -187,7 +188,7 @@ namespace SimpleCTRL.Threads
 
         private static void RepairTick()
         {
-            if (_lastVehicle.Exists())
+            if (_lastVehicle.Exists() && !cantRepairOnFootClasses.Contains(_lastVehicle.Class))
             {
                 Ped player = Game.LocalPlayer.Character;
                 if (CannotDoAction())
