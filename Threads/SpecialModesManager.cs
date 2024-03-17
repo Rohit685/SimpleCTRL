@@ -14,7 +14,7 @@ namespace SimpleCTRL.Threads
     {
         #region Fields
         private static bool notified, hotNotify;
-        private static readonly List<VehicleClass> cantRepairOnFootClasses = new List<VehicleClass> { VehicleClass.Motorcycle, VehicleClass.Helicopter};
+        private static readonly List<VehicleClass> cantRepairOnFootClasses = new List<VehicleClass> { VehicleClass.Boat, VehicleClass.Commercial, VehicleClass.Helicopter, VehicleClass.Industrial, VehicleClass.Motorcycle, VehicleClass.Plane, VehicleClass.Service, VehicleClass.Rail, VehicleClass.Utility };
         private static readonly List<VehicleClass> ignoredClasses = new List<VehicleClass> { VehicleClass.Boat, VehicleClass.Helicopter, VehicleClass.Plane, VehicleClass.Cycle, VehicleClass.Military, VehicleClass.Rail, VehicleClass.Utility };
 
         private static bool pedInSameVehicleLast, isBrakingForward, isBrakingReverse, isRepairing, prompt;
