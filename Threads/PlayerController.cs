@@ -54,6 +54,8 @@ namespace SimpleCTRL.Threads
         private static void Command_Shuffle() => ShuffleSeats();
         #endregion
 
+        public static bool isEngineOn = false;
+
         private static void OnTick()
         {
             Ped player = Game.LocalPlayer.Character;
@@ -151,7 +153,7 @@ namespace SimpleCTRL.Threads
                     _isShuffleDisabled = true;
                 }
             }
-   
+
             if (ConfigHandler.VehicleIndicators == true)
             {
                 if (Controls.IsControlDownWithModifier(Controls.SimpleControls.LIGHT_INDR))
@@ -199,9 +201,9 @@ namespace SimpleCTRL.Threads
                     default:
                         Game.LogTrivial("not valid ini option");
                         break;
-                    //case "AutomaticTurn":
-                    //    Extensions.HandleAutomaticTurnMode(initialHeading);
-                    //    break;
+                        //case "AutomaticTurn":
+                        //    Extensions.HandleAutomaticTurnMode(initialHeading);
+                        //    break;
                 }
             }
 
@@ -251,7 +253,7 @@ namespace SimpleCTRL.Threads
             }
             #endregion
         }
-
+        
         private static void FuelTick()
         {
             Ped player = Game.LocalPlayer.Character;
