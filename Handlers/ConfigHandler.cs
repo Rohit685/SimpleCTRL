@@ -122,22 +122,23 @@ namespace SimpleCTRL.Handlers
                 }
             }
 
+
             DeformationMultiplier = -1;
-            DeformationExponent = 0.4f;
-            CollisionDamageExponent = 0.6f;
-            DamageFactorEngine = 2.0f;
-            DamageFactorBody = 3.0f;
-            DamageFactorPetrolTank = 64f;
-            EngineDamageExponent = 0.6f;
-            WeaponsDamageMultiplier = 2.0f;
-            DegradingHealthSpeedFactor = 10f;
-            CascadingFailureSpeedFactor = 8.0f;
-            DegradingFailureThreshold = 800f;
-            CascadingFailureThreshold = 360f;
+            DeformationExponent = 1f;
+            CollisionDamageExponent = 1f;
+            DamageFactorEngine = 5.1f;
+            DamageFactorBody = 5.1f;
+            DamageFactorPetrolTank = 61f;
+            EngineDamageExponent = 1f;
+            WeaponsDamageMultiplier = 0.124f;
+            DegradingHealthSpeedFactor = 3.0f;
+            CascadingFailureSpeedFactor = 1.5f;
+            DegradingFailureThreshold = 677f;
+            CascadingFailureThreshold = 310f;
             EngineSafeGuard = 100f;
             TorqueMultiplierEnable = true;
             LimpMode = true;
-            LimpModeMultiplier = 0.19f;
+            LimpModeMultiplier = 0.15f;
             DisableMenuMouse = val.ReadBoolean("ADVANCED", "DisableMenuMouse", DisableMenuMouse);
             LogLevel = val.ReadInt32("ADVANCED", "LogLevel", LogLevel);
 
