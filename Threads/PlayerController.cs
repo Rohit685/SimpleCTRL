@@ -54,8 +54,6 @@ namespace SimpleCTRL.Threads
         private static void Command_Shuffle() => ShuffleSeats();
         #endregion
 
-        public static bool isEngineOn = false;
-
         private static void OnTick()
         {
             Ped player = Game.LocalPlayer.Character;
