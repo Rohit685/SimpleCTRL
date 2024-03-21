@@ -49,6 +49,12 @@ namespace SimpleCTRL.Utils
             return 2;
         }
 
+        public static bool IsVehicleReversing(Vehicle vehicle)
+        {
+            Vector3 relativeSpeed = NativeFunction.CallByHash<Vector3>(0x9A8D700A51CB7B0D, vehicle, true); // GET_ENTITY_SPEED_VECTOR
+            return relativeSpeed.Y < 0f;
+        }
+
         public static bool IsDrivingAVehicle(this Ped playerPed)
         {
             Vehicle v = playerPed.CurrentVehicle;
