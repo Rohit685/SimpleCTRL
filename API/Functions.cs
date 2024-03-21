@@ -188,32 +188,32 @@ namespace SimpleCTRL.API
             #endregion
 		}
 
-		public static void CreateJerryCanPickUps()
-        {
-			if (ConfigHandler.FuelSystem == true)
-            {
-				Model model = new Model("prop_jerrycan_01a");
-				N.RequestModel(model);
+		//public static void CreateJerryCanPickUps()
+  //      {
+		//	if (ConfigHandler.FuelSystem == true)
+  //          {
+		//		Model model = new Model("prop_jerrycan_01a");
+		//		N.RequestModel(model);
 
-				if (N.HasModelLoaded(model))
-				{
-					var MainFiber = new GameFiber(delegate
-					{
-						while (true)
-						{
-							foreach (GasStation x in Globals.GasStations)
-							{
-								Vector3 p = x.Position;
-								NativeFunction.CallByHash<int>(0xFBA08C503DD5FA58, 3332236287, p.X, p.Y, p.Z - 0.5f, 8, true, model); // CREATE_PICKUP
-								Game.LogTrivial("creating");
-							}
-							GameFiber.Yield();
-						}
-					});
-					MainFiber.Start();
-				}
-			}
-		}
+		//		if (N.HasModelLoaded(model))
+		//		{
+		//			var MainFiber = new GameFiber(delegate
+		//			{
+		//				while (true)
+		//				{
+		//					foreach (GasStation x in Globals.GasStations)
+		//					{
+		//						Vector3 p = x.Position;
+		//						NativeFunction.CallByHash<int>(0xFBA08C503DD5FA58, 3332236287, p.X, p.Y, p.Z - 0.5f, 8, true, model); // CREATE_PICKUP
+		//						Game.LogTrivial("creating");
+		//					}
+		//					GameFiber.Yield();
+		//				}
+		//			});
+		//			MainFiber.Start();
+		//		}
+		//	}
+		//}
 
 		public static void CreateDepartmentPumps()
 		{
