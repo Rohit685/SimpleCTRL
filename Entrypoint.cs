@@ -35,6 +35,7 @@ namespace SimpleCTRL
                 Current.LastWorldTime = DateTime.UtcNow;
                 Functions.CreateDepartmentPumps();
                 Functions.CreateBlips();
+                Functions.CreateJerryCanPickUps();
             }
             else
             {
