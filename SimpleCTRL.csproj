@@ -88,6 +88,7 @@
     <Compile Include="Current.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="Handlers\ControlHandler.cs" />
+    <Compile Include="Handlers\ExternalPluginHandler.cs" />
     <Compile Include="Handlers\SoundHandler.cs" />
     <Compile Include="Handlers\UIHandler.cs" />
     <Compile Include="Models\AircraftFuelSpecs.cs" />
@@ -113,6 +114,9 @@
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\LoggingLevel.cs" />
     <Compile Include="VehicleProperties.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ExternalFunctions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
