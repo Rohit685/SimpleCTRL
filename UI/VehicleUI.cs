@@ -42,7 +42,14 @@ namespace SimpleCTRL.UI
                 {
                     Rect.Draw(0.095f, 0.0475f, speedPanelWidth, speedPanelHeight, 0, 0, 0, 100); // UI: MPH Panel
                     Text.Draw(.84f, -0.125f, .6f, $"~w~{Math.Ceiling(vehSpeedMph)}", Color.White, Alignment.Right); // INT: Speed Value
-                    Text.Draw(0.875f, -0.135f, .4f, $"~w~MPH", Color.White); // TXT: Speed Unit
+                    if (ConfigHandler.SpeedometerFormat == "MPH")
+                    {
+                        Text.Draw(0.875f, -0.135f, .4f, $"~w~MPH", Color.White); // TXT: Speed Unit
+                    } 
+                    else if (ConfigHandler.SpeedometerFormat == "KM/H")
+                    {
+                        Text.Draw(0.860f, -0.135f, .4f, $"~w~KM/H", Color.White); // TXT: Speed Unit
+                    }
                 }
 
                 if (_playerVehicle.IsAircraft() || _playerVehicle.IsBlimp)
