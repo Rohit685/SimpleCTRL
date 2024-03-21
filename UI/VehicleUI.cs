@@ -33,7 +33,7 @@ namespace SimpleCTRL.UI
 
                 float vehEngineHealth = _playerVehicle.EngineHealth;
                 float vehBodyHealth = N.GetVehicleBodyHealth(_playerVehicle);
-                float vehSpeedMph = _playerVehicle.Speed * 2.236936f;
+                float vehSpeedMph = _playerVehicle.Speed * (ConfigHandler.SpeedometerFormat == "KM/H" ? 3.6f : 2.236936f);
 
                 float speedPanelWidth = 0.046f;
                 float speedPanelHeight = 0.03f;
