@@ -61,6 +61,7 @@ namespace SimpleCTRL.Handlers
         public static bool ParkIndicatorEnabled = true;
         public static bool LicensePlateEnabled = true;
         public static bool SpeedometerEnabled = true;
+        public static string SpeedometerFormat = "MPH";
         public static bool EngStatusEnabled = true;
 
         public static bool PreventAutomaticReversing = true;
@@ -163,6 +164,7 @@ namespace SimpleCTRL.Handlers
             ParkIndicatorEnabled = val.ReadBoolean("DISPLAY", "ParkIndicatorEnabled", ParkIndicatorEnabled);
             LicensePlateEnabled = val.ReadBoolean("DISPLAY", "LicensePlateEnabled", LicensePlateEnabled);
             SpeedometerEnabled = val.ReadBoolean("DISPLAY", "SpeedometerEnabled", SpeedometerEnabled);
+            SpeedometerFormat = val.ReadString("DISPLAY", "SpeedometerFormat", SpeedometerFormat);
             EngStatusEnabled = val.ReadBoolean("DISPLAY", "EngStatusEnabled", EngStatusEnabled);
 
             PreventAutomaticReversing = val.ReadBoolean("IMMERSION", "PreventAutomaticReversing", PreventAutomaticReversing);
