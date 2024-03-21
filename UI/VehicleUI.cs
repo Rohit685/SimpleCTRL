@@ -41,8 +41,8 @@ namespace SimpleCTRL.UI
                 if (ConfigHandler.SpeedometerEnabled == true)
                 {
                     Rect.Draw(0.095f, 0.0475f, speedPanelWidth, speedPanelHeight, 0, 0, 0, 100); // UI: MPH Panel
-                    Text.Draw(.87f, -0.125f, .6f, $"~w~{Math.Ceiling(vehSpeedMph)}", Color.White, Alignment.Right); // INT: Speed Value)
-                    Text.Draw(0.875f, -0.135f, .4f, $"~w~mph", Color.White); // TXT: Speed Unit
+                    Text.Draw(.84f, -0.125f, .6f, $"~w~{Math.Ceiling(vehSpeedMph)}", Color.White, Alignment.Right); // INT: Speed Value
+                    Text.Draw(0.875f, -0.135f, .4f, $"~w~MPH", Color.White); // TXT: Speed Unit
                 }
 
                 if (_playerVehicle.IsAircraft() || _playerVehicle.IsBlimp)
