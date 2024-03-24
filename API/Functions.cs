@@ -220,18 +220,16 @@ namespace SimpleCTRL.API
 			if (ConfigHandler.FuelSystem == true)
             {
 				Model model = new Model("prop_gas_pump_old2");
-				// NativeFunction.CallByHash<int>(0x963D27A58DF860AC, model);
 				N.RequestModel(model);
 
-				;           // if (NativeFunction.CallByHash<bool>(0x98A4EB5D89A0C952, model))
 				if (N.HasModelLoaded(model))
-				{
-					var MainFiber = new GameFiber(delegate
+                {
+					GameFiber.StartNew(delegate
 					{
 						while (true)
-						{
+                        {
 							foreach (GasPump pump in Globals.DepartmentPumps)
-							{
+                            {
 								if (pump != null && Game.LocalPlayer.Character != null)
 								{
 									unsafe
@@ -260,13 +258,11 @@ namespace SimpleCTRL.API
 										}
 									}
 								}
-
 							}
 							GameFiber.Yield();
-						}
+                        }
 					});
-					MainFiber.Start();
-				}
+                }
 			}
 		}
 
