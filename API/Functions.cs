@@ -235,18 +235,16 @@ namespace SimpleCTRL.API
 									unsafe
 									{
 										Vector3 position = Game.LocalPlayer.Character.Position;
-										// if (position.DistanceToSquared(pump.Position) <= 50000f && !NativeFunction.CallByHash<bool>(0xBFA48E2FF417213F, pump.Position.X, pump.Position.Y, pump.Position.Z, 2f, Globals.DepartmentPumpObjectHash, false)
 										if (position.DistanceToSquared(pump.Position) <= 50000f && !N.DoesObjectOfTypeExistAtCoords(pump.Position.X, pump.Position.Y, pump.Position.Z, 2f, Globals.DepartmentPumpObjectHash))
 										{
 											position = pump.Position;
-											// float resultArg = 0f;
-											// NativeFunction.CallByHash<int>(0x07503F7948F491A7, pump.Position.X, pump.Position.Y, 1000f);
+										    Logging.Info("No pump found at " + ((object)(Vector3)(position)).ToString() + ". Adding!", "Functions");
 											N.RequestCollisionAtCoord(pump.Position.X, pump.Position.Y, 1000f);
-											// NativeFunction.CallByHash<bool>(0xC906A7DAB05C8D2B, pump.Position.X, pump.Position.Y, 1000f, &resultArg, false);
 											float resultArg = N.GetGroundZFor3DCoord(pump.Position.X, pump.Position.Y, 1000f, false);
 											pump.Position.Z = resultArg;
 											Rage.Object obj = new Rage.Object(model.Hash, pump.Position);
 											// obj.Rotation = Common.API.Math.DirectionToRotation(Common.API.Math.HeadingToDirection(pump.Rotation), 0f).ToRotator();
+											// Game.LogTrivial(Common.API.Math.DirectionToRotation(Common.API.Math.HeadingToDirection(pump.Rotation), 0f).ToRotator().ToString());
 											if (EntityExtensions.Exists(obj))
 											{
 												obj.IsInvincible = true;

@@ -33,7 +33,7 @@ namespace SimpleCTRL
                 SpecialModesManager.Start();
                 UIHandler.Start();
                 Current.LastWorldTime = DateTime.UtcNow;
-                Functions.CreateDepartmentPumps();
+                Functions.CreateDepartmentPumps(); // for some reason you have to reload plugin for them to show
                 Functions.CreateBlips();
             }
             else

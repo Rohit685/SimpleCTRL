@@ -7,6 +7,9 @@ namespace SimpleCTRL.Handlers
     static class Dll
     {
         [DllImport("kernel32.dll")]
+        public static extern IntPtr LoadLibrary(string dllToLoad);
+
+        [DllImport("kernel32.dll")]
         public static extern IntPtr GetModuleHandle(string lpFileName);
 
         [DllImport("kernel32.dll")]
@@ -35,14 +38,22 @@ namespace SimpleCTRL.Handlers
 
         public ExternalPluginHandler()
         {
-            IntPtr dhLib = Dll.GetModuleHandle(@"DashHook.dll");
-            if (dhLib == IntPtr.Zero)
+            IntPtr mtLib = Dll.GetModuleHandle(@"DashHook.dll");
+            if (mtLib == IntPtr.Zero)
             {
-                Game.LogTrivial("Couldn't get module handle?");
-            } 
+                mtLib = Dll.LoadLibrary(@"DashHook.dll");
+                if (mtLib == IntPtr.Zero)
+                {
+                    Game.LogTrivial("Library missing");
+                }
+                else
+                {
+                   Game.LogTrivial("Load DashHook.dll success");
+                }
+            }
             else
             {
-                Game.LogTrivial("Load DashHook.dll success");
+                Game.LogTrivial("Grab handle DashHook.dll success");
             }
         }
     }
