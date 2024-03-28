@@ -216,51 +216,50 @@ namespace SimpleCTRL.API
 		//}
 
 		public static void CreateDepartmentPumps()
-		{
+        {
 			if (ConfigHandler.FuelSystem == true)
-            {
-				Model model = new Model("prop_gas_pump_old2");
-				N.RequestModel(model);
-
-				if (N.HasModelLoaded(model))
+			{
+				while (true)
                 {
-					GameFiber.StartNew(delegate
+					Model model = new Model("prop_gas_pump_old2");
+					N.RequestModel(model);
+
+					if (N.HasModelLoaded(model))
 					{
-						while (true)
-                        {
-							foreach (GasPump pump in Globals.DepartmentPumps)
-                            {
-								if (pump != null && Game.LocalPlayer.Character != null)
+						foreach (GasPump pump in Globals.DepartmentPumps)
+						{
+							if (pump != null && Game.LocalPlayer.Character != null)
+							{
+								unsafe
 								{
-									unsafe
+									Vector3 position = Game.LocalPlayer.Character.Position;
+									if (position.DistanceToSquared(pump.Position) <= 50000f && !N.DoesObjectOfTypeExistAtCoords(pump.Position.X, pump.Position.Y, pump.Position.Z, 2f, Globals.DepartmentPumpObjectHash))
 									{
-										Vector3 position = Game.LocalPlayer.Character.Position;
-										if (position.DistanceToSquared(pump.Position) <= 50000f && !N.DoesObjectOfTypeExistAtCoords(pump.Position.X, pump.Position.Y, pump.Position.Z, 2f, Globals.DepartmentPumpObjectHash))
+										position = pump.Position;
+										Logging.Info("No pump found at " + ((object)(Vector3)(position)).ToString() + ". Adding!", "Functions");
+										N.RequestCollisionAtCoord(pump.Position.X, pump.Position.Y, 1000f);
+										float resultArg = N.GetGroundZFor3DCoord(pump.Position.X, pump.Position.Y, 1000f, false);
+										pump.Position.Z = resultArg;
+										Rage.Object obj = new Rage.Object(model.Hash, pump.Position);
+										// obj.Rotation = Common.API.Math.DirectionToRotation(Common.API.Math.HeadingToDirection(pump.Rotation), 0f).ToRotator();
+										// Game.LogTrivial(Common.API.Math.DirectionToRotation(Common.API.Math.HeadingToDirection(pump.Rotation), 0f).ToRotator().ToString());
+										if (EntityExtensions.Exists(obj))
 										{
-											position = pump.Position;
-										    Logging.Info("No pump found at " + ((object)(Vector3)(position)).ToString() + ". Adding!", "Functions");
-											N.RequestCollisionAtCoord(pump.Position.X, pump.Position.Y, 1000f);
-											float resultArg = N.GetGroundZFor3DCoord(pump.Position.X, pump.Position.Y, 1000f, false);
-											pump.Position.Z = resultArg;
-											Rage.Object obj = new Rage.Object(model.Hash, pump.Position);
-											// obj.Rotation = Common.API.Math.DirectionToRotation(Common.API.Math.HeadingToDirection(pump.Rotation), 0f).ToRotator();
-											// Game.LogTrivial(Common.API.Math.DirectionToRotation(Common.API.Math.HeadingToDirection(pump.Rotation), 0f).ToRotator().ToString());
-											if (EntityExtensions.Exists(obj))
-											{
-												obj.IsInvincible = true;
-												obj.IsPositionFrozen = true;
-												obj.IsExplosionProof = true;
-												obj.IsFireProof = true;
-												obj.IsCollisionProof = true;
-											}
+											obj.IsInvincible = true;
+											obj.IsPositionFrozen = true;
+											obj.IsExplosionProof = true;
+											obj.IsFireProof = true;
+											obj.IsCollisionProof = true;
 										}
 									}
 								}
 							}
-							GameFiber.Yield();
-                        }
-					});
-                }
+							GameFiber.Wait(250);
+						}
+						GameFiber.Wait(250);
+					}
+					GameFiber.Yield();
+				}
 			}
 		}
 

@@ -33,7 +33,7 @@ namespace SimpleCTRL
                 SpecialModesManager.Start();
                 UIHandler.Start();
                 Current.LastWorldTime = DateTime.UtcNow;
-                Functions.CreateDepartmentPumps(); // for some reason you have to reload plugin for them to show
+                GameFiber.StartNew(delegate { Functions.CreateDepartmentPumps(); }); // for some reason you have to reload plugin for them to show
                 Functions.CreateBlips();
             }
             else
