@@ -1,5 +1,4 @@
-﻿using Common;
-using Rage;
+﻿using Rage;
 using Rage.Attributes;
 using SimpleCTRL.API;
 using SimpleCTRL.Handlers;
@@ -33,7 +32,7 @@ namespace SimpleCTRL
                 SpecialModesManager.Start();
                 UIHandler.Start();
                 Current.LastWorldTime = DateTime.UtcNow;
-                GameFiber.StartNew(delegate { Functions.CreateDepartmentPumps(); }); // for some reason you have to reload plugin for them to show
+                GameFiber.StartNew(delegate { Functions.CreateDepartmentPumps(); }); 
                 Functions.CreateBlips();
             }
             else
