@@ -347,7 +347,7 @@ namespace SimpleCTRL.Threads
             // if (!N.IsRadarHidden() && (Globals.RefuelingAllowed || vehicle.IsPlayerDriving()))
             if (Globals.RefuelingAllowed || vehicle.IsPlayerDriving())
             {
-                if (!N.IsHudHidden() || (player.CurrentVehicle != null && player.CurrentVehicle.IsAircraft()))
+                if (NativeFunction.CallByHash<bool>(0xAF754F20EB5CD51A) || (player.CurrentVehicle != null && player.CurrentVehicle.IsAircraft()))
                 {
                     CustomUI.RenderBar(vehicle.FuelLevel, Current.VehicleFuelCapacity, vehicle.IsElectric());
                 }
