@@ -620,12 +620,14 @@ namespace SimpleCTRL.Threads
                         {
                             Game.DisplaySubtitle("The mechanics are taking a look at your vehicle", 5000);
 
+                            GameFiber.Wait(5000);
+
                             Vehicle _currentVehicle = Game.LocalPlayer.Character.CurrentVehicle;
                             if (_currentVehicle.EngineHealth < 200f)
                             {
                                 Game.DisplaySubtitle("The mechanics are repairing your vehicle");
+                                GameFiber.Wait(3000);
                             }
-                            GameFiber.Sleep(3000);
                             if (_currentVehicle.FuelLevel > 1f)
                             {
                                 _currentVehicle.IsDriveable = true;
