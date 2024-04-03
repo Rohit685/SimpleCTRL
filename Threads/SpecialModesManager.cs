@@ -619,25 +619,26 @@ namespace SimpleCTRL.Threads
                         if (Game.LocalPlayer.Character.IsInAnyVehicle(false))
                         {
                             Game.DisplaySubtitle("The mechanics are taking a look at your vehicle", 5000);
-
                             GameFiber.Wait(5000);
-
                             Vehicle _currentVehicle = Game.LocalPlayer.Character.CurrentVehicle;
-                            if (_currentVehicle.EngineHealth < 200f)
+                            if (EntityExtensions.Exists(_currentVehicle))
                             {
-                                Game.DisplaySubtitle("The mechanics are repairing your vehicle");
-                                GameFiber.Wait(3000);
+                                if (_currentVehicle.EngineHealth < 200f)
+                                {
+                                    Game.DisplaySubtitle("The mechanics are repairing your vehicle");
+                                    GameFiber.Wait(3000);
+                                }
+                                if (_currentVehicle.FuelLevel > 1f)
+                                {
+                                    _currentVehicle.IsDriveable = true;
+                                }
+                                _currentVehicle.Repair();
+                                healthBodyLast = healthEngineLast = healthPetrolTankLast = 1000f;
+                                _currentVehicle.IsEngineOn = true;
+                                _repairedVehicle = null;
+                                NativeFunction.CallByHash<int>(0xBAA045B4E42F3C06, _currentVehicle, 0.0f); // SET_VEHICLE_MAX_SPEED
+                                Game.DisplayNotification("~g~The mechanic repaired your car!");
                             }
-                            if (_currentVehicle.FuelLevel > 1f)
-                            {
-                                _currentVehicle.IsDriveable = true;
-                            }
-                            _currentVehicle.Repair();
-                            healthBodyLast = healthEngineLast = healthPetrolTankLast = 1000f;
-                            _currentVehicle.IsEngineOn = true;
-                            _repairedVehicle = null;
-                            NativeFunction.CallByHash<int>(0xBAA045B4E42F3C06, _currentVehicle, 0.0f); // SET_VEHICLE_MAX_SPEED
-                            Game.DisplayNotification("~g~The mechanic repaired your car!");
                         }
                         else
                         {
