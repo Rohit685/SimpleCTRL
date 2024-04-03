@@ -9,7 +9,7 @@ namespace SimpleCTRL
 			("Venoxity.Common.dll", "1.0.0.0"),
 			("NAudio.dll", "1.10.0"),
 			("Newtonsoft.Json.dll", "13.0.0.0"),
-			("RAGENativeUI.dll", "1.9.3.0"),
+			("RAGENativeUI.dll", "1.9.2.0"),
 	        ("InputManager.dll", "1.0.0.0")
 	    };
 

@@ -62,9 +62,9 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RAGENativeUI, Version=1.9.2.0, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="RAGENativeUI, Version=1.9.3.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\JakeE\source\repos\RAGENativeUI\Source\bin\Debug\RAGENativeUI.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\RAGENativeUI.dll</HintPath>
     </Reference>
     <Reference Include="RagePluginHook, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>packages\RagePluginHook.1.98.0\lib\net472\RagePluginHook.dll</HintPath>
@@ -106,6 +106,14 @@
     <Compile Include="Threads\SpecialModesManager.cs" />
     <Compile Include="UI\CustomUI.cs" />
     <Compile Include="UI\SettingsMenuUI.cs" />
+    <Compile Include="UI\TinyTween\FloatTween.cs" />
+    <Compile Include="UI\TinyTween\ITween.cs" />
+    <Compile Include="UI\TinyTween\LerpFunc.cs" />
+    <Compile Include="UI\TinyTween\ScaleFunc.cs" />
+    <Compile Include="UI\TinyTween\ScaleFuncs.cs" />
+    <Compile Include="UI\TinyTween\StopBehavior.cs" />
+    <Compile Include="UI\TinyTween\Tween.cs" />
+    <Compile Include="UI\TinyTween\TweenState.cs" />
     <Compile Include="UI\VehicleUI.cs" />
     <Compile Include="Utils\Calc.cs" />
     <Compile Include="Utils\Controls.cs" />
