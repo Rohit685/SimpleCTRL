@@ -60,6 +60,7 @@ namespace SimpleCTRL.Threads
 
             #region Vehicle Control
             Vehicle playerVeh = player.CurrentVehicle;
+            Vehicle lastParkedVehicle = player.CurrentVehicle;
 
             if (!EntityExtensions.Exists(playerVeh))
             {
@@ -111,6 +112,15 @@ namespace SimpleCTRL.Threads
                                 Extensions.DeleteVehicleBlip(playerVeh);
                             }
                         }
+                    }
+
+                    // Tempoary fix gonna do a really advanced system later on where it stores parked vehicles, etc
+                    if (Globals.isParked && Game.LocalPlayer.Character.LastVehicle != lastParkedVehicle)
+                    {
+                        Globals.isParked = false;
+
+                        Extensions.LockTransmission(playerVeh, false);
+                        Extensions.DeleteVehicleBlip(playerVeh);
                     }
                     #endregion
                 }, "Player Controller - Parking System");
