@@ -608,36 +608,39 @@ namespace SimpleCTRL.Threads
             RepairShop repairShop = Extensions.IsNearMechanic();
             if (repairShop != null)
             {
-                if (Game.LocalPlayer.Character.IsInAnyVehicle(false))
-                {
-                    Game.DisplayHelp("Press ~INPUT_CONTEXT~ to repair.");
-                }
-                if (Game.IsControlPressed(0, GameControl.Context))
+                if (_currentVehicle.EngineHealth < 1000f)
                 {
                     if (Game.LocalPlayer.Character.IsInAnyVehicle(false))
                     {
-                        Game.DisplaySubtitle("The mechanics are taking a look at your vehicle", 5000);
-
-                        Vehicle _currentVehicle = Game.LocalPlayer.Character.CurrentVehicle;
-                        if (_currentVehicle.EngineHealth < 200f)
-                        {
-                            Game.DisplaySubtitle("The mechanics are repairing your vehicle");
-                        }
-                        GameFiber.Sleep(3000);
-                        if (_currentVehicle.FuelLevel > 1f)
-                        {
-                            _currentVehicle.IsDriveable = true;
-                        }
-                        _currentVehicle.Repair();
-                        healthBodyLast = healthEngineLast = healthPetrolTankLast = 1000f;
-                        _currentVehicle.IsEngineOn = true;
-                        _repairedVehicle = null;
-                        NativeFunction.CallByHash<int>(0xBAA045B4E42F3C06, _currentVehicle, 0.0f); // SET_VEHICLE_MAX_SPEED
-                        Game.DisplayNotification("~g~The mechanic repaired your car!");
+                        Game.DisplayHelp("Press ~INPUT_CONTEXT~ to repair.");
                     }
-                    else
+                    if (Game.IsControlPressed(0, GameControl.Context))
                     {
-                        Game.DisplayNotification("You must be in your vehicle for the mechanics to repair it!");
+                        if (Game.LocalPlayer.Character.IsInAnyVehicle(false))
+                        {
+                            Game.DisplaySubtitle("The mechanics are taking a look at your vehicle", 5000);
+
+                            Vehicle _currentVehicle = Game.LocalPlayer.Character.CurrentVehicle;
+                            if (_currentVehicle.EngineHealth < 200f)
+                            {
+                                Game.DisplaySubtitle("The mechanics are repairing your vehicle");
+                            }
+                            GameFiber.Sleep(3000);
+                            if (_currentVehicle.FuelLevel > 1f)
+                            {
+                                _currentVehicle.IsDriveable = true;
+                            }
+                            _currentVehicle.Repair();
+                            healthBodyLast = healthEngineLast = healthPetrolTankLast = 1000f;
+                            _currentVehicle.IsEngineOn = true;
+                            _repairedVehicle = null;
+                            NativeFunction.CallByHash<int>(0xBAA045B4E42F3C06, _currentVehicle, 0.0f); // SET_VEHICLE_MAX_SPEED
+                            Game.DisplayNotification("~g~The mechanic repaired your car!");
+                        }
+                        else
+                        {
+                            Game.DisplayNotification("You must be in your vehicle for the mechanics to repair it!");
+                        }
                     }
                 }
             }
