@@ -608,7 +608,7 @@ namespace SimpleCTRL.Threads
             RepairShop repairShop = Extensions.IsNearMechanic();
             if (repairShop != null)
             {
-                if (_currentVehicle.EngineHealth < 1000f)
+                if (NativeFunction.CallByHash<float>(0xF271147EB7B40F12, _currentVehicle) < 1000f)
                 {
                     if (Game.LocalPlayer.Character.IsInAnyVehicle(false))
                     {
