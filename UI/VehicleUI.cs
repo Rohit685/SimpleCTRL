@@ -25,7 +25,7 @@ namespace SimpleCTRL.UI
             N.HideHudComponentThisFrame(8);
 
             #region Car Hud
-            if (_playerVehicle != null && _playerVehicle.Class != VehicleClass.Cycle && NativeFunction.CallByHash<bool>(0xAF754F20EB5CD51A))
+            if (_playerVehicle != null && _playerVehicle.Class != VehicleClass.Cycle && !N.IsHudHidden())
             {
                 string vehPlate = _playerVehicle.LicensePlate;
 
