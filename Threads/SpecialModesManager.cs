@@ -445,7 +445,16 @@ namespace SimpleCTRL.Threads
                 _currentVehicle = Game.LocalPlayer.Character.CurrentVehicle;
                 Vehicle veh = _currentVehicle;
 
-                float classMultiplier = ConfigHandler.ClassDamageMultiplier[(int)veh.Class];
+                float classMultiplier;
+
+                try
+                {
+                    classMultiplier = ConfigHandler.ClassDamageMultiplier[(int)veh.Class];
+                }
+                catch (ArgumentOutOfRangeException ex)
+                {
+                    classMultiplier = 1.0f;
+                }
 
                 healthEngineCurrent = veh.EngineHealth;
                 if (healthEngineCurrent == 1000f)
