@@ -9,6 +9,8 @@ namespace SimpleCTRL
 
         public static List<GasPump> DepartmentPumps = new List<GasPump>();
 
+        public static List<Object> DepartmentPumpObjects = new List<Object>();
+
         public static List<Blip> Blips = new List<Blip>();
 
         public static List<AirportFuelPump> AirportFuelPumps = new List<AirportFuelPump>();
