@@ -83,7 +83,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API\Functions.cs" />
+    <Compile Include="API\VehicleUtility.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Current.cs" />
     <Compile Include="Globals.cs" />

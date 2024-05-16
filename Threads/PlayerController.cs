@@ -351,7 +351,7 @@ namespace SimpleCTRL.Threads
                 {
                     CustomUI.RenderBar(vehicle.FuelLevel, Current.VehicleFuelCapacity, vehicle.IsElectric());
                 }
-                GasStation gas = Functions.GetGasStationInRange(player.Position, 250f);
+                GasStation gas = VehicleUtility.GetGasStationInRange(player.Position, 250f);
                 if (gas != null)
                 {
                     if (gas != Current.GasStation)

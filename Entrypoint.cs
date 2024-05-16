@@ -32,8 +32,8 @@ namespace SimpleCTRL
                 SpecialModesManager.Start();
                 UIHandler.Start();
                 Current.LastWorldTime = DateTime.UtcNow;
-                GameFiber.StartNew(delegate { Functions.CreateDepartmentPumps(); }); 
-                Functions.CreateBlips();
+                GameFiber.StartNew(delegate { VehicleUtility.CreateDepartmentPumps(); }); 
+                VehicleUtility.CreateBlips();
             }
             else
             {
@@ -44,7 +44,7 @@ namespace SimpleCTRL
         private static void OnUnload(bool isTerminating)
         {
             Logging.Info("stopping SimpleCTRL", "SimpleCTRL");
-            Functions.RemoveBlips();
+            VehicleUtility.RemoveBlips();
         }
 
         private static bool CheckDependencies()

@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace SimpleCTRL.API
 {
-	public static class Functions
+	public static class VehicleUtility
 	{
 		internal static float ConsumeCarFuel(Vehicle v, float kilometresTravelled)
 		{

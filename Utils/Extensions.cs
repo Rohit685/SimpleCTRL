@@ -430,7 +430,7 @@ namespace SimpleCTRL.Utils
                 }
                 float distance = Vector3.Distance(Current.TripInfos[vehicle.Handle.ToInt32()].LastPosition, vehicle.Position);
                 float kmTravelled = Math.Abs(distance / 1000f) * 5.2f;
-                float fuelUsed = Functions.ConsumeCarFuel(vehicle, kmTravelled);
+                float fuelUsed = VehicleUtility.ConsumeCarFuel(vehicle, kmTravelled);
                 Current.TripInfos[vehicle.Handle.ToInt32()].DistanceTraveledKM += kmTravelled;
                 Current.TripInfos[vehicle.Handle.ToInt32()].LastPosition = vehicle.Position;
                 Current.TripInfos[vehicle.Handle.ToInt32()].FuelConsumed += fuelUsed;
@@ -557,7 +557,7 @@ namespace SimpleCTRL.Utils
             if (fuel > 0f && vehicle.IsEngineOn)
             {
                 TimeSpan timeElapsed = DateTime.UtcNow - Current.LastWorldTime;
-                float fuelUsed = Functions.ConsumeFuelAircraft(vehicle, timeElapsed);
+                float fuelUsed = VehicleUtility.ConsumeFuelAircraft(vehicle, timeElapsed);
                 fuel -= fuelUsed;
                 fuel = ((fuel < 0f) ? 0f : fuel);
             }
@@ -810,7 +810,7 @@ namespace SimpleCTRL.Utils
         {
             if (ConfigHandler.AircraftUseAirportPumps)
             {
-                AirportFuelPump airport = Functions.GetAirportFuelPumpInRange(vehicle.Position, 100f);
+                AirportFuelPump airport = VehicleUtility.GetAirportFuelPumpInRange(vehicle.Position, 100f);
                 if (airport != null && airport.Position != Vector3.Zero)
                 {
                     return true;
