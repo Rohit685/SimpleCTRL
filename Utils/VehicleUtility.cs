@@ -7,7 +7,7 @@ using SimpleCTRL.Utils;
 using System;
 using System.Linq;
 
-namespace SimpleCTRL.API
+namespace SimpleCTRL.Utils
 {
 	public static class VehicleUtility
 	{

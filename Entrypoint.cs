@@ -1,6 +1,5 @@
 ﻿using Rage;
 using Rage.Attributes;
-using SimpleCTRL.API;
 using SimpleCTRL.Handlers;
 using SimpleCTRL.Threads;
 using SimpleCTRL.Utils;

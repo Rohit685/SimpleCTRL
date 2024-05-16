@@ -3,7 +3,6 @@ using Common.Native;
 using Rage;
 using Rage.Native;
 using RAGENativeUI;
-using SimpleCTRL.API;
 using SimpleCTRL.Handlers;
 using SimpleCTRL.UI;
 using System;

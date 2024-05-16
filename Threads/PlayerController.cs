@@ -4,7 +4,6 @@ using InputManager;
 using Rage;
 using Rage.Attributes;
 using Rage.Native;
-using SimpleCTRL.API;
 using SimpleCTRL.Handlers;
 using SimpleCTRL.UI;
 using SimpleCTRL.Utils;
