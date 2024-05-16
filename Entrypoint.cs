@@ -44,6 +44,15 @@ namespace SimpleCTRL
         {
             Logging.Info("stopping SimpleCTRL", "SimpleCTRL");
             VehicleUtility.RemoveBlips();
+            foreach (var obj in Globals.DepartmentPumpObjects)
+            {
+                if (EntityExtensions.Exists(obj))
+                {
+                    obj.Delete();
+                }
+            }
+
+            Globals.DepartmentPumpObjects.Clear();
         }
 
         private static bool CheckDependencies()
