@@ -78,8 +78,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Venoxity.Common">
-      <HintPath>..\..\..\..\Venoxity Development\Programming\SP\Common\bin\x64\Release\Venoxity.Common.dll</HintPath>
+    <Reference Include="Venoxity.Common, Version=1.0.1.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\Venoxity.Common.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
