@@ -124,7 +124,6 @@
     <Compile Include="VehicleProperties.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="API\" />
     <Folder Include="ExternalFunctions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
