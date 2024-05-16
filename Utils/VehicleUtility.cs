@@ -240,6 +240,7 @@ namespace SimpleCTRL.Utils
 										float resultArg = N.GetGroundZFor3DCoord(pump.Position.X, pump.Position.Y, 1000f, false);
 										pump.Position.Z = resultArg;
 										Rage.Object obj = new Rage.Object(model.Hash, pump.Position);
+										Globals.DepartmentPumpObjects.Add(obj);
 										NativeFunction.CallByHash<int>(0x8524A8B0171D5E07, obj, 0.0f, 0.0f, Common.API.Math.DirectionToRotation(Common.API.Math.HeadingToDirection(pump.Rotation), 0f).Z, 1);
 										if (EntityExtensions.Exists(obj)) 
 										{
