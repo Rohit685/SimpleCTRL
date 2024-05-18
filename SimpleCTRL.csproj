@@ -84,6 +84,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\PedExtensions.cs" />
+    <Compile Include="Extensions\PoolHandleExtensions.cs" />
+    <Compile Include="Extensions\Vector3Extensions.cs" />
+    <Compile Include="Extensions\VehicleExtensions.cs" />
     <Compile Include="Utils\VehicleUtility.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Current.cs" />
@@ -118,7 +122,6 @@
     <Compile Include="UI\VehicleUI.cs" />
     <Compile Include="Utils\Calc.cs" />
     <Compile Include="Utils\Controls.cs" />
-    <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\Helpers.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\LoggingLevel.cs" />
