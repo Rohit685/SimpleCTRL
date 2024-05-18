@@ -203,7 +203,7 @@ namespace SimpleCTRL.Utils
 		//					foreach (GasStation x in Globals.GasStations)
 		//					{
 		//						Vector3 p = x.Position;
-		//						NativeFunction.CallByHash<int>(0xFBA08C503DD5FA58, 3332236287, p.X, p.Y, p.Z - 0.5f, 8, true, model); // CREATE_PICKUP
+		//						NativeFunction.CallByHash<int>(0xFBA08C503DD5FA58, -962731009, p.X, p.Y, p.Z - 0.5f, 8, true, model); // CREATE_PICKUP
 		//						Game.LogTrivial("creating");
 		//					}
 		//					GameFiber.Yield();
