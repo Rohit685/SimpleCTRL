@@ -15,6 +15,37 @@ namespace SimpleCTRL.Utils
 {
     internal static class Extensions
     {
+        private static IntPtr cachedAddress = IntPtr.Zero;
+
+        private static IntPtr FindAndCacheAddress()
+        {
+            if (cachedAddress != IntPtr.Zero)
+            {
+                return cachedAddress;
+            }
+
+            IntPtr addr = Game.FindPattern("33 C0 0F 57 C0 ?? 0D");
+            if (addr != IntPtr.Zero)
+            {
+                unsafe
+                {
+                    cachedAddress = (IntPtr)(bool*)(*(int*)((byte*)addr + 7) + (byte*)addr + 11);
+                }
+            }
+            return addr;
+        }
+
+        public static bool IsBigMapActive()
+        {
+            IntPtr addr = FindAndCacheAddress();
+            unsafe
+            {
+                bool* expandedRadar = (bool*)addr;
+
+                return *expandedRadar;
+            }
+        }
+
         public static RepairShop IsNearMechanic()
         {
             foreach (RepairShop repairShop in ConfigHandler.RepairShops)
