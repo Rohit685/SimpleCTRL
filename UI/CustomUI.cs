@@ -65,10 +65,10 @@ namespace SimpleCTRL.UI
 			}
 		}
 
-		private static string EngineKeyFormat { get; set; } = Extensions.FormatKeyBinding(ConfigHandler.EngineToggleKey);
-		private static string EngineButtonFormat { get; set; } = Extensions.FormatKeyBinding(ConfigHandler.EngineControllerButton);
-		private static string RefuelKeyFormat { get; set; } = Extensions.FormatKeyBinding(ConfigHandler.RefuelKey);
-		private static string RefuelButtonFormat { get; set; } = Extensions.FormatKeyBinding(ConfigHandler.RefuelControllerButton);
+		private static string EngineKeyFormat { get; set; } = ConversionAndFormattingHelper.FormatKeyBinding(ConfigHandler.EngineToggleKey);
+		private static string EngineButtonFormat { get; set; } = ConversionAndFormattingHelper.FormatKeyBinding(ConfigHandler.EngineControllerButton);
+		private static string RefuelKeyFormat { get; set; } = ConversionAndFormattingHelper.FormatKeyBinding(ConfigHandler.RefuelKey);
+		private static string RefuelButtonFormat { get; set; } = ConversionAndFormattingHelper.FormatKeyBinding(ConfigHandler.RefuelControllerButton);
 
 		private static bool IsUsingController => !NativeFunction.Natives.xA571D46727E2B718<bool>(2);
 		#endregion

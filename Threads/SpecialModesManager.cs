@@ -136,7 +136,7 @@ namespace SimpleCTRL.Threads
                         Game.DisableControlAction(0, GameControl.VehicleBrake, true);
                     }
 
-                    hotBrakes += Extensions.GetBrakePressure(N.GetControlValue(0, 72));
+                    hotBrakes += VehicleHelper.GetBrakePressure(N.GetControlValue(0, 72));
                     if (Game.IsControlPressed(0, GameControl.VehicleAccelerate))
                     {
                         hotBrakes += 5;
@@ -152,7 +152,7 @@ namespace SimpleCTRL.Threads
 
                 if (veh.Mods.BrakesModIndex > 1)
                 {
-                    hotBrakes -= (int)Math.Round((double)Extensions.GetBrakePressure(N.GetControlValue(0, 72)) / 3);
+                    hotBrakes -= (int)Math.Round((double)VehicleHelper.GetBrakePressure(N.GetControlValue(0, 72)) / 3);
                 }
 
                 if (veh.IsInWater && hotBrakes < 200)
@@ -293,7 +293,7 @@ namespace SimpleCTRL.Threads
         {
             Ped player = Game.LocalPlayer.Character;
             // return !player.IsOnFoot || !EntityExtensions.Exists(_lastVehicle) || player.IsCuffed || Extensions.GetDistance(_lastVehicle.Position, player.Position) > 5f || player.IsDead || NativeFunction.CallByHash<int>(0x83F969AA1EE2A664, _lastVehicle, -1) != player.Handle || _lastVehicle.IsDead || N.DecorGetBool(player, "IsDead") || N.DecorGetBool(player, "IsGrabbed");
-            return !player.IsOnFoot || !EntityExtensions.Exists(_lastVehicle) || player.IsCuffed || Extensions.GetDistance(_lastVehicle.Position, player.Position) > 5f || player.IsDead || N.GetLastPedInVehicleSeat(_lastVehicle, -1) != player.Handle || _lastVehicle.IsDead || N.DecorGetBool(player, "IsDead") || N.DecorGetBool(player, "IsGrabbed");
+            return !player.IsOnFoot || !EntityExtensions.Exists(_lastVehicle) || player.IsCuffed || Extensions.Vector3Extensions.GetDistance(_lastVehicle.Position, player.Position) > 5f || player.IsDead || N.GetLastPedInVehicleSeat(_lastVehicle, -1) != player.Handle || _lastVehicle.IsDead || N.DecorGetBool(player, "IsDead") || N.DecorGetBool(player, "IsGrabbed");
         }
         private static bool IsDead() => Game.LocalPlayer.Character.IsDead || N.DecorGetBool(Game.LocalPlayer.Character, "IsDead");
         private static string GetRandom(this List<string> list) => list[new Random().Next(list.Count)];
@@ -614,7 +614,7 @@ namespace SimpleCTRL.Threads
 
         private static void ShopInteraction()
         {
-            RepairShop repairShop = Extensions.IsNearMechanic();
+            RepairShop repairShop = VehicleHelper.GetNearestRepairShop();
             if (repairShop != null)
             {
                 if (NativeFunction.CallByHash<float>(0xF271147EB7B40F12, _currentVehicle) < 1000f)

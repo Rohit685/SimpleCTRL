@@ -2,6 +2,7 @@
 using Common.Native;
 using Common.UI;
 using Rage;
+using SimpleCTRL.Extensions;
 using SimpleCTRL.Handlers;
 using SimpleCTRL.Utils;
 using System;

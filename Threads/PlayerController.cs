@@ -4,6 +4,7 @@ using InputManager;
 using Rage;
 using Rage.Attributes;
 using Rage.Native;
+using SimpleCTRL.Extensions;
 using SimpleCTRL.Handlers;
 using SimpleCTRL.UI;
 using SimpleCTRL.Utils;
@@ -93,8 +94,8 @@ namespace SimpleCTRL.Threads
                                     }
                                 }
 
-                                Extensions.LockTransmission(playerVeh, true);
-                                Extensions.CreateVehicleBlip(playerVeh);
+                                Extensions.VehicleExtensions.LockTransmission(playerVeh, true);
+                                Extensions.VehicleExtensions.CreateVehicleBlip(playerVeh);
                             }
                             else
                             {
@@ -107,8 +108,8 @@ namespace SimpleCTRL.Threads
                                     Globals.isParked = false;
                                 }
 
-                                Extensions.LockTransmission(playerVeh, false);
-                                Extensions.DeleteVehicleBlip(playerVeh);
+                                Extensions.VehicleExtensions.LockTransmission(playerVeh, false);
+                                Extensions.VehicleExtensions.DeleteVehicleBlip(playerVeh);
                             }
                         }
                     }
@@ -118,8 +119,8 @@ namespace SimpleCTRL.Threads
                     {
                         Globals.isParked = false;
 
-                        Extensions.LockTransmission(playerVeh, false);
-                        Extensions.DeleteVehicleBlip(playerVeh);
+                        Extensions.VehicleExtensions.LockTransmission(playerVeh, false);
+                        Extensions.VehicleExtensions.DeleteVehicleBlip(playerVeh);
                     }
                     #endregion
                 }, "Player Controller - Parking System");
@@ -200,10 +201,10 @@ namespace SimpleCTRL.Threads
                 switch (ConfigHandler.VehicleIndicatorMode)
                 {
                     case "Normal":
-                        Extensions.HandleNormalMode(ref intendedStatus, ref status);
+                        Extensions.VehicleExtensions.HandleNormalMode(ref intendedStatus, ref status);
                         break;
                     case "TurnOffAtTurn":
-                        Extensions.HandleTurnOffAtTurnMode(ref intendedStatus, ref turnOffAt, ref status, ref initialHeading);
+                        Extensions.VehicleExtensions.HandleTurnOffAtTurnMode(ref intendedStatus, ref turnOffAt, ref status, ref initialHeading);
                         break;
                     default:
                         Game.LogTrivial("not valid ini option");
