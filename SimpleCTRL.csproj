@@ -125,7 +125,7 @@
     <Compile Include="Utils\Helpers.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\LoggingLevel.cs" />
-    <Compile Include="VehicleProperties.cs" />
+    <Compile Include="Models\VehicleProperties.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ExternalFunctions\" />
