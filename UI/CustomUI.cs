@@ -6,6 +6,7 @@ using SimpleCTRL.TinyTween;
 using SimpleCTRL.Handlers;
 using SimpleCTRL.Utils;
 using Rage.Native;
+using Rage;
 
 namespace SimpleCTRL.UI
 {
@@ -110,36 +111,38 @@ namespace SimpleCTRL.UI
 			return new PointF((int)Math.Round((w - w * t) / 2f + 1f), (int)Math.Round((h - h * t) / 2f - 2f));
 		}
 
-		public static float GetBarWidth()
+		/// <summary>
+		/// Returns resolution specified bar width
+		/// </summary>
+		/// <returns></returns>
+		private static float GetBarWidth()
 		{
-			double aspect = N.GetAspectRatio(false);
-			if (aspect <= 1.3333333730697632)
+			float width;
+			double aspect = NativeFunction.CallByHash<float>(0xF1307EF624A80D87);
+			bool bigMap = Extensions.IsBigMapActive();
+
+			switch (aspect)
 			{
-				if (aspect == 1.25)
-				{
-					return 255f;
-				}
-				if (aspect == 1.3333333730697632)
-				{
-					return 240f;
-				}
+				case (float)1.5: // 3:2
+					width = bigMap ? 336f : 212f;
+					break;
+				case (float)1.33333337306976: // 4:3
+					width = bigMap ? 378f : 240f;
+					break;
+				case (float)1.66666662693024: // 5:3
+					width = bigMap ? 302f : 191f;
+					break;
+				case (float)1.25: // 5:4
+					width = bigMap ? 405f : 255f;
+					break;
+				case (float)1.60000002384186: // 16:10
+					width = bigMap ? 316f : 200f;
+					break;
+				default:
+					width = bigMap ? 285f : 180f; // 16:9
+					break;
 			}
-			else
-			{
-				if (aspect == 1.5)
-				{
-					return 212f;
-				}
-				if (aspect == 1.600000023841858)
-				{
-					return 200f;
-				}
-				if (aspect == 1.6666666269302368)
-				{
-					return 191f;
-				}
-			}
-			return 180f;
+			return width;
 		}
 		#endregion
 
