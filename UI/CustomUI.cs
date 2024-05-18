@@ -77,7 +77,18 @@ namespace SimpleCTRL.UI
 		{
 			float fuelLevelPercentage = currentFuelLevel / maxFuelLevel * 100f;
 			PointF safeZone = GetSafezoneBounds();
-			Position = new PointF(basePosition.X + safeZone.X, basePosition.Y - safeZone.Y);
+
+			bool bigMap = false; // code later
+
+			if (bigMap)
+            {
+				Position = new PointF(basePosition.X + safeZone.X, basePosition.Y - safeZone.Y - 180f);
+			}
+			else
+            {
+				Position = new PointF(basePosition.X + safeZone.X, basePosition.Y - safeZone.Y);
+			}
+			
 			fuelBar.SizeF = new SizeF(fuelBarWidth / 100f * fuelLevelPercentage, fuelBarHeight);
 			if (maxFuelLevel > 0f && fuelLevelPercentage < 15f)
 			{
