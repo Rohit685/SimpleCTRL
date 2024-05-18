@@ -119,7 +119,7 @@ namespace SimpleCTRL.UI
 		{
 			float width;
 			double aspect = NativeFunction.CallByHash<float>(0xF1307EF624A80D87);
-			bool bigMap = Extensions.IsBigMapActive();
+			bool bigMap = false; // code later
 
 			switch (aspect)
 			{
