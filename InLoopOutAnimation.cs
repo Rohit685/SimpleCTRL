@@ -3,6 +3,8 @@ using Rage.Native;
 
 namespace SimpleCTRL
 {
+	// NEEDS WORK
+
 	#region Enums
 	/// <summary>
 	/// Represents the states of the InLoopOutAnimation.
@@ -95,7 +97,7 @@ namespace SimpleCTRL
 		protected void PlayStart(Ped ped)
 		{
 			// ped.Task.PlayAnimation(start.dict, start.name, 8f, -1, (AnimationFlags)0);
-			NativeFunction.CallByHash<int>(0xEA47FE3719165B94, ped, start.dict, start.name, 8f, 8f, -1, 0); // TASK_​PLAY_​ANIM
+			ped.Tasks.PlayAnimation(start.dict, start.name, -1, 8f, 8f, 0f, AnimationFlags.None);
 			state = State.Starting;
 		}
 
@@ -106,7 +108,7 @@ namespace SimpleCTRL
 		protected void PlayLoop(Ped ped)
 		{
 			// ped.Task.PlayAnimation(loop.dict, loop.name, 50f, -1, (AnimationFlags)1);
-			NativeFunction.CallByHash<int>(0xEA47FE3719165B94, ped, loop.dict, loop.name, 8f, 50f, -1, 1); // TASK_​PLAY_​ANIM
+			ped.Tasks.PlayAnimation(loop.dict, loop.name, -1, 8f, 50f, 0f, AnimationFlags.Loop);
 			state = State.Looping;
 		}
 
@@ -117,7 +119,7 @@ namespace SimpleCTRL
 		protected void PlayEnd(Ped ped)
 		{
 			// ped.Task.PlayAnimation(end.dict, end.name, 8f, -1, (AnimationFlags)128);
-			NativeFunction.CallByHash<int>(0xEA47FE3719165B94, ped, end.dict, end.name, 8f, 8f, -1, 128); // TASK_​PLAY_​ANIM
+			ped.Tasks.PlayAnimation(end.dict, end.name, -1, 8f, 8f, 0f, AnimationFlags.Idle);
 			state = State.Ended;
 		}
 
