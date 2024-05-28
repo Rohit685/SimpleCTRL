@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Rage;
-using SimpleCTRL.Handlers;
 
 namespace SimpleCTRL
 {
