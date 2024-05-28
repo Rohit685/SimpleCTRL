@@ -127,8 +127,6 @@
     <Compile Include="Utils\LoggingLevel.cs" />
     <Compile Include="Core\Models\VehicleProperties.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ExternalFunctions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
