@@ -60,6 +60,7 @@ namespace SimpleCTRL.Extensions
                 CustomUI.InstructManualRefuelOrSiphon();
             }
             Game.DisableControlAction(0, GameControl.Attack, true);
+            Game.DisableControlAction(0, GameControl.Attack2, true);
             Game.DisableControlAction(0, GameControl.Aim, true);
             Game.DisableControlAction(0, GameControl.AccurateAim, true);
             if (N.IsDisabledControlPressed(0, 24) && !N.IsDisabledControlPressed(0, 25))
