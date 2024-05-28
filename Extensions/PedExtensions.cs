@@ -19,94 +19,106 @@ namespace SimpleCTRL.Extensions
         /// <param name="playerPed">The player's <see cref="Ped"/>.</param>
         internal static void ManualRefuel(this Ped playerPed)
         {
-            if (playerPed.LastVehicle.Exists())
+            if (playerPed.Inventory.EquippedWeapon == null || playerPed.Inventory.EquippedWeapon.Hash != WeaponHash.PetrolCan)
             {
-                Vector3 pos = playerPed.Position;
-                Vehicle vehicle = playerPed.LastVehicle;
-                Vector3 position = playerPed.LastVehicle.Position;
-                if (!(position.DistanceToSquared(pos) <= 10f) || !(N.DecorExistOn(vehicle, "_Fuel_Level") || !vehicle.IsRoadVehicle() || vehicle.IsElectric()))
+                Globals.HudActive = false; // should be fine for here for now. but in theory it should be when you have it out and keep walking towards the prompt yk so it should be in position based
+                return;
+            }
+            Vector3 pos = ((Entity)playerPed).Position;
+            HitResult raycastResult = World.TraceCapsule(pos, ((Entity)playerPed).ForwardVector, 10f, TraceFlags.IntersectVehicles, (Entity)(object)playerPed);
+            //if (!raycastResult.Hit) // dont knoiw if should be dithitentity
+            //{
+            //    return;
+            //}
+            Entity hitEntity = raycastResult.HitEntity;
+            Vehicle vehicle = (Vehicle)(object)((hitEntity is Vehicle) ? hitEntity : null);
+            if (vehicle == null)
+            {
+                return;
+            }
+            Vector3 position = ((Entity)vehicle).Position;
+            if (!(position.DistanceToSquared(pos) <= 10f) || !(N.DecorExistOn(vehicle, "_Fuel_Level") || !vehicle.IsRoadVehicle() || vehicle.IsElectric()))
+            {
+                return;
+            }
+            if (!Current.VehicleFuelLevelInitialized)
+            {
+                vehicle.InitFuel();
+            }
+            float max = vehicle.MaxFuelLevel();
+            float fuel = vehicle.GetFuelLevel();
+            if (max - fuel < 0.2f)
+            {
+                CustomUI.InstructFullOrEmpty("Fuel tank full");
+            }
+            else if (fuel == 0f)
+            {
+                CustomUI.InstructFullOrEmpty("Fuel tank empty");
+            }
+            else
+            {
+                CustomUI.InstructManualRefuelOrSiphon();
+            }
+            Game.DisableControlAction(0, GameControl.Attack, true);
+            Game.DisableControlAction(0, GameControl.Aim, true);
+            Game.DisableControlAction(0, GameControl.AccurateAim, true);
+            if (N.IsDisabledControlPressed(0, 24) && !N.IsDisabledControlPressed(0, 25))
+            {
+                if (fuel < max)
                 {
-                    return;
+                    Globals.JerryCanAnimation.Magick(playerPed);
+                    Current.FuelAmountPumped += 0.023f;
+                    vehicle.SetFuelLevel(fuel + 0.023f);
                 }
-                if (!Current.VehicleFuelLevelInitialized)
+            }
+            else if (N.IsDisabledControlPressed(0, 25) && !N.IsDisabledControlPressed(0, 24))
+            {
+                if (fuel > 0f)
                 {
-                    vehicle.InitFuel();
-                }
-                float max = vehicle.MaxFuelLevel();
-                float fuel = vehicle.GetFuelLevel();
-                if (max - fuel < 0.2f)
-                {
-                    // CustomUI.InstructFullOrEmpty("Fuel tank full");
-                }
-                else if (fuel == 0f)
-                {
-                    // CustomUI.InstructFullOrEmpty("Fuel tank empty");
-                }
-                else
-                {
-                    return; // finsih this function later
-                }
-                Game.DisableControlAction(0, GameControl.Attack, true);
-                Game.DisableControlAction(0, GameControl.Aim, true);
-                Game.DisableControlAction(0, GameControl.AccurateAim, true);
-                if (Game.IsControlPressed(0, GameControl.Attack) && !Game.IsControlPressed(0, GameControl.Aim))
-                {
-                    if (fuel < max)
+                    if (!NativeFunction.CallByHash<bool>(0x1F0B79228E461EC9, playerPed, Globals.DictSiphoning, Globals.AnimSiphoning, 3)) // IS_ENTITY_PLAYING_ANIM
                     {
-                        // jerry can animation here
-                        Current.FuelAmountPumped += 0.023f;
-                        vehicle.SetFuelLevel(fuel + 0.023f);
-                    }
-                }
-                else if (Game.IsControlPressed(0, GameControl.Aim) && !N.IsDisabledControlPressed((int)GameControl.Aim, 0))
-                {
-                    if (fuel > 0f)
-                    {
-                        //if (!API.IsEntityPlayingAnim(((PoolObject)playerPed).Handle, Globals.DictSiphoning, Globals.AnimSiphoning, 3))
-                        //{
-                        //    playerPed.Task.PlayAnimation(Globals.DictSiphoning, Globals.AnimSiphoning, 2f, 8f, -1, (AnimationFlags)1, 0f);
-                        //    Current.FuelAmountSiphoned += 0.00125f;
-                        //    vehicle.SetFuelLevel(fuel - 0.00125f);
-                        //}
-                        //else
-                        //{
-                        //    Current.FuelAmountSiphoned += 0.00125f;
-                        //    vehicle.SetFuelLevel(fuel - 0.00125f);
-                        //}
+                        playerPed.Tasks.PlayAnimation(Globals.DictSiphoning, Globals.AnimSiphoning, -1, 2f, 8f, 0f, AnimationFlags.Loop);
+                        Current.FuelAmountSiphoned += 0.00125f;
+                        vehicle.SetFuelLevel(fuel - 0.00125f);
                     }
                     else
                     {
-                        vehicle.SetFuelLevel(0f);
-                        // playerPed.Task.ClearAnimation(Globals.DictSiphoning, Globals.AnimSiphoning);
+                        Current.FuelAmountSiphoned += 0.00125f;
+                        vehicle.SetFuelLevel(fuel - 0.00125f);
                     }
                 }
-                if (Game.IsControlJustReleased(0, GameControl.VehicleAttack) && fuel >= max)
-                {
-                    vehicle.SetFuelLevel(max);
-                    // Globals.JerryCanAnimation.RewindAndStop(playerPed);
-                }
-                if (Game.IsControlJustReleased(9, GameControl.Attack))
-                {
-                    // Globals.JerryCanAnimation.RewindAndStop(playerPed);
-                }
-                if (Game.IsControlJustReleased(0, GameControl.VehicleAim) && fuel <= 0f)
+                else
                 {
                     vehicle.SetFuelLevel(0f);
-                    // playerPed.Task.ClearAnimation(Globals.DictSiphoning, Globals.AnimSiphoning);
+                    NativeFunction.CallByHash<bool>(0x28004F88151E03E0, playerPed, Globals.AnimSiphoning, Globals.DictSiphoning); // STOP_ENTITY_ANIM
                 }
-                if (Game.IsControlJustReleased(9, GameControl.Aim))
-                {
-                    Game.DisableControlAction(0, GameControl.Attack, true);
-                    Game.DisableControlAction(0, GameControl.Attack2, true);
-                    // playerPed.Task.ClearAnimation(Globals.DictSiphoning, Globals.AnimSiphoning);
-                }
-                CustomUI.RenderInstructions();
-                //if (!Globals.HudActive) //  Due to fix sound check only being called once per load plugin
-                //{
-                //    NativeFunction.CallByHash<int>(0x67C540AA08E4A6F5, -1, "CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", 1);
-                //}
-                //Globals.HudActive = true;
             }
+            if (NativeFunction.CallByHash<bool>(0x305C8DCD79DA8B0F, 0, 69) && fuel >= max) // IS_DISABLED_CONTROL_JUST_RELEASED
+            {
+                vehicle.SetFuelLevel(max);
+                Globals.JerryCanAnimation.RewindAndStop(playerPed);
+            }
+            if (NativeFunction.CallByHash<bool>(0x305C8DCD79DA8B0F, 9, 24)) // IS_DISABLED_CONTROL_JUST_RELEASED
+            {
+                Globals.JerryCanAnimation.RewindAndStop(playerPed);
+            }
+            if (NativeFunction.CallByHash<bool>(0x305C8DCD79DA8B0F, 9, 68) && fuel <= 0f) // IS_DISABLED_CONTROL_JUST_RELEASED
+            {
+                vehicle.SetFuelLevel(0f);
+                NativeFunction.CallByHash<bool>(0x28004F88151E03E0, playerPed, Globals.AnimSiphoning, Globals.DictSiphoning); // STOP_ENTITY_ANIM
+            }
+            if (NativeFunction.CallByHash<bool>(0x305C8DCD79DA8B0F, 9, 25)) // IS_DISABLED_CONTROL_JUST_RELEASED
+            {
+                Game.DisableControlAction(0, (GameControl)24, true);
+                Game.DisableControlAction(0, (GameControl)257, true);
+                NativeFunction.CallByHash<bool>(0x28004F88151E03E0, playerPed, Globals.AnimSiphoning, Globals.DictSiphoning); // STOP_ENTITY_ANIM
+            }
+            CustomUI.RenderInstructions();
+            if (!Globals.HudActive) 
+            {
+                NativeFunction.CallByHash<int>(0x67C540AA08E4A6F5, -1, "CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", 1);
+            }
+            Globals.HudActive = true;
         }
         #endregion
 
