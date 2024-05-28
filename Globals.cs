@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Rage;
+using SimpleCTRL.Handlers;
 
 namespace SimpleCTRL
 {
@@ -24,6 +25,8 @@ namespace SimpleCTRL
         public static bool WasDriver = false;
 
         public static bool isParked = false;
+
+        internal static InLoopOutAnimation JerryCanAnimation = new InLoopOutAnimation(new Animation("weapon@w_sp_jerrycan", "fire_intro"), new Animation("weapon@w_sp_jerrycan", "fire"), new Animation("weapon@w_sp_jerrycan", "fire_outro"));
 
         public static readonly string DictRefueling = "timetable@gardener@filling_can";
 
