@@ -98,13 +98,13 @@
     <Compile Include="Handlers\ExternalPluginHandler.cs" />
     <Compile Include="Handlers\SoundHandler.cs" />
     <Compile Include="Handlers\UIHandler.cs" />
-    <Compile Include="Models\AircraftFuelSpecs.cs" />
-    <Compile Include="Models\AirportFuelPump.cs" />
-    <Compile Include="Models\GasPump.cs" />
-    <Compile Include="Models\GasStation.cs" />
-    <Compile Include="Models\RepairShop.cs" />
-    <Compile Include="Models\TripInfo.cs" />
-    <Compile Include="Models\VehicleFuelSpecs.cs" />
+    <Compile Include="Core\Models\AircraftFuelSpecs.cs" />
+    <Compile Include="Core\Models\AirportFuelPump.cs" />
+    <Compile Include="Core\Models\GasPump.cs" />
+    <Compile Include="Core\Models\GasStation.cs" />
+    <Compile Include="Core\Models\RepairShop.cs" />
+    <Compile Include="Core\Models\TripInfo.cs" />
+    <Compile Include="Core\Models\VehicleFuelSpecs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Decorators.cs" />
     <Compile Include="Entrypoint.cs" />
@@ -125,7 +125,7 @@
     <Compile Include="Utils\Helpers.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\LoggingLevel.cs" />
-    <Compile Include="Models\VehicleProperties.cs" />
+    <Compile Include="Core\Models\VehicleProperties.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ExternalFunctions\" />
