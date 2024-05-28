@@ -2,7 +2,7 @@
 
 namespace SimpleCTRL
 {
-	public static class Constants
+	public static class UtilityConstants
 	{
 		public static readonly List<(string Name, string Version)> Dependencies = new List<(string, string)>
 		{

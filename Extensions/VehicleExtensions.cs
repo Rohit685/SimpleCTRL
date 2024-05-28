@@ -39,7 +39,7 @@ namespace SimpleCTRL.Extensions
         /// <returns>The position of the vehicle's fuel tank.</returns>
         private static Vector3 GetVehicleTankPos(Vehicle vehicle)
         {
-            string[] vehicleFuelTankBones = Constants.VehicleFuelTankBones;
+            string[] vehicleFuelTankBones = UtilityConstants.VehicleFuelTankBones;
             int foundBoneIndex = -1;
             foreach (string boneName in vehicleFuelTankBones)
             {

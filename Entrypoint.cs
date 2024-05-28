@@ -57,7 +57,7 @@ namespace SimpleCTRL
 
         private static bool CheckDependencies()
         {
-            foreach (var dependency in Constants.Dependencies)
+            foreach (var dependency in UtilityConstants.Dependencies)
             {
                 if (!IsAssemblyAvailable(dependency.Name, dependency.Version))
                 {

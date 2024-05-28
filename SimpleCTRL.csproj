@@ -91,7 +91,7 @@
     <Compile Include="Extensions\VehicleExtensions.cs" />
     <Compile Include="InLoopOutAnimation.cs" />
     <Compile Include="Utils\VehicleUtility.cs" />
-    <Compile Include="Constants.cs" />
+    <Compile Include="Core\UtilityConstants.cs" />
     <Compile Include="Core\Managed.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="Handlers\ControlHandler.cs" />
