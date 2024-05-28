@@ -88,9 +88,7 @@
     <Compile Include="Extensions\PoolHandleExtensions.cs" />
     <Compile Include="Extensions\Vector3Extensions.cs" />
     <Compile Include="Extensions\VehicleExtensions.cs" />
-    <Compile Include="Handlers\Animation.cs" />
-    <Compile Include="Handlers\InLoopOutAnimation.cs" />
-    <Compile Include="Handlers\State.cs" />
+    <Compile Include="InLoopOutAnimation.cs" />
     <Compile Include="Utils\VehicleUtility.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Current.cs" />

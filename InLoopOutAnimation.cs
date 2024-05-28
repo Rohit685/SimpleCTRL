@@ -1,8 +1,38 @@
 ﻿using Rage;
 using Rage.Native;
 
-namespace SimpleCTRL.Handlers
+namespace SimpleCTRL
 {
+	#region Enums
+	/// <summary>
+	/// Represents the states of the InLoopOutAnimation.
+	/// </summary>
+	internal enum State
+	{
+		Starting,
+		Looping,
+		Ended
+	}
+	#endregion
+
+	#region Structs
+	/// <summary>
+	/// Represents an animation with a dictionary and name.
+	/// </summary>
+	internal struct Animation
+	{
+		public string dict;
+
+		public string name;
+
+		public Animation(string animationDictionary, string animationName)
+		{
+			dict = animationDictionary;
+			name = animationName;
+		}
+	}
+    #endregion
+
     internal class InLoopOutAnimation
     {
         #region Fields
