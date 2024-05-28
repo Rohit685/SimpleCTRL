@@ -92,7 +92,7 @@
     <Compile Include="InLoopOutAnimation.cs" />
     <Compile Include="Utils\VehicleUtility.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Current.cs" />
+    <Compile Include="Core\Current.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="Handlers\ControlHandler.cs" />
     <Compile Include="Handlers\ExternalPluginHandler.cs" />
