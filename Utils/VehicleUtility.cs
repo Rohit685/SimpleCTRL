@@ -52,20 +52,11 @@ namespace SimpleCTRL.Utils
 				float baseLitresPerHour = afs.LitresPerHour;
 				float fuelConsumptionMultiplier = 4f; 
 				fuelUsed = baseLitresPerHour * fuelConsumptionMultiplier * (float)timeElapsed.TotalHours;
-				fuelUsed = SafeFloat(fuelUsed, 0f);
+				fuelUsed = FloatExtensions.SafeFloat(fuelUsed, 0f);
 
 				return Math.Abs(fuelUsed);
 			}
 			return 0f;
-		}
-
-		private static float SafeFloat(float f, float _default)
-		{
-			if (float.IsInfinity(f) || float.IsNaN(f))
-			{
-				f = _default;
-			}
-			return f;
 		}
 
 		private static float ConsumeFuelRoadVehicle(Vehicle v, float kilometresTravelled)
@@ -93,11 +84,11 @@ namespace SimpleCTRL.Utils
 					gear = 1;
 				}
 				float econLossFactor = v.CurrentRPM() / (float)v.CurrentGear;
-				econLossFactor = SafeFloat(econLossFactor, 1f);
+				econLossFactor = FloatExtensions.SafeFloat(econLossFactor, 1f);
 				float accelerationLossFactor = Math.Abs(v.Acceleration() * 1.5f);
-				accelerationLossFactor = SafeFloat(accelerationLossFactor, 0f);
+				accelerationLossFactor = FloatExtensions.SafeFloat(accelerationLossFactor, 0f);
 				float normalizedFuelEconomy = baseLitresPer100Km + baseLitresPer100Km * econLossFactor + accelerationLossFactor;
-				normalizedFuelEconomy = SafeFloat(normalizedFuelEconomy, baseLitresPer100Km);
+				normalizedFuelEconomy = FloatExtensions.SafeFloat(normalizedFuelEconomy, baseLitresPer100Km);
 				fuelUsed = normalizedFuelEconomy * kilometresTravelled / 100f;
 			}
 			else
@@ -111,7 +102,7 @@ namespace SimpleCTRL.Utils
 					fuelUsed *= rpmfactor;
 				}
 			}
-			fuelUsed = SafeFloat(fuelUsed, 0f);
+			fuelUsed = FloatExtensions.SafeFloat(fuelUsed, 0f);
 			return Math.Abs(fuelUsed);
 		}
 
