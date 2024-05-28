@@ -262,21 +262,5 @@ namespace SimpleCTRL.Utils
 				}
 			}
 		}
-
-		internal static GasStation GetGasStationInRange(Vector3 pos, float rangeSquared)
-        {
-			return (from x in Globals.GasStations
-					where Vector3.DistanceSquared(x.Position, pos) < rangeSquared
-					orderby Vector3.DistanceSquared(x.Position, pos)
-					select x).FirstOrDefault();
-		}
-
-		internal static AirportFuelPump GetAirportFuelPumpInRange(Vector3 pos, float rangeSquared)
-        {
-			return (from x in Globals.AirportFuelPumps
-					where Vector3.DistanceSquared(x.Position, pos) < rangeSquared
-					orderby Vector3.DistanceSquared(x.Position, pos)
-					select x).FirstOrDefault();
-		}
 	}
 }

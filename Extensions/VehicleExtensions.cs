@@ -70,7 +70,7 @@ namespace SimpleCTRL.Extensions
         {
             if (ConfigHandler.AircraftUseAirportPumps)
             {
-                AirportFuelPump airport = VehicleUtility.GetAirportFuelPumpInRange(vehicle.Position, 100f);
+                AirportFuelPump airport = AirportFuelPump.GetClosestInRange(vehicle.Position, 100f);
                 if (airport != null && airport.Position != Vector3.Zero)
                 {
                     return true;
