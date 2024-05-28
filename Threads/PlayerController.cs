@@ -182,17 +182,17 @@ namespace SimpleCTRL.Threads
                     switch (status)
                     {
                         case VehicleIndicatorLightsStatus.RightOnly:
-                            if (vehicle.IsEngineOn && (DateTime.Now - Current.LastVehicleIndicator).TotalSeconds > 1.1) // not sure if need adjustment
+                            if (vehicle.IsEngineOn && (DateTime.Now - Managed.LastVehicleIndicator).TotalSeconds > 1.1) // not sure if need adjustment
                             {
                                 SoundHandler.PlayAudio(SoundHandler.Audio.Indicator);
-                                Current.LastVehicleIndicator = DateTime.Now;
+                                Managed.LastVehicleIndicator = DateTime.Now;
                             }
                             break;
                         case VehicleIndicatorLightsStatus.LeftOnly:
-                            if (vehicle.IsEngineOn && (DateTime.Now - Current.LastVehicleIndicator).TotalSeconds > 1.1) // not sure if need adjustment
+                            if (vehicle.IsEngineOn && (DateTime.Now - Managed.LastVehicleIndicator).TotalSeconds > 1.1) // not sure if need adjustment
                             {
                                 SoundHandler.PlayAudio(SoundHandler.Audio.Indicator);
-                                Current.LastVehicleIndicator = DateTime.Now;
+                                Managed.LastVehicleIndicator = DateTime.Now;
                             }
                             break;
                     }
@@ -273,15 +273,15 @@ namespace SimpleCTRL.Threads
             {
                 Globals.WasDriver = ClientCurrentVehicle.Driver == ClientPed;
             }
-            if (Current.MyVehicle != ClientCurrentVehicle)
+            if (Managed.MyVehicle != ClientCurrentVehicle)
             {
-                Current.VehicleFuelLevelInitialized = false;
+                Managed.VehicleFuelLevelInitialized = false;
             }
-            Current.MyVehicle = ClientLastVehicle ?? null;
+            Managed.MyVehicle = ClientLastVehicle ?? null;
             int refuelingAllowed;
-            if (Current.MyVehicle != null)
+            if (Managed.MyVehicle != null)
             {
-                vehicle = Current.MyVehicle;
+                vehicle = Managed.MyVehicle;
                 if (vehicle != null && (int)vehicle.Class != 13 && !vehicle.IsBoat() && !vehicle.DisplayName().Contains("BLIMP"))
                 {
                     if (ClientPed.IsOnFoot)
@@ -300,33 +300,33 @@ namespace SimpleCTRL.Threads
             goto IL_0328;
             IL_0162:
             Globals.RefuelingAllowed = (byte)refuelingAllowed != 0;
-            if (!Current.VehicleFuelLevelInitialized)
+            if (!Managed.VehicleFuelLevelInitialized)
             {
                 vehicle.InitFuel();
             }
             if (playerVeh.IsAircraft())
             {
-                if (!Current.AircraftEngineOn && vehicle.IsEngineOn)
+                if (!Managed.AircraftEngineOn && vehicle.IsEngineOn)
                 {
                     N.SetVehicleEngineOn(vehicle, false, false, true);
-                    Current.AircraftEngineOn = false;
+                    Managed.AircraftEngineOn = false;
                 }
-                else if (Current.AircraftEngineOn && vehicle.IsEngineOn)
+                else if (Managed.AircraftEngineOn && vehicle.IsEngineOn)
                 {
                     float percentFuel = vehicle.FuelLevel / vehicle.MaxFuelLevel() * 100f;
-                    if (vehicle.IsInAir && percentFuel < ConfigHandler.AircraftLowFuelWarning && (DateTime.Now - Current.LastAircraftLowFuelWarning).TotalSeconds > 5.0) // adjust timer 
+                    if (vehicle.IsInAir && percentFuel < ConfigHandler.AircraftLowFuelWarning && (DateTime.Now - Managed.LastAircraftLowFuelWarning).TotalSeconds > 5.0) // adjust timer 
                     {
                         SoundHandler.PlayAudio(SoundHandler.Audio.LowFuel);
-                        Current.LastAircraftLowFuelWarning = DateTime.Now;
+                        Managed.LastAircraftLowFuelWarning = DateTime.Now;
                     }
                 }
                 vehicle.ConsumeAircraftFuel();
-                if (!vehicle.IsInAir && vehicle.Speed < 2f && !vehicle.IsEngineOn && (DateTime.Now - Current.LastAircraftEngineHintDisplayed).TotalSeconds > 30.0)
+                if (!vehicle.IsInAir && vehicle.Speed < 2f && !vehicle.IsEngineOn && (DateTime.Now - Managed.LastAircraftEngineHintDisplayed).TotalSeconds > 30.0)
                 {
                     Game.DisplayHelp("Press ~INPUT_VEH_FLY_UNDERCARRIAGE~ to start the engine.");
-                    Current.LastAircraftEngineHintDisplayed = DateTime.Now;
+                    Managed.LastAircraftEngineHintDisplayed = DateTime.Now;
                 }
-                Current.LastAircraftAltitude = vehicle.HeightAboveGround;
+                Managed.LastAircraftAltitude = vehicle.HeightAboveGround;
             }
             else
             {
@@ -349,31 +349,31 @@ namespace SimpleCTRL.Threads
             {
                 if (!N.IsHudHidden() || (player.CurrentVehicle != null && player.CurrentVehicle.IsAircraft()))
                 {
-                    CustomUI.RenderBar(vehicle.FuelLevel, Current.VehicleFuelCapacity, vehicle.IsElectric());
+                    CustomUI.RenderBar(vehicle.FuelLevel, Managed.VehicleFuelCapacity, vehicle.IsElectric());
                 }
                 GasStation gas = GasStation.GetClosestInRange(player.Position, 250f);
                 if (gas != null)
                 {
-                    if (gas != Current.GasStation)
+                    if (gas != Managed.GasStation)
                     {
-                        Current.GasStation = gas;
+                        Managed.GasStation = gas;
                     }
                 }
-                else if (Current.GasStation != null)
+                else if (Managed.GasStation != null)
                 {
-                    Current.GasStation = null;
+                    Managed.GasStation = null;
                 }
             }
             goto IL_0328;
             IL_0328:
             if (Game.LocalPlayer.Character.IsOnFoot)
             {
-                Current.AircraftEngineOn = false;
+                Managed.AircraftEngineOn = false;
                 ClientPed.ManualRefuel();
-                Current.VehicleFuelLevelInitialized = false;
-                foreach (int x in Current.TripInfos.Keys)
+                Managed.VehicleFuelLevelInitialized = false;
+                foreach (int x in Managed.TripInfos.Keys)
                 {
-                    if (Current.TripInfos[x] != null)
+                    if (Managed.TripInfos[x] != null)
                     {
                         try
                         {
@@ -390,7 +390,7 @@ namespace SimpleCTRL.Threads
                     }
                 }
             }
-            Current.LastWorldTime = DateTime.UtcNow;
+            Managed.LastWorldTime = DateTime.UtcNow;
             #endregion
         }
 

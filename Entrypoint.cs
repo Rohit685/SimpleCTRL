@@ -30,7 +30,7 @@ namespace SimpleCTRL
                 PlayerController.Start();
                 SpecialModesManager.Start();
                 UIHandler.Start();
-                Current.LastWorldTime = DateTime.UtcNow;
+                Managed.LastWorldTime = DateTime.UtcNow;
                 GameFiber.StartNew(delegate { VehicleUtility.CreateDepartmentPumps(); }); 
                 VehicleUtility.CreateBlips();
             }

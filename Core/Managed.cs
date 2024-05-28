@@ -4,7 +4,7 @@ using Rage;
 
 namespace SimpleCTRL
 {
-    public class Current
+    public class Managed
     {
         public static GasStation GasStation = null;
 

@@ -41,7 +41,7 @@ namespace SimpleCTRL.Extensions
             {
                 return;
             }
-            if (!Current.VehicleFuelLevelInitialized)
+            if (!Managed.VehicleFuelLevelInitialized)
             {
                 vehicle.InitFuel();
             }
@@ -68,7 +68,7 @@ namespace SimpleCTRL.Extensions
                 if (fuel < max)
                 {
                     Globals.JerryCanAnimation.Magick(playerPed);
-                    Current.FuelAmountPumped += 0.023f;
+                    Managed.FuelAmountPumped += 0.023f;
                     vehicle.SetFuelLevel(fuel + 0.023f);
                 }
             }
@@ -79,12 +79,12 @@ namespace SimpleCTRL.Extensions
                     if (!NativeFunction.CallByHash<bool>(0x1F0B79228E461EC9, playerPed, Globals.DictSiphoning, Globals.AnimSiphoning, 3)) // IS_ENTITY_PLAYING_ANIM
                     {
                         playerPed.Tasks.PlayAnimation(Globals.DictSiphoning, Globals.AnimSiphoning, -1, 2f, 8f, 0f, AnimationFlags.Loop);
-                        Current.FuelAmountSiphoned += 0.00125f;
+                        Managed.FuelAmountSiphoned += 0.00125f;
                         vehicle.SetFuelLevel(fuel - 0.00125f);
                     }
                     else
                     {
-                        Current.FuelAmountSiphoned += 0.00125f;
+                        Managed.FuelAmountSiphoned += 0.00125f;
                         vehicle.SetFuelLevel(fuel - 0.00125f);
                     }
                 }
