@@ -207,7 +207,7 @@ namespace SimpleCTRL.UI
 			buttons.CallFunction("CLEAR_ALL");
 			buttons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
 			buttons.CallFunction("CREATE_CONTAINER");
-			buttons.CallFunction("SET_DATA_SLOT", 0, N.GetControlInstructionalButtonsString(2, 24, false), "Manual refueling");
+			buttons.CallFunction("SET_DATA_SLOT", 0, N.GetControlInstructionalButtonsString(2, 24, false), "Refuel");
 			buttons.CallFunction("SET_DATA_SLOT", 1, N.GetControlInstructionalButtonsString(2, 25, false), "Siphon");
 			buttons.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
 		}
