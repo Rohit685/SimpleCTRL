@@ -122,7 +122,6 @@
     <Compile Include="UI\TinyTween\Tween.cs" />
     <Compile Include="UI\TinyTween\TweenState.cs" />
     <Compile Include="UI\VehicleUI.cs" />
-    <Compile Include="Utils\Controls.cs" />
     <Compile Include="Utils\Helpers.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\LoggingLevel.cs" />

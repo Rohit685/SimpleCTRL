@@ -378,7 +378,7 @@ namespace SimpleCTRL.Extensions
             {
                 CustomUI.InstructRefuel();
                 // Game.IsControlPressed(0, GameControl.Context)
-                if (Controls.IsControlDownWithModifier(Controls.SimpleControls.REFUEL))
+                if (ControlHandler.IsControlDownWithModifier(SimpleControls.REFUEL))
                 {
                     float pumpRate = MaxFuelLevel(vehicle) * 0.001f;
 
@@ -389,7 +389,7 @@ namespace SimpleCTRL.Extensions
                     }
                 }
                 // Game.IsControlJustReleased(0, GameControl.Context)
-                if (!Controls.IsControlDownWithModifier(Controls.SimpleControls.REFUEL) && Current.FuelAmountPumped > 0f)
+                if (!ControlHandler.IsControlDownWithModifier(SimpleControls.REFUEL) && Current.FuelAmountPumped > 0f)
                 {
                     if (ConfigHandler.RefuelNotification == true)
                     {
@@ -473,7 +473,7 @@ namespace SimpleCTRL.Extensions
                         CustomUI.InstructRefuel();
                     }
                     // if (Game.IsControlPressed(0, GameControl.Context))
-                    if (Controls.IsControlDownWithModifier(Controls.SimpleControls.REFUEL))
+                    if (ControlHandler.IsControlDownWithModifier(SimpleControls.REFUEL))
                     {
                         if (fuel < Current.VehicleFuelCapacity)
                         {
@@ -493,7 +493,7 @@ namespace SimpleCTRL.Extensions
                         }
                     }
                     // Game.IsControlJustReleased(0, GameControl.Context)
-                    if ((!Globals.RefuelingAllowed || !Controls.IsControlDownWithModifier(Controls.SimpleControls.REFUEL)) && Current.FuelAmountPumped > 0f)
+                    if ((!Globals.RefuelingAllowed || !ControlHandler.IsControlDownWithModifier(SimpleControls.REFUEL)) && Current.FuelAmountPumped > 0f)
                     {
                         if (!IsElectric(vehicle))
                         {
@@ -531,7 +531,7 @@ namespace SimpleCTRL.Extensions
                         Game.LocalPlayer.Character.Tasks.ClearSecondary();
                     }
                     // Game.IsControlJustPressed(0, GameControl.Context)
-                    if (!Game.LocalPlayer.Character.IsOnFoot && Controls.IsControlDownWithModifier(Controls.SimpleControls.REFUEL) && IsPlayerDriving(vehicle))
+                    if (!Game.LocalPlayer.Character.IsOnFoot && ControlHandler.IsControlDownWithModifier(SimpleControls.REFUEL) && IsPlayerDriving(vehicle))
                     {
                         Game.DisplayNotification("You must be on foot in order to refuel.");
                     }

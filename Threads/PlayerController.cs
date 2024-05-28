@@ -72,7 +72,7 @@ namespace SimpleCTRL.Threads
                 GameFiber.StartNew(delegate
                 {
                     #region Parking System
-                    if (Controls.IsControlDownWithModifier(Controls.SimpleControls.PARK))
+                    if (ControlHandler.IsControlDownWithModifier(SimpleControls.PARK))
                     {
                         if (playerVeh.GetPedOnSeat((int)VehicleSeat.Driver) == player && player.IsAlive && playerVeh.IsEngineOn && playerVeh.IsCar && playerVeh.Speed == 0)
                         {
@@ -164,15 +164,15 @@ namespace SimpleCTRL.Threads
 
             if (ConfigHandler.VehicleIndicators == true)
             {
-                if (Controls.IsControlDownWithModifier(Controls.SimpleControls.LIGHT_INDR))
+                if (ControlHandler.IsControlDownWithModifier(SimpleControls.LIGHT_INDR))
                 {
                     intendedStatus = (VehicleIndicatorLightsStatus)1;
                 }
-                if (Controls.IsControlDownWithModifier(Controls.SimpleControls.LIGHT_INDL))
+                if (ControlHandler.IsControlDownWithModifier(SimpleControls.LIGHT_INDL))
                 {
                     intendedStatus = (VehicleIndicatorLightsStatus)2;
                 }
-                if (Controls.IsControlDownWithModifier(Controls.SimpleControls.LIGHT_HAZRD))
+                if (ControlHandler.IsControlDownWithModifier(SimpleControls.LIGHT_HAZRD))
                 {
                     intendedStatus = (VehicleIndicatorLightsStatus)3;
                 }
@@ -217,7 +217,7 @@ namespace SimpleCTRL.Threads
 
             if (Game.LocalPlayer.Character.IsInAnyVehicle(false))
             {
-                Func<bool> controlCondition = () => Controls.IsControlDownWithModifier(Controls.SimpleControls.ENG_TOGGLE);
+                Func<bool> controlCondition = () => ControlHandler.IsControlDownWithModifier(SimpleControls.ENG_TOGGLE);
 
                 turnEngineOn.CheckControlHoldDuration(controlCondition, 1000, () =>
                 {
