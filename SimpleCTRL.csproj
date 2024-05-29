@@ -106,7 +106,7 @@
     <Compile Include="Core\Models\GasStation.cs" />
     <Compile Include="Core\Models\RepairShop.cs" />
     <Compile Include="Core\Models\TripInfo.cs" />
-    <Compile Include="Core\Models\VehicleFuelSpecs.cs" />
+    <Compile Include="Core\Models\Vehicle\VehicleFuelSpecs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Decorators.cs" />
     <Compile Include="Entrypoint.cs" />
@@ -126,7 +126,7 @@
     <Compile Include="Utils\Helpers.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\LoggingLevel.cs" />
-    <Compile Include="Core\Models\VehicleProperties.cs" />
+    <Compile Include="Core\Models\Vehicle\VehicleProperties.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

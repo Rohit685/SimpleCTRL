@@ -114,7 +114,7 @@ namespace SimpleCTRL.Extensions
                 Game.DisableControlAction(0, (GameControl)257, true);
                 NativeFunction.CallByHash<bool>(0x28004F88151E03E0, playerPed, Globals.AnimSiphoning, Globals.DictSiphoning); // STOP_ENTITY_ANIM
             }
-            CustomUI.RenderInstructions();
+            HUD.RenderInstructions();
             if (!Globals.HudActive) 
             {
                 NativeFunction.CallByHash<int>(0x67C540AA08E4A6F5, -1, "CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", 1);
