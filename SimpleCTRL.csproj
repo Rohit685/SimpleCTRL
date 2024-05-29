@@ -92,6 +92,7 @@
     <Compile Include="Extensions\PoolHandleExtensions.cs" />
     <Compile Include="Extensions\Vector3Extensions.cs" />
     <Compile Include="Extensions\VehicleExtensions.cs" />
+    <Compile Include="Handlers\DoorHandler.cs" />
     <Compile Include="InLoopOutAnimation.cs" />
     <Compile Include="Core\UtilityConstants.cs" />
     <Compile Include="Core\Managed.cs" />
