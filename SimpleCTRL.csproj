@@ -84,6 +84,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\GameWorld.cs" />
     <Compile Include="Extensions\FloatExtensions.cs" />
     <Compile Include="Extensions\PedExtensions.cs" />
     <Compile Include="Extensions\PoolHandleExtensions.cs" />
