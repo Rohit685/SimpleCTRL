@@ -2,7 +2,7 @@
 using Common.Native;
 using Rage;
 using Rage.Native;
-using SimpleCTRL.UI;
+using SimpleCTRL.Core.Models.UI;
 using System.Collections.Generic;
 
 namespace SimpleCTRL.Extensions
@@ -49,15 +49,15 @@ namespace SimpleCTRL.Extensions
             float fuel = vehicle.GetFuelLevel();
             if (max - fuel < 0.2f)
             {
-                CustomUI.InstructFullOrEmpty("Fuel tank full");
+                HUD.InstructFullOrEmpty("Fuel tank full");
             }
             else if (fuel == 0f)
             {
-                CustomUI.InstructFullOrEmpty("Fuel tank empty");
+                HUD.InstructFullOrEmpty("Fuel tank empty");
             }
             else
             {
-                CustomUI.InstructManualRefuelOrSiphon();
+                HUD.InstructManualRefuelOrSiphon();
             }
             Game.DisableControlAction(0, GameControl.Attack, true);
             Game.DisableControlAction(0, GameControl.Attack2, true);

@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="Components\GameWorld.cs" />
     <Compile Include="Components\FuelLogic.cs" />
+    <Compile Include="Core\Models\UI\HUD.cs" />
     <Compile Include="Extensions\FloatExtensions.cs" />
     <Compile Include="Extensions\PedExtensions.cs" />
     <Compile Include="Extensions\PoolHandleExtensions.cs" />
@@ -112,7 +113,6 @@
     <Compile Include="Handlers\ConfigHandler.cs" />
     <Compile Include="Threads\PlayerController.cs" />
     <Compile Include="Threads\SpecialModesManager.cs" />
-    <Compile Include="UI\CustomUI.cs" />
     <Compile Include="UI\SettingsMenuUI.cs" />
     <Compile Include="UI\TinyTween\FloatTween.cs" />
     <Compile Include="UI\TinyTween\ITween.cs" />

@@ -8,10 +8,10 @@ using SimpleCTRL.Utils;
 using Rage.Native;
 using Rage;
 
-namespace SimpleCTRL.UI
+namespace SimpleCTRL.Core.Models.UI
 {
-	public class CustomUI
-	{
+    public class HUD
+    {
 		#region Fields
 		public static Scaleform buttons = new Scaleform();
 
@@ -81,14 +81,14 @@ namespace SimpleCTRL.UI
 			bool bigMap = false; // code later
 
 			if (bigMap)
-            {
+			{
 				Position = new PointF(basePosition.X + safeZone.X, basePosition.Y - safeZone.Y - 180f);
 			}
 			else
-            {
+			{
 				Position = new PointF(basePosition.X + safeZone.X, basePosition.Y - safeZone.Y);
 			}
-			
+
 			fuelBar.SizeF = new SizeF(fuelBarWidth / 100f * fuelLevelPercentage, fuelBarHeight);
 			if (maxFuelLevel > 0f && fuelLevelPercentage < 15f)
 			{
@@ -158,17 +158,17 @@ namespace SimpleCTRL.UI
 		#endregion
 
 		public static void InstructToggleEngine()
-        {
+		{
 			buttons.Load("instructional_buttons");
 			buttons.CallFunction("CLEAR_ALL");
 			buttons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
 			buttons.CallFunction("CREATE_CONTAINER");
 			if (IsUsingController)
-            {
+			{
 				buttons.CallFunction("SET_DATA_SLOT", 0, EngineButtonFormat, "Toggle engine");
-			} 
+			}
 			else
-            {
+			{
 				buttons.CallFunction("SET_DATA_SLOT", 0, EngineKeyFormat, "Toggle engine");
 			}
 			buttons.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
@@ -181,18 +181,18 @@ namespace SimpleCTRL.UI
 			buttons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
 			buttons.CallFunction("CREATE_CONTAINER");
 			if (IsUsingController)
-            {
+			{
 				buttons.CallFunction("SET_DATA_SLOT", 0, RefuelButtonFormat, "Refuel");
 			}
 			else
-            {
+			{
 				buttons.CallFunction("SET_DATA_SLOT", 0, RefuelKeyFormat, "Refuel");
 			}
 			buttons.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
 		}
 
 		public static void InstructFullOrEmpty(string fuel)
-        {
+		{
 			buttons.Load("instructional_buttons");
 			buttons.CallFunction("CLEAR_ALL");
 			buttons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
@@ -202,7 +202,7 @@ namespace SimpleCTRL.UI
 		}
 
 		public static void InstructManualRefuelOrSiphon()
-        {
+		{
 			buttons.Load("instructional_buttons");
 			buttons.CallFunction("CLEAR_ALL");
 			buttons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
@@ -214,16 +214,16 @@ namespace SimpleCTRL.UI
 
 		// possibly change in future but fine for now should use instructfull or empty
 		public static void HideRefuel()
-        {
+		{
 			buttons.CallFunction("CLEAR_ALL");
 		}
 
 		public static void RenderInstructions()
-        {
+		{
 			if (!N.IsHudHidden())
-            {
+			{
 				buttons.Render2D();
-            }
+			}
 		}
 	}
 }

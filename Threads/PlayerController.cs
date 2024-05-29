@@ -4,6 +4,7 @@ using InputManager;
 using Rage;
 using Rage.Attributes;
 using Rage.Native;
+using SimpleCTRL.Core.Models.UI;
 using SimpleCTRL.Extensions;
 using SimpleCTRL.Handlers;
 using SimpleCTRL.UI;
@@ -349,7 +350,7 @@ namespace SimpleCTRL.Threads
             {
                 if (!N.IsHudHidden() || (player.CurrentVehicle != null && player.CurrentVehicle.IsAircraft()))
                 {
-                    CustomUI.RenderBar(vehicle.FuelLevel, Managed.VehicleFuelCapacity, vehicle.IsElectric());
+                    HUD.RenderBar(vehicle.FuelLevel, Managed.VehicleFuelCapacity, vehicle.IsElectric());
                 }
                 GasStation gas = GasStation.GetClosestInRange(player.Position, 250f);
                 if (gas != null)

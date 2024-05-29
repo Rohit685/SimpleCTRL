@@ -3,6 +3,7 @@ using Common.Native;
 using Rage;
 using Rage.Native;
 using SimpleCTRL.Components;
+using SimpleCTRL.Core.Models.UI;
 using SimpleCTRL.Handlers;
 using SimpleCTRL.UI;
 using SimpleCTRL.Utils;
@@ -377,7 +378,7 @@ namespace SimpleCTRL.Extensions
             }
             if (IsVehicleNearAnyTankerOrFuelPump(vehicle))
             {
-                CustomUI.InstructRefuel();
+                HUD.InstructRefuel();
                 // Game.IsControlPressed(0, GameControl.Context)
                 if (ControlHandler.IsControlDownWithModifier(SimpleControls.REFUEL))
                 {
@@ -402,7 +403,7 @@ namespace SimpleCTRL.Extensions
                 }
                 if (Game.LocalPlayer.Character.CurrentVehicle != null)
                 {
-                    CustomUI.RenderInstructions();
+                    HUD.RenderInstructions();
                     if (!Globals.HudActive) //  Due to fix sound check only being called once per load plugin
                     {
                         NativeFunction.CallByHash<int>(0x67C540AA08E4A6F5, -1, "CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", 1);
@@ -460,18 +461,18 @@ namespace SimpleCTRL.Extensions
             {
                 if (Game.LocalPlayer.Character.CurrentVehicle != null && IsPlayerDriving(vehicle))
                 {
-                    CustomUI.InstructToggleEngine();
+                    HUD.InstructToggleEngine();
                 }
                 if (Globals.RefuelingAllowed)
                 {
                     if (fuel >= Managed.VehicleFuelCapacity)
                     {
                         // CustomUI.InstructFullOrEmpty("Fuel tank full")
-                        CustomUI.HideRefuel();
+                        HUD.HideRefuel();
                     }
                     else
                     {
-                        CustomUI.InstructRefuel();
+                        HUD.InstructRefuel();
                     }
                     // if (Game.IsControlPressed(0, GameControl.Context))
                     if (ControlHandler.IsControlDownWithModifier(SimpleControls.REFUEL))
@@ -539,7 +540,7 @@ namespace SimpleCTRL.Extensions
                 }
                 if ((Game.LocalPlayer.Character.CurrentVehicle != null && IsPlayerDriving(vehicle)) || Globals.RefuelingAllowed)
                 {
-                    CustomUI.RenderInstructions();
+                    HUD.RenderInstructions();
                     if (!Globals.HudActive)
                     {
                         NativeFunction.CallByHash<int>(0x67C540AA08E4A6F5, -1, "CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", 1);
