@@ -2,6 +2,7 @@
 using Common.Native;
 using Rage;
 using Rage.Native;
+using SimpleCTRL.Components;
 using SimpleCTRL.Handlers;
 using SimpleCTRL.UI;
 using SimpleCTRL.Utils;
@@ -350,7 +351,7 @@ namespace SimpleCTRL.Extensions
             if (fuel > 0f && vehicle.IsEngineOn)
             {
                 TimeSpan timeElapsed = DateTime.UtcNow - Managed.LastWorldTime;
-                float fuelUsed = VehicleUtility.ConsumeFuelAircraft(vehicle, timeElapsed);
+                float fuelUsed = FuelLogic.ConsumeFuelAircraft(vehicle, timeElapsed);
                 fuel -= fuelUsed;
                 fuel = ((fuel < 0f) ? 0f : fuel);
             }
@@ -431,7 +432,7 @@ namespace SimpleCTRL.Extensions
                 }
                 float distance = Vector3.Distance(Managed.TripInfos[vehicle.Handle.ToInt32()].LastPosition, vehicle.Position);
                 float kmTravelled = Math.Abs(distance / 1000f) * 5.2f;
-                float fuelUsed = VehicleUtility.ConsumeCarFuel(vehicle, kmTravelled);
+                float fuelUsed = FuelLogic.ConsumeCarFuel(vehicle, kmTravelled);
                 Managed.TripInfos[vehicle.Handle.ToInt32()].DistanceTraveledKM += kmTravelled;
                 Managed.TripInfos[vehicle.Handle.ToInt32()].LastPosition = vehicle.Position;
                 Managed.TripInfos[vehicle.Handle.ToInt32()].FuelConsumed += fuelUsed;
