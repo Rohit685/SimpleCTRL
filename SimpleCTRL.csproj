@@ -92,7 +92,6 @@
     <Compile Include="Extensions\Vector3Extensions.cs" />
     <Compile Include="Extensions\VehicleExtensions.cs" />
     <Compile Include="InLoopOutAnimation.cs" />
-    <Compile Include="Utils\VehicleUtility.cs" />
     <Compile Include="Core\UtilityConstants.cs" />
     <Compile Include="Core\Managed.cs" />
     <Compile Include="Globals.cs" />

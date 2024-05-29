@@ -33,7 +33,7 @@ namespace SimpleCTRL
                 UIHandler.Start();
                 Managed.LastWorldTime = DateTime.UtcNow;
                 GameFiber.StartNew(delegate { GameWorld.CreateDepartmentPumps(); }); 
-                VehicleUtility.CreateBlips();
+                GameWorld.CreateBlips();
             }
             else
             {
@@ -44,7 +44,7 @@ namespace SimpleCTRL
         private static void OnUnload(bool isTerminating)
         {
             Logging.Info("stopping SimpleCTRL", "SimpleCTRL");
-            VehicleUtility.RemoveBlips();
+            GameWorld.RemoveBlips();
             foreach (var obj in Globals.DepartmentPumpObjects)
             {
                 if (EntityExtensions.Exists(obj))
