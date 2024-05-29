@@ -7,7 +7,6 @@ using Rage.Native;
 using SimpleCTRL.Core.Models.UI;
 using SimpleCTRL.Extensions;
 using SimpleCTRL.Handlers;
-using SimpleCTRL.UI;
 using SimpleCTRL.Utils;
 using System;
 
