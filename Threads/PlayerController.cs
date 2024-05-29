@@ -21,13 +21,11 @@ namespace SimpleCTRL.Threads
         protected static bool _doorsNotify = false;                // Show notification first time they get any vehicle after joining
             
         // Vehicle Control
-        private static bool _isShuffleDisabled = true;
         protected static VehicleIndicatorLightsStatus intendedStatus = (VehicleIndicatorLightsStatus)0;
         protected static VehicleIndicatorLightsStatus status = (VehicleIndicatorLightsStatus)0;
         protected static float initialHeading = 0f;
         protected static uint turnOffAt = 0u;
         public static bool isDisabled = false;
-        protected bool _areWindowsDown = false;
         protected static float _steeringAngle;
         protected static Vehicle _steeringVeh = null;
 
@@ -51,7 +49,7 @@ namespace SimpleCTRL.Threads
         private static void Command_Trunk() => DoorHandler.HandleTrunk();
 
         [ConsoleCommand]
-        private static void Command_Shuffle() => ShuffleSeats();
+        private static void Command_Shuffle() => VehicleControlHandler.ShuffleSeats();
         #endregion
 
         private static void OnTick()
@@ -135,13 +133,13 @@ namespace SimpleCTRL.Threads
                     shuffleButtonPresses++;
                     if (shuffleButtonPresses == 2)
                     {
-                        ShuffleSeats();
+                        VehicleControlHandler.ShuffleSeats();
                         shuffleButtonPresses = 0;
                     }
                 }
 
                 // Check conditions for disabling shuffle
-                if (_isShuffleDisabled && playerVeh != null && playerVeh.GetPedOnSeat((int)VehicleSeat.Passenger) == player && N.GetIsTaskActive(player, 165))
+                if (VehicleControlHandler._isShuffleDisabled && playerVeh != null && playerVeh.GetPedOnSeat((int)VehicleSeat.Passenger) == player && N.GetIsTaskActive(player, 165))
                 {
                     if (!playerVeh.IsSeatFree((int)VehicleSeat.Driver) && !playerVeh.Driver.IsPlayer)
                     {
@@ -154,11 +152,11 @@ namespace SimpleCTRL.Threads
                         N.SetPedIntoVehicle(player, playerVeh, (int)VehicleSeat.Passenger);
                     }
                 }
-                else if (!_isShuffleDisabled && playerVeh != null && playerVeh.IsSeatFree((int)VehicleSeat.Driver))
+                else if (!VehicleControlHandler._isShuffleDisabled && playerVeh != null && playerVeh.IsSeatFree((int)VehicleSeat.Driver))
                 {
                     N.SetPedConfigFlag(player, 184, true);
                     N.SetPedIntoVehicle(player, playerVeh, (int)VehicleSeat.Driver);
-                    _isShuffleDisabled = true;
+                    VehicleControlHandler._isShuffleDisabled = true;
                 }
             }
 
@@ -510,83 +508,5 @@ namespace SimpleCTRL.Threads
             }
             #endregion
         }
-
-        #region Vehicle Control Handler
-        public static void OpenDoor(string door)
-        {
-            int doorIndex = -1;
-            switch (door)
-            {
-                case "lfront":
-                    doorIndex = 0;
-                    break;
-                case "rfront":
-                    doorIndex = 1;
-                    break;
-                case "lrear":
-                    doorIndex = 2;
-                    break;
-                case "rrear":
-                    doorIndex = 3;
-                    break;
-                case "hood":
-                    doorIndex = 4;
-                    break;
-                case "trunk":
-                    doorIndex = 5;
-                    break;
-            }
-            if (doorIndex >= 0)
-            {
-                Vehicle veh = Game.LocalPlayer.Character.LastVehicle;
-                VehicleDoorIndex index = (VehicleDoorIndex)doorIndex;
-
-                if (veh.Doors[(int)index].IsOpen)
-                {
-                    veh.Doors[(int)index].Close(true);
-                }
-                else
-                {
-                    veh.Doors[(int)index].Open(true);
-                }
-            }
-        }
-
-        internal void Windows()
-        {
-            _areWindowsDown = !_areWindowsDown;
-
-            if (_areWindowsDown)
-            {
-                Game.LocalPlayer.Character.CurrentVehicle.Windows[(int)VehicleWindowIndex.FrontLeftWindow].RollUp();
-                Game.LocalPlayer.Character.CurrentVehicle.Windows[(int)VehicleWindowIndex.FrontRightWindow].RollUp();
-                Game.LocalPlayer.Character.CurrentVehicle.Windows[(int)VehicleWindowIndex.BackLeftWindow].RollUp();
-                Game.LocalPlayer.Character.CurrentVehicle.Windows[(int)VehicleWindowIndex.BackRightWindow].RollUp();
-            }
-            else
-            {
-                // NativeFunction.CallByHash<int>(0x85796B0549DDE156, Game.LocalPlayer.Character.CurrentVehicle);
-                N.RollDownWindows(Game.LocalPlayer.Character.CurrentVehicle);
-            }
-        }
-
-        internal static void ShuffleSeats()
-        {
-            Ped playerPed = Game.LocalPlayer.Character;
-            Vehicle playerVeh = playerPed.CurrentVehicle;
-
-            if (playerVeh != null)
-            {
-                if (playerVeh.Driver == playerPed)
-                {
-                    N.SetPedIntoVehicle(playerPed, playerVeh, (int)VehicleSeat.Passenger);
-                }
-                else
-                {
-                    _isShuffleDisabled = false;
-                }
-            }
-        }
-        #endregion
     }
 }
