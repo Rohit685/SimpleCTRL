@@ -31,10 +31,6 @@ namespace SimpleCTRL
 
         public static readonly string AnimRefueling = "gar_ig_5_filling_can";
 
-        public static readonly string DictSiphoning = "rcmextreme3";
-
-        public static readonly string AnimSiphoning = "idle";
-
         public static uint DepartmentPumpObjectHash = (uint)new Model("prop_gas_pump_old2").Hash;
     }
 }

@@ -57,7 +57,7 @@ namespace SimpleCTRL.Extensions
             }
             else
             {
-                HUD.InstructManualRefuelOrSiphon();
+                HUD.InstructManualRefuel();
             }
             Game.DisableControlAction(0, GameControl.Attack, true);
             Game.DisableControlAction(0, GameControl.Attack2, true);
@@ -72,28 +72,6 @@ namespace SimpleCTRL.Extensions
                     vehicle.SetFuelLevel(fuel + 0.023f);
                 }
             }
-            else if (N.IsDisabledControlPressed(0, 25) && !N.IsDisabledControlPressed(0, 24))
-            {
-                if (fuel > 0f)
-                {
-                    if (!NativeFunction.CallByHash<bool>(0x1F0B79228E461EC9, playerPed, Globals.DictSiphoning, Globals.AnimSiphoning, 3)) // IS_ENTITY_PLAYING_ANIM
-                    {
-                        playerPed.Tasks.PlayAnimation(Globals.DictSiphoning, Globals.AnimSiphoning, -1, 2f, 8f, 0f, AnimationFlags.Loop);
-                        Managed.FuelAmountSiphoned += 0.00125f;
-                        vehicle.SetFuelLevel(fuel - 0.00125f);
-                    }
-                    else
-                    {
-                        Managed.FuelAmountSiphoned += 0.00125f;
-                        vehicle.SetFuelLevel(fuel - 0.00125f);
-                    }
-                }
-                else
-                {
-                    vehicle.SetFuelLevel(0f);
-                    NativeFunction.CallByHash<bool>(0x28004F88151E03E0, playerPed, Globals.AnimSiphoning, Globals.DictSiphoning); // STOP_ENTITY_ANIM
-                }
-            }
             if (NativeFunction.CallByHash<bool>(0x305C8DCD79DA8B0F, 0, 69) && fuel >= max) // IS_DISABLED_CONTROL_JUST_RELEASED
             {
                 vehicle.SetFuelLevel(max);
@@ -102,17 +80,6 @@ namespace SimpleCTRL.Extensions
             if (NativeFunction.CallByHash<bool>(0x305C8DCD79DA8B0F, 9, 24)) // IS_DISABLED_CONTROL_JUST_RELEASED
             {
                 Globals.JerryCanAnimation.RewindAndStop(playerPed);
-            }
-            if (NativeFunction.CallByHash<bool>(0x305C8DCD79DA8B0F, 9, 68) && fuel <= 0f) // IS_DISABLED_CONTROL_JUST_RELEASED
-            {
-                vehicle.SetFuelLevel(0f);
-                NativeFunction.CallByHash<bool>(0x28004F88151E03E0, playerPed, Globals.AnimSiphoning, Globals.DictSiphoning); // STOP_ENTITY_ANIM
-            }
-            if (NativeFunction.CallByHash<bool>(0x305C8DCD79DA8B0F, 9, 25)) // IS_DISABLED_CONTROL_JUST_RELEASED
-            {
-                Game.DisableControlAction(0, (GameControl)24, true);
-                Game.DisableControlAction(0, (GameControl)257, true);
-                NativeFunction.CallByHash<bool>(0x28004F88151E03E0, playerPed, Globals.AnimSiphoning, Globals.DictSiphoning); // STOP_ENTITY_ANIM
             }
             HUD.RenderInstructions();
             if (!Globals.HudActive) 
