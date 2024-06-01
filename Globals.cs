@@ -32,5 +32,7 @@ namespace SimpleCTRL
         public static readonly string AnimRefueling = "gar_ig_5_filling_can";
 
         public static uint DepartmentPumpObjectHash = (uint)new Model("prop_gas_pump_old2").Hash;
+
+        public static Model fuelNozzleModel = new Model("prop_cs_fuel_nozle");
     }
 }
