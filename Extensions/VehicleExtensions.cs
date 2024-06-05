@@ -18,6 +18,8 @@ namespace SimpleCTRL.Extensions
     {
         private static bool nozzleAttached = false;
         private static Rage.Object fuelnozzle = null;
+        private static readonly Random random = new Random(Guid.NewGuid().GetHashCode());
+        private static int chance;
 
         #region Pump Methods
         /// <summary>
@@ -489,6 +491,10 @@ namespace SimpleCTRL.Extensions
             int lefthand = NativeFunction.CallByHash<int>(0x3F428D08BE5AAE31, Game.LocalPlayer.Character, 18905);
             NativeFunction.CallByHash<int>(0x6B9BBD38AB0796DF, fuelnozzle, Game.LocalPlayer.Character, lefthand, 0.13f, 0.04f, 0.01f, -42.0f, -115.0f, -63.42f, false, true, false, true, false, true);
             nozzleAttached = true;
+
+            GasStation gas = GasStation.GetClosestInRange(Game.LocalPlayer.Character.Position, 250f);
+
+            Game.LogTrivial(gas.Position.ToString());
         }
 
         private static void DetachNozzle()
@@ -555,6 +561,17 @@ namespace SimpleCTRL.Extensions
                             }
 
                             PlayRefuelingAnimation();
+
+                            //if (Game.LocalPlayer.Character.LastVehicle.IsEngineOn)
+                            //{
+                            //    chance = random.Next(1, 101);
+                            //    Game.LogTrivial(chance.ToString());
+                            //    if (chance <= 5)
+                            //    {
+                            //        Vector3 vehicleCoords = Game.LocalPlayer.Character.LastVehicle.Position;
+                            //        NativeFunction.CallByHash<int>(0xE3AD2BDBAEE269AC, vehicleCoords.X, vehicleCoords.Y, vehicleCoords.Z, 5, 50.0f, true, false, true);
+                            //    }
+                            //}
                         }
                         else
                         {
