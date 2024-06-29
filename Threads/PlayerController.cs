@@ -262,181 +262,184 @@ namespace SimpleCTRL.Threads
         
         private static void FuelTick()
         {
-            Ped player = Game.LocalPlayer.Character;
-
             #region Fuel System
-            Vehicle playerVeh = player.CurrentVehicle;
-
-            if (EntityExtensions.Exists(ClientCurrentVehicle))
-            {
-                Globals.WasDriver = ClientCurrentVehicle.Driver == ClientPed;
-            }
-            if (Managed.MyVehicle != ClientCurrentVehicle)
-            {
-                Managed.VehicleFuelLevelInitialized = false;
-            }
-            Managed.MyVehicle = ClientLastVehicle ?? null;
-            int refuelingAllowed;
-            if (Managed.MyVehicle != null)
-            {
-                vehicle = Managed.MyVehicle;
-                if (vehicle != null && (int)vehicle.Class != 13 && !vehicle.IsBoat() && !vehicle.DisplayName().Contains("BLIMP"))
-                {
-                    if (ClientPed.IsOnFoot)
-                    {
-                        Vector3 position = ClientPed.Position;
-                        if (position.DistanceToSquared(vehicle.Position) <= 15f)
-                        {
-                            refuelingAllowed = (Globals.WasDriver ? 1 : 0);
-                            goto IL_0162;
-                        }
-                    }
-                    refuelingAllowed = 0;
-                    goto IL_0162;
-                }
-            }
-            goto IL_0328;
-            IL_0162:
-            Globals.RefuelingAllowed = (byte)refuelingAllowed != 0;
-            if (!Managed.VehicleFuelLevelInitialized)
-            {
-                vehicle.InitFuel();
-            }
-            if (playerVeh.IsAircraft())
-            {
-                if (!Managed.AircraftEngineOn && vehicle.IsEngineOn)
-                {
-                    N.SetVehicleEngineOn(vehicle, false, false, true);
-                    Managed.AircraftEngineOn = false;
-                }
-                else if (Managed.AircraftEngineOn && vehicle.IsEngineOn)
-                {
-                    float percentFuel = vehicle.FuelLevel / vehicle.MaxFuelLevel() * 100f;
-                    if (vehicle.IsInAir && percentFuel < ConfigHandler.AircraftLowFuelWarning && (DateTime.Now - Managed.LastAircraftLowFuelWarning).TotalSeconds > 5.0) // adjust timer 
-                    {
-                        SoundHandler.PlayAudio(SoundHandler.Audio.LowFuel);
-                        Managed.LastAircraftLowFuelWarning = DateTime.Now;
-                    }
-                }
-                vehicle.ConsumeAircraftFuel();
-                if (!vehicle.IsInAir && vehicle.Speed < 2f && !vehicle.IsEngineOn && (DateTime.Now - Managed.LastAircraftEngineHintDisplayed).TotalSeconds > 30.0)
-                {
-                    Game.DisplayHelp("Press ~INPUT_VEH_FLY_UNDERCARRIAGE~ to start the engine.");
-                    Managed.LastAircraftEngineHintDisplayed = DateTime.Now;
-                }
-                Managed.LastAircraftAltitude = vehicle.HeightAboveGround;
-            }
-            else
-            {
-                if (vehicle.Model.IsCar && vehicle.PetrolTankHealth() < 700f && vehicle.GetFuelLevel() > 0f)
-                {
-                    if (vehicle.PetrolTankHealth() < 250f && !vehicle.IsElectric())
-                    {
-                        vehicle.SetFuelLevel(vehicle.GetFuelLevel() - 0.005f);
-                    }
-                    vehicle.SetFuelLevel(vehicle.GetFuelLevel() - 0.003f);
-                }
-                if (vehicle.IsPlayerDriving() || Globals.RefuelingAllowed)
-                {
-                    vehicle.ConsumeRoadVehicleFuel();
-                }
-            }
-            // if (!NativeFunction.CallByHash<bool>(0x157F93B036700462) && (Globals.RefuelingAllowed || vehicle.IsPlayerDriving()))
-            // if (!N.IsRadarHidden() && (Globals.RefuelingAllowed || vehicle.IsPlayerDriving()))
-            if (Globals.RefuelingAllowed || vehicle.IsPlayerDriving())
-            {
-                if (!N.IsHudHidden() || (player.CurrentVehicle != null && player.CurrentVehicle.IsAircraft()))
-                {
-                    HUD.RenderBar(vehicle.FuelLevel, Managed.VehicleFuelCapacity, vehicle.IsElectric());
-                }
-                GasStation gas = GasStation.GetClosestInRange(player.Position, 250f);
-                if (gas != null)
-                {
-                    if (gas != Managed.GasStation)
-                    {
-                        Managed.GasStation = gas;
-                    }
-                }
-                else if (Managed.GasStation != null)
-                {
-                    Managed.GasStation = null;
-                }
-            }
-            goto IL_0328;
-            IL_0328:
-            if (Game.LocalPlayer.Character.IsOnFoot)
-            {
-                Managed.AircraftEngineOn = false;
-                ClientPed.ManualRefuel();
-                Managed.VehicleFuelLevelInitialized = false;
-                foreach (int x in Managed.TripInfos.Keys)
-                {
-                    if (Managed.TripInfos[x] != null)
-                    {
-                        try
-                        {
-                            Vehicle v = World.GetEntityByHandle<Vehicle>(new PoolHandle((uint)x));
-                            if (v.Exists() && v.IsEngineOn)
-                            {
-                                v.ConsumeRoadVehicleFuel();
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            return;
-                        }
-                    }
-                }
-            }
-            Managed.LastWorldTime = DateTime.UtcNow;
-            #endregion
-        }
-
-        private static void GPSTick()
-        {
             GameFiber.StartNew(delegate
             {
                 Ped player = Game.LocalPlayer.Character;
 
-                #region GPS System
-                if (!player.IsInAnyVehicle(false))
+                Vehicle playerVeh = player.CurrentVehicle;
+
+                if (EntityExtensions.Exists(ClientCurrentVehicle))
                 {
-                    first = true;
+                    Globals.WasDriver = ClientCurrentVehicle.Driver == ClientPed;
                 }
-                if (!player.IsInAnyVehicle(false) || player.CurrentVehicle.IsHelicopter || player.CurrentVehicle.IsPlane)
+                if (Managed.MyVehicle != ClientCurrentVehicle)
                 {
-                    return;
+                    Managed.VehicleFuelLevelInitialized = false;
                 }
-                if (!NativeFunction.CallByHash<bool>(0x1DD1F58F493F1DA5) && waypoint)
+                Managed.MyVehicle = ClientLastVehicle ?? null;
+                int refuelingAllowed;
+                if (Managed.MyVehicle != null)
                 {
-                    waypoint = false;
-                    first = true;
-                    SoundHandler.PlayAudio(SoundHandler.Audio.Arrived);
+                    vehicle = Managed.MyVehicle;
+                    if (vehicle != null && (int)vehicle.Class != 13 && !vehicle.IsBoat() && !vehicle.DisplayName().Contains("BLIMP"))
+                    {
+                        if (ClientPed.IsOnFoot)
+                        {
+                            Vector3 position = ClientPed.Position;
+                            if (position.DistanceToSquared(vehicle.Position) <= 15f)
+                            {
+                                refuelingAllowed = (Globals.WasDriver ? 1 : 0);
+                                goto IL_0162;
+                            }
+                        }
+                        refuelingAllowed = 0;
+                        goto IL_0162;
+                    }
                 }
-                if (!NativeFunction.CallByHash<bool>(0x1DD1F58F493F1DA5))
+                goto IL_0328;
+                IL_0162:
+                Globals.RefuelingAllowed = (byte)refuelingAllowed != 0;
+                if (!Managed.VehicleFuelLevelInitialized)
                 {
-                    return;
+                    vehicle.InitFuel();
                 }
-                if (first)
+                if (playerVeh.IsAircraft())
                 {
-                    waypoint = true;
-                    first = false;
-                    string[] audioFiles = { "TONE.WAV", "CALCULATINROUTE.WAV", "HIGHLIGHTEDROUTE.WAV" };
-                    int[] delays = { 1378, 1980, 2497 };
-                    SoundHandler.PlayAudioSequence(audioFiles, delays);
+                    if (!Managed.AircraftEngineOn && vehicle.IsEngineOn)
+                    {
+                        N.SetVehicleEngineOn(vehicle, false, false, true);
+                        Managed.AircraftEngineOn = false;
+                    }
+                    else if (Managed.AircraftEngineOn && vehicle.IsEngineOn)
+                    {
+                        float percentFuel = vehicle.FuelLevel / vehicle.MaxFuelLevel() * 100f;
+                        if (vehicle.IsInAir && percentFuel < ConfigHandler.AircraftLowFuelWarning && (DateTime.Now - Managed.LastAircraftLowFuelWarning).TotalSeconds > 5.0) // adjust timer 
+                        {
+                            SoundHandler.PlayAudio(SoundHandler.Audio.LowFuel);
+                            Managed.LastAircraftLowFuelWarning = DateTime.Now;
+                        }
+                    }
+                    vehicle.ConsumeAircraftFuel();
+                    if (!vehicle.IsInAir && vehicle.Speed < 2f && !vehicle.IsEngineOn && (DateTime.Now - Managed.LastAircraftEngineHintDisplayed).TotalSeconds > 30.0)
+                    {
+                        Game.DisplayHelp("Press ~INPUT_VEH_FLY_UNDERCARRIAGE~ to start the engine.");
+                        Managed.LastAircraftEngineHintDisplayed = DateTime.Now;
+                    }
+                    Managed.LastAircraftAltitude = vehicle.HeightAboveGround;
                 }
-                #endregion
-            }, "Player Controller - GPS System");
+                else
+                {
+                    if (vehicle.Model.IsCar && vehicle.PetrolTankHealth() < 700f && vehicle.GetFuelLevel() > 0f)
+                    {
+                        if (vehicle.PetrolTankHealth() < 250f && !vehicle.IsElectric())
+                        {
+                            vehicle.SetFuelLevel(vehicle.GetFuelLevel() - 0.005f);
+                        }
+                        vehicle.SetFuelLevel(vehicle.GetFuelLevel() - 0.003f);
+                    }
+                    if (vehicle.IsPlayerDriving() || Globals.RefuelingAllowed)
+                    {
+                        vehicle.ConsumeRoadVehicleFuel();
+                    }
+                }
+                // if (!NativeFunction.CallByHash<bool>(0x157F93B036700462) && (Globals.RefuelingAllowed || vehicle.IsPlayerDriving()))
+                // if (!N.IsRadarHidden() && (Globals.RefuelingAllowed || vehicle.IsPlayerDriving()))
+                if (Globals.RefuelingAllowed || vehicle.IsPlayerDriving())
+                {
+                    if (!N.IsHudHidden() || (player.CurrentVehicle != null && player.CurrentVehicle.IsAircraft()))
+                    {
+                        HUD.RenderBar(vehicle.FuelLevel, Managed.VehicleFuelCapacity, vehicle.IsElectric());
+                    }
+                    GasStation gas = GasStation.GetClosestInRange(player.Position, 250f);
+                    if (gas != null)
+                    {
+                        if (gas != Managed.GasStation)
+                        {
+                            Managed.GasStation = gas;
+                        }
+                    }
+                    else if (Managed.GasStation != null)
+                    {
+                        Managed.GasStation = null;
+                    }
+                }
+                goto IL_0328;
+                IL_0328:
+                if (Game.LocalPlayer.Character.IsOnFoot)
+                {
+                    Managed.AircraftEngineOn = false;
+                    ClientPed.ManualRefuel();
+                    Managed.VehicleFuelLevelInitialized = false;
+                    foreach (int x in Managed.TripInfos.Keys)
+                    {
+                        if (Managed.TripInfos[x] != null)
+                        {
+                            try
+                            {
+                                Vehicle v = World.GetEntityByHandle<Vehicle>(new PoolHandle((uint)x));
+                                if (v.Exists() && v.IsEngineOn)
+                                {
+                                    v.ConsumeRoadVehicleFuel();
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                return;
+                            }
+                        }
+                    }
+                }
+                Managed.LastWorldTime = DateTime.UtcNow;
+            });
+            #endregion
         }
+
+        //private static void GPSTick()
+        //{
+        //    GameFiber.StartNew(delegate
+        //    {
+        //        Ped player = Game.LocalPlayer.Character;
+
+        //        #region GPS System
+        //        if (!player.IsInAnyVehicle(false))
+        //        {
+        //            first = true;
+        //        }
+        //        if (!player.IsInAnyVehicle(false) || player.CurrentVehicle.IsHelicopter || player.CurrentVehicle.IsPlane)
+        //        {
+        //            return;
+        //        }
+        //        if (!NativeFunction.CallByHash<bool>(0x1DD1F58F493F1DA5) && waypoint)
+        //        {
+        //            waypoint = false;
+        //            first = true;
+        //            SoundHandler.PlayAudio(SoundHandler.Audio.Arrived);
+        //        }
+        //        if (!NativeFunction.CallByHash<bool>(0x1DD1F58F493F1DA5))
+        //        {
+        //            return;
+        //        }
+        //        if (first)
+        //        {
+        //            waypoint = true;
+        //            first = false;
+        //            string[] audioFiles = { "TONE.WAV", "CALCULATINROUTE.WAV", "HIGHLIGHTEDROUTE.WAV" };
+        //            int[] delays = { 1378, 1980, 2497 };
+        //            SoundHandler.PlayAudioSequence(audioFiles, delays);
+        //        }
+        //        #endregion
+        //    }, "Player Controller - GPS System");
+        //}
 
         public static void Start()
         {
             Logging.Info("starting...", "PlayerController");
-            GameFiber.StartNew(delegate { Run(); });
-            GameFiber.StartNew(delegate { Run2(); });
+            GameFiber.StartNew(delegate { VehicleSystemHandler(); });
+            GameFiber.StartNew(delegate { LeaveEngineRunningHandler(); });
         }
 
-        public static void Run()
+        public static void VehicleSystemHandler()
         {
             // NativeFunction.CallByHash<int>(0xD3BD40951412FEF6, Globals.DictRefueling); 
             N.RequestAnimDict(Globals.DictRefueling);
@@ -450,14 +453,14 @@ namespace SimpleCTRL.Threads
                 {
                     FuelTick();
                 }
-                if (ConfigHandler.GlobalPositioningSystem == true)
-                {
-                    GPSTick();
-                }
+                //if (ConfigHandler.GlobalPositioningSystem == true)
+                //{
+                //    GPSTick();
+                //}
             }
         }
 
-        private static void Run2()
+        private static void LeaveEngineRunningHandler()
         {
             #region Leave Engine Running
             while (true)
