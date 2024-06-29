@@ -96,6 +96,10 @@ namespace SimpleCTRL.Handlers
                     return "SHIFT_PARK_RELEASE_01.wav";
                 case Audio.Arrived:
                     return "UHAVEARRIVED.wav";
+                case Audio.PickUpNozzle:
+                    return "PICK_UP_NOZZLE.wav";
+                case Audio.PutBackNozzle:
+                    return "PUT_BACK_NOZZLE.wav";
                 default:
                     Logging.Warning("unknown audio type " + Enum.GetName(typeof(Audio), audio), "SoundHandler");
                     return string.Empty;
@@ -108,7 +112,9 @@ namespace SimpleCTRL.Handlers
             Indicator,
             ShiftParkPull,
             ShiftParkRelease,
-            Arrived
+            Arrived,
+            PickUpNozzle,
+            PutBackNozzle
         }
     }
 }
