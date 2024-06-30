@@ -31,5 +31,7 @@ namespace SimpleCTRL
         public static bool AircraftEngineOn = false;
 
         public static float LastAircraftAltitude = 0f;
+
+        public static bool nozzleAttached = false;
     }
 }
