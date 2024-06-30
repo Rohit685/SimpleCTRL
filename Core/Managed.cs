@@ -42,5 +42,7 @@ namespace SimpleCTRL
             Warning,
             Ready
         }
+
+        public static EngineState CurrentEngineState = EngineState.Off;
     }
 }

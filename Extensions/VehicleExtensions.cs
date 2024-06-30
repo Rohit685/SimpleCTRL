@@ -371,6 +371,8 @@ namespace SimpleCTRL.Extensions
                         GameFiber.Sleep(250);
                     }
 
+                    Managed.CurrentEngineState = EngineState.Ready;
+
                     NativeFunction.CallByHash<int>(0x428CA6DBD1094446, vehicle, false); // FREEZE_ENTITY_POSITION
                     Game.DisplayNotification("Helicopter blades at full speed and helicopter is now unfrozen.");
                 }
