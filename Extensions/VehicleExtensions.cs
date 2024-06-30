@@ -29,6 +29,31 @@ namespace SimpleCTRL.Extensions
             "prop_gas_pump_old2",
             "prop_gas_pump_old3",
         };
+        private static float[] nozzleBasedOnClass = new float[]
+        {
+            0.65f, // Compacts
+            0.65f, // Sedans
+            0.85f, // SUVs
+            0.6f,  // Coupes
+            0.55f, // Muscle
+            0.6f,  // Sports Classics
+            0.6f,  // Sports
+            0.55f, // Super
+            0.12f, // Motorcycles
+            0.8f,  // Off-road
+            0.7f,  // Industrial
+            0.6f,  // Utility
+            0.7f,  // Vans
+            0.0f,  // Cycles
+            0.0f,  // Boats
+            0.0f,  // Helicopters
+            0.0f,  // Planes
+            0.6f,  // Service
+            0.65f, // Emergency
+            0.65f, // Military
+            0.75f, // Commercial
+            0.0f   // Trains
+        };
 
         #region Pump Methods
 
@@ -333,6 +358,18 @@ namespace SimpleCTRL.Extensions
             if (Game.IsControlJustPressed(0, GameControl.VehicleFlyUnderCarriage))
             {
                 ToggleEngine(vehicle);
+
+                NativeFunction.CallByHash<int>(0x428CA6DBD1094446, vehicle, true); // FREEZE_ENTITY_POSITION
+
+                NativeFunction.CallByHash<int>(0xFD280B4D7F3ABC4D, vehicle, 0); // SET_HELI_BLADES_SPEED
+                for (int i = 1; i <= 100; i++)
+                {
+                    NativeFunction.CallByHash<int>(0xFD280B4D7F3ABC4D, vehicle, i / 100.0f); // SET_HELI_BLADES_SPEED
+                    GameFiber.Sleep(250);
+                }
+
+                NativeFunction.CallByHash<int>(0x428CA6DBD1094446, vehicle, false); // FREEZE_ENTITY_POSITION
+
             }
         }
 
@@ -531,12 +568,26 @@ namespace SimpleCTRL.Extensions
             Game.LocalPlayer.Character.Tasks.ClearSecondary();
         }
 
+        private static void GrabExistingNozzle()
+        {
+            if (Globals.fuelNozzle != null)
+            {
+                int lefthand = NativeFunction.CallByHash<int>(0x3F428D08BE5AAE31, Game.LocalPlayer.Character, 18905);
+                NativeFunction.CallByHash<int>(0x6B9BBD38AB0796DF, Globals.fuelNozzle, Game.LocalPlayer.Character, lefthand, 0.13f, 0.04f, 0.01f, -42.0f, -115.0f, -63.42f, false, true, false, true, false, true);
+                // NativeFunction.CallByHash<int>(0x6B9BBD38AB0796DF, Globals.fuelNozzle, Game.LocalPlayer.Character, N.GetPedBoneIndex(Game.LocalPlayer.Character, 0x49D9), 0.11f, 0.02f, 0.02f, -80.0f, -90.0f, 15.0f, true, true, false, true, 1, true); // ATTACH_ENTITY_TO_ENTITY
+            }
+            Managed.nozzleAttached = true;
+            Managed.nozzleInVehicle = false;
+        }
+
         private static void PutNozzleInVehicle(Vehicle vehicle, int ptankBone)
         {
             if (Globals.fuelNozzle != null)
             {
                 NativeFunction.CallByHash<int>(0x6B9BBD38AB0796DF, Globals.fuelNozzle, vehicle, ptankBone, -0.18f, 0.0f, 0.75f, -125.0f, -90.0f, -90.0f, true, true, false, false, 1, true); // ATTACH_ENTITY_TO_ENTITY
             }
+            Managed.nozzleAttached = false;
+            Managed.nozzleInVehicle = true;
         }
 
         private static void AttachNozzle()
@@ -647,12 +698,31 @@ namespace SimpleCTRL.Extensions
 
                         if (veh)
                         {
-                            Text.Draw3D(fuelTankPos, "Attach Nozzle [E]", 0.08f);
+                            VehicleClass vehClass = Managed.MyVehicle.Class;
+                            float zPos = nozzleBasedOnClass[(int)vehClass];
+
+                            Vector3 adjustedFuelTankPos = new Vector3(fuelTankPos.X, fuelTankPos.Y, fuelTankPos.Z + zPos);
+                            Text.Draw3D(adjustedFuelTankPos, "Attach Nozzle [E]", 0.08f);
                         }
                     }
                     else 
                     {
-                        Text.Draw3D(closestPump.Position, "Grab Nozzle [E]", 0.08f);
+                        if (!Managed.nozzleInVehicle)
+                        {
+                            Text.Draw3D(closestPump.Position, "Grab Nozzle [E]", 0.08f);
+                        }
+                        else
+                        {
+                            if (veh)
+                            {
+                                VehicleClass vehClass = Managed.MyVehicle.Class;
+                                float zPos = nozzleBasedOnClass[(int)vehClass];
+
+                                Vector3 adjustedFuelTankPos = new Vector3(fuelTankPos.X, fuelTankPos.Y, fuelTankPos.Z + zPos);
+
+                                Text.Draw3D(adjustedFuelTankPos, "Grab Nozzle [E]", 0.08f);
+                            }
+                        }
                     }
 
                     GameFiber.StartNew(delegate
@@ -692,13 +762,31 @@ namespace SimpleCTRL.Extensions
                                 }
                                 else
                                 {
-                                    AttachNozzle();
+                                    if (!Managed.nozzleInVehicle)
+                                    {
+                                        AttachNozzle();
+                                    }
+                                    else
+                                    {
+                                        Common.API.Functions.LoadAnim("timetable@gardener@filling_can");
+                                        NativeFunction.CallByHash<int>(0xEA47FE3719165B94, Game.LocalPlayer.Character, "timetable@gardener@filling_can", "gar_ig_5_filling_can", 2.0f, 8.0f, -1, 50, 0, 0, 0, 0);
+                                        GameFiber.Sleep(300);
+                                        GrabExistingNozzle();
+                                        GameFiber.Sleep(300);
+                                        Game.LocalPlayer.Character.Tasks.Clear();
+                                    }
                                 }
                             }
                         }
 
+                        // manage this better so it appiles to the vehicle being attached as well to the pump
                         while (Managed.nozzleAttached)
                         {
+                            //if (Managed.nozzleInVehicle)
+                            //{
+                            //    break;
+                            //}
+
                             Vector3 currentCoords = Game.LocalPlayer.Character.Position;
                             float dist = (grabbedNozzleCoords - currentCoords).Length();
                             if (dist > 7.5f)

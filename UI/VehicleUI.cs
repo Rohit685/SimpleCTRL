@@ -97,31 +97,33 @@ namespace SimpleCTRL.UI
                     Text.Draw(0.99f, .065f, .45f, Globals.isParked ? "~r~P" : "", Color.LightGray, Alignment.Right); // TXT: Current Gear
                 }
 
-                if (VehicleExtensions.IsVehicleReversing(_playerVehicle))
+                if (!_playerVehicle.IsAircraft() || !_playerVehicle.IsBlimp)
                 {
-                    gearText = "R"; 
-                }
-                else if (_playerVehicle.CurrentGear == 1)
-                {
-                    gearText = "D"; 
-                }
-                else if (_playerVehicle.CurrentGear > 1)
-                {
-                    gearText = _playerVehicle.CurrentGear.ToString(); 
-                }
-                else if (_playerVehicle.CurrentGear == 0 && NativeFunction.CallByHash<bool>(0x5721B434AD84D57A, _playerVehicle))
-                {
-                    gearText = "N"; 
-                }
-                else
-                {
-                    gearText = ""; 
-                }
+                    if (VehicleExtensions.IsVehicleReversing(_playerVehicle))
+                    {
+                        gearText = "R";
+                    }
+                    else if (_playerVehicle.CurrentGear == 1)
+                    {
+                        gearText = "D";
+                    }
+                    else if (_playerVehicle.CurrentGear > 1)
+                    {
+                        gearText = _playerVehicle.CurrentGear.ToString();
+                    }
+                    else if (_playerVehicle.CurrentGear == 0 && NativeFunction.CallByHash<bool>(0x5721B434AD84D57A, _playerVehicle))
+                    {
+                        gearText = "N";
+                    }
+                    else
+                    {
+                        gearText = "";
+                    }
 
-
-                if (!Globals.isParked)
-                {
-                    Text.Draw(0.99f, .065f, .45f, gearText, Color.LightGray, Alignment.Right);
+                    if (!Globals.isParked)
+                    {
+                        Text.Draw(0.99f, .065f, .45f, gearText, Color.LightGray, Alignment.Right);
+                    }
                 }
 
                 if (vehEngineHealth < 110)
