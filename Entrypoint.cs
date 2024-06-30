@@ -56,19 +56,18 @@ namespace SimpleCTRL
                 }
             }
 
-            if (Managed.nozzleAttached)
+            if (Globals.fuelNozzle != null)
             {
                 Globals.fuelNozzle.Delete();
-                Managed.nozzleAttached = false;
-                NativeFunction.CallByHash<int>(0x6CE36C35C1AC8163); // ROPE_UNLOAD_TEXTURES
-                unsafe
+            }
+            NativeFunction.CallByHash<int>(0x6CE36C35C1AC8163); // ROPE_UNLOAD_TEXTURES
+            unsafe
+            {
+                fixed (int* pRopeId = &Globals.Rope)
                 {
-                    fixed (int* pRopeId = &Globals.Rope)
+                    if (NativeFunction.Natives.DOES_ROPE_EXIST<bool>((IntPtr)pRopeId))
                     {
-                        if (NativeFunction.Natives.DOES_ROPE_EXIST<bool>((IntPtr)pRopeId))
-                        {
-                            NativeFunction.Natives.DELETE_ROPE<int>((IntPtr)pRopeId);
-                        }
+                        NativeFunction.Natives.DELETE_ROPE<int>((IntPtr)pRopeId);
                     }
                 }
             }
