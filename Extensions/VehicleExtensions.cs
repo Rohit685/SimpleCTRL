@@ -357,19 +357,23 @@ namespace SimpleCTRL.Extensions
         {
             if (Game.IsControlJustPressed(0, GameControl.VehicleFlyUnderCarriage))
             {
+                bool isEngineOn = vehicle.IsEngineOn;
                 ToggleEngine(vehicle);
 
-                NativeFunction.CallByHash<int>(0x428CA6DBD1094446, vehicle, true); // FREEZE_ENTITY_POSITION
-
-                NativeFunction.CallByHash<int>(0xFD280B4D7F3ABC4D, vehicle, 0); // SET_HELI_BLADES_SPEED
-                for (int i = 1; i <= 100; i++)
+                if (!isEngineOn)
                 {
-                    NativeFunction.CallByHash<int>(0xFD280B4D7F3ABC4D, vehicle, i / 100.0f); // SET_HELI_BLADES_SPEED
-                    GameFiber.Sleep(250);
+                    NativeFunction.CallByHash<int>(0x428CA6DBD1094446, vehicle, true); // FREEZE_ENTITY_POSITION
+
+                    NativeFunction.CallByHash<int>(0xFD280B4D7F3ABC4D, vehicle, 0); // SET_HELI_BLADES_SPEED
+                    for (int i = 1; i <= 100; i++)
+                    {
+                        NativeFunction.CallByHash<int>(0xFD280B4D7F3ABC4D, vehicle, i / 100.0f); // SET_HELI_BLADES_SPEED
+                        GameFiber.Sleep(250);
+                    }
+
+                    NativeFunction.CallByHash<int>(0x428CA6DBD1094446, vehicle, false); // FREEZE_ENTITY_POSITION
+                    Game.DisplayNotification("Helicopter blades at full speed and helicopter is now unfrozen.");
                 }
-
-                NativeFunction.CallByHash<int>(0x428CA6DBD1094446, vehicle, false); // FREEZE_ENTITY_POSITION
-
             }
         }
 

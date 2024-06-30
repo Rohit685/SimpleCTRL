@@ -35,5 +35,12 @@ namespace SimpleCTRL
         public static bool nozzleAttached = false;
 
         public static bool nozzleInVehicle = false;
+
+        public enum EngineState
+        {
+            Off,
+            Warning,
+            Ready
+        }
     }
 }
