@@ -1,6 +1,7 @@
 ﻿using Common.Native;
 using Rage;
 using Rage.Attributes;
+using Rage.Native;
 using SimpleCTRL.Components;
 using SimpleCTRL.Handlers;
 using SimpleCTRL.Threads;
@@ -52,6 +53,23 @@ namespace SimpleCTRL
                 if (EntityExtensions.Exists(obj))
                 {
                     obj.Delete();
+                }
+            }
+
+            if (Managed.nozzleAttached)
+            {
+                Globals.fuelNozzle.Delete();
+                Managed.nozzleAttached = false;
+                NativeFunction.CallByHash<int>(0x6CE36C35C1AC8163); // ROPE_UNLOAD_TEXTURES
+                unsafe
+                {
+                    fixed (int* pRopeId = &Globals.Rope)
+                    {
+                        if (NativeFunction.Natives.DOES_ROPE_EXIST<bool>((IntPtr)pRopeId))
+                        {
+                            NativeFunction.Natives.DELETE_ROPE<int>((IntPtr)pRopeId);
+                        }
+                    }
                 }
             }
 
