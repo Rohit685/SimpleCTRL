@@ -97,7 +97,7 @@ namespace SimpleCTRL.UI
                     Text.Draw(0.99f, .065f, .45f, Globals.isParked ? "~r~P" : "", Color.LightGray, Alignment.Right); // TXT: Current Gear
                 }
 
-                if (!_playerVehicle.IsAircraft() || !_playerVehicle.IsBlimp)
+                if (!_playerVehicle.IsAircraft() && !_playerVehicle.IsBlimp)
                 {
                     if (VehicleExtensions.IsVehicleReversing(_playerVehicle))
                     {
