@@ -2,6 +2,7 @@
 using Common.Native;
 using Common.UI;
 using Rage;
+using Rage.Native;
 using SimpleCTRL.Extensions;
 using SimpleCTRL.Handlers;
 using SimpleCTRL.Utils;
@@ -35,6 +36,8 @@ namespace SimpleCTRL.UI
                 float vehEngineHealth = _playerVehicle.EngineHealth;
                 float vehBodyHealth = N.GetVehicleBodyHealth(_playerVehicle);
                 float vehSpeedMph = _playerVehicle.Speed * (ConfigHandler.SpeedometerFormat == "KM/H" ? 3.6f : 2.236936f);
+
+                string gearText;
 
                 float speedPanelWidth = 0.046f;
                 float speedPanelHeight = 0.03f;
@@ -92,6 +95,33 @@ namespace SimpleCTRL.UI
                 if (ConfigHandler.ParkIndicatorEnabled)
                 {
                     Text.Draw(0.99f, .065f, .45f, Globals.isParked ? "~r~P" : "", Color.LightGray, Alignment.Right); // TXT: Current Gear
+                }
+
+                if (VehicleExtensions.IsVehicleReversing(_playerVehicle))
+                {
+                    gearText = "R"; 
+                }
+                else if (_playerVehicle.CurrentGear == 1)
+                {
+                    gearText = "D"; 
+                }
+                else if (_playerVehicle.CurrentGear > 1)
+                {
+                    gearText = _playerVehicle.CurrentGear.ToString(); 
+                }
+                else if (_playerVehicle.CurrentGear == 0 && NativeFunction.CallByHash<bool>(0x5721B434AD84D57A, _playerVehicle))
+                {
+                    gearText = "N"; 
+                }
+                else
+                {
+                    gearText = ""; 
+                }
+
+
+                if (!Globals.isParked)
+                {
+                    Text.Draw(0.99f, .065f, .45f, gearText, Color.LightGray, Alignment.Right);
                 }
 
                 if (vehEngineHealth < 110)
