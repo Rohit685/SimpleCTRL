@@ -25,8 +25,6 @@ namespace SimpleCTRL
 
         public static bool isParked = false;
 
-        public static int Rope;
-
         internal static InLoopOutAnimation JerryCanAnimation = new InLoopOutAnimation(new Animation("weapon@w_sp_jerrycan", "fire_intro"), new Animation("weapon@w_sp_jerrycan", "fire"), new Animation("weapon@w_sp_jerrycan", "fire_outro"));
 
         public static readonly string DictRefueling = "timetable@gardener@filling_can";
@@ -34,9 +32,5 @@ namespace SimpleCTRL
         public static readonly string AnimRefueling = "gar_ig_5_filling_can";
 
         public static uint DepartmentPumpObjectHash = (uint)new Model("prop_gas_pump_old2").Hash;
-
-        public static Object fuelNozzle = null;
-
-        public static Model fuelNozzleModel = new Model("prop_cs_fuel_nozle");
     }
 }

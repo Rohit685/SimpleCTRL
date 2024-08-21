@@ -1,5 +1,4 @@
-﻿using Common.Native;
-using Rage;
+﻿using Rage;
 using Rage.Attributes;
 using Rage.Native;
 using SimpleCTRL.Components;
@@ -34,7 +33,6 @@ namespace SimpleCTRL
                 SpecialModesManager.Start();
                 UIHandler.Start();
                 Managed.LastWorldTime = DateTime.UtcNow;
-                N.RequestModel(Globals.fuelNozzleModel);
                 GameFiber.StartNew(delegate { GameWorld.CreateDepartmentPumps(); }); 
                 GameWorld.CreateBlips();
             }
