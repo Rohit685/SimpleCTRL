@@ -1,6 +1,5 @@
 ﻿using Rage;
 using Rage.Attributes;
-using Rage.Native;
 using SimpleCTRL.Components;
 using SimpleCTRL.Handlers;
 using SimpleCTRL.Threads;
@@ -13,7 +12,7 @@ using System.Reflection;
 [assembly: Plugin("SimpleCTRL", Author = "Venoxity Development", PrefersSingleInstance = true, ShouldTickInPauseMenu = true, SupportUrl = "https://discord.gg/jCEdAF8AQz")]
 namespace SimpleCTRL
 {
-    internal class Entrypoint 
+    internal class Entrypoint
     {
         private static readonly Dictionary<string, DecoratorType> decorators = new Dictionary<string, DecoratorType>()
         {
@@ -33,7 +32,7 @@ namespace SimpleCTRL
                 SpecialModesManager.Start();
                 UIHandler.Start();
                 Managed.LastWorldTime = DateTime.UtcNow;
-                GameFiber.StartNew(delegate { GameWorld.CreateDepartmentPumps(); }); 
+                GameFiber.StartNew(delegate { GameWorld.CreateDepartmentPumps(); });
                 GameWorld.CreateBlips();
             }
             else
@@ -51,22 +50,6 @@ namespace SimpleCTRL
                 if (EntityExtensions.Exists(obj))
                 {
                     obj.Delete();
-                }
-            }
-
-            if (Globals.fuelNozzle != null)
-            {
-                Globals.fuelNozzle.Delete();
-            }
-            NativeFunction.CallByHash<int>(0x6CE36C35C1AC8163); // ROPE_UNLOAD_TEXTURES
-            unsafe
-            {
-                fixed (int* pRopeId = &Globals.Rope)
-                {
-                    if (NativeFunction.Natives.DOES_ROPE_EXIST<bool>((IntPtr)pRopeId))
-                    {
-                        NativeFunction.Natives.DELETE_ROPE<int>((IntPtr)pRopeId);
-                    }
                 }
             }
 

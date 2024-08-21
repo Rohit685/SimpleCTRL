@@ -21,7 +21,7 @@ namespace SimpleCTRL.Extensions
         {
             if (playerPed.Inventory.EquippedWeapon == null || playerPed.Inventory.EquippedWeapon.Hash != WeaponHash.PetrolCan)
             {
-                Globals.HudActive = false; // should be fine for here for now. but in theory it should be when you have it out and keep walking towards the prompt yk so it should be in position based
+                // Globals.HudActive = false; // should be fine for here for now. but in theory it should be when you have it out and keep walking towards the prompt yk so it should be in position based
                 return;
             }
             Vector3 pos = ((Entity)playerPed).Position;
@@ -82,11 +82,11 @@ namespace SimpleCTRL.Extensions
                 Globals.JerryCanAnimation.RewindAndStop(playerPed);
             }
             HUD.RenderInstructions();
-            if (!Globals.HudActive) 
-            {
-                NativeFunction.CallByHash<int>(0x67C540AA08E4A6F5, -1, "CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", 1);
-            }
-            Globals.HudActive = true;
+            //if (!Globals.HudActive) 
+            //{
+            //    NativeFunction.CallByHash<int>(0x67C540AA08E4A6F5, -1, "CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", 1);
+            //}
+            //Globals.HudActive = true;
         }
         #endregion
 

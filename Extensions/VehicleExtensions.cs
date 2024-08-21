@@ -334,10 +334,10 @@ namespace SimpleCTRL.Extensions
         {
             List<string> electricVehicles = new List<string>
             {
-                "airtug", "caddy", "caddy2", "caddy3", "cyclone", "dilettante", "imorgon", "iwagen", "khamelion", "neon", 
+                "airtug", "caddy", "caddy2", "caddy3", "cyclone", "dilettante", "imorgon", "iwagen", "khamelion", "neon",
                 "omnisegt", "raiden", "surge", "tezeract", "voltic", "voltic2"
             };
-        
+
             return electricVehicles.Contains(vehicle.DisplayName().ToLower());
         }
         #endregion
