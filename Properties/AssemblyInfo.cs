@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Venoxity Development")]
 [assembly: AssemblyProduct("SimpleCTRL")]
-[assembly: AssemblyCopyright("Copyright © 2021-2024")]
+[assembly: AssemblyCopyright("Copyright Â© 2021-2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
