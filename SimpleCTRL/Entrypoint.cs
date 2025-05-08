@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using SimpleCTRL.Modules;
 
 [assembly: Rage.Attributes.Plugin("SimpleCTRL", Author = "Venoxity Development", PrefersSingleInstance = true, ShouldTickInPauseMenu = true, SupportUrl = "https://discord.gg/jCEdAF8AQz")]
 namespace SimpleCTRL
@@ -34,6 +34,8 @@ namespace SimpleCTRL
                 Settings.Initialize();
                 Decorators.Initialize();
                 Decorators.Register(decorators);
+
+                VehicleDamageModule.Start();
 
                 Logging.Info("SimpleCTRL successfully initialized.", "EntryPoint");
             }
