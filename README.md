@@ -1,1 +1,1 @@
-# SimpleCTRL<br>[![GitHub Actions][actions-img]][actions-url]
+# SimpleCTRL<br>
