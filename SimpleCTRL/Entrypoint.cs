@@ -36,6 +36,7 @@ namespace SimpleCTRL
                 Decorators.Register(decorators);
 
                 VehicleDamageModule.Start();
+                VehicleSystemModule.Start();
 
                 Logging.Info("SimpleCTRL successfully initialized.", "EntryPoint");
             }
