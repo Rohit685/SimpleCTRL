@@ -74,4 +74,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>SET GTA="C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V"
+
+if exist %25GTA%25 (
+  copy /Y "$(TargetDir)$(ProjectName).dll" "C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\Plugins\$(ProjectName).dll"
+  copy /Y "$(TargetDir)$(ProjectName).pdb" "C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\Plugins\$(ProjectName).pdb"
+)
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>
