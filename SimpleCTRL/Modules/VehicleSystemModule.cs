@@ -57,7 +57,7 @@
 
         private static void PreventSeatShuffling()
         {
-            if (!Settings.AllowShuffle) return;
+            if (Settings.AllowShuffle) return;
 
             Vehicle playerVeh = ClientCurrentVehicle;
             if (!EntityExtensions.Exists(playerVeh)) return;
@@ -96,15 +96,29 @@
 
         private static void MaintainWheelPosition()
         {
-            if (Settings.EnableTireRentainment && ShouldMaintainSteeringPosition())
+            if (Settings.EnableTireRentainment)
             {
-                _steeringVeh = ClientCurrentVehicle;
-                _steeringAngle = GetSteeringAngle(ClientCurrentVehicle.SteeringAngle);
-            }
+                if (ShouldMaintainSteeringPosition())
+                {
+                    _steeringVeh = ClientCurrentVehicle;
+                    if (ClientCurrentVehicle.SteeringAngle > 20)
+                    {
+                        _steeringAngle = 40;
+                    }
+                    else if (ClientCurrentVehicle.SteeringAngle < -20)
+                    {
+                        _steeringAngle = -40;
+                    }
+                    else if (ClientCurrentVehicle.SteeringAngle > 5 || ClientCurrentVehicle.SteeringAngle < -5)
+                    {
+                        _steeringAngle = ClientCurrentVehicle.SteeringAngle;
+                    }
+                }
 
-            if (EntityExtensions.Exists(_steeringVeh) && (ClientPed.IsOnFoot || N.IsVehicleStopped(_steeringVeh)))
-            {
-                _steeringVeh.SteeringAngle = _steeringAngle;
+                if (EntityExtensions.Exists(_steeringVeh) && (ClientPed.IsOnFoot || N.IsVehicleStopped(_steeringVeh)))
+                {
+                    _steeringVeh.SteeringAngle = _steeringAngle;
+                }
             }
         }
 
@@ -114,13 +128,6 @@
                    ClientCurrentVehicle.Driver == ClientPed && ClientCurrentVehicle.IsAlive &&
                    !ClientCurrentVehicle.Model.IsBicycle && (ClientCurrentVehicle.Model.IsCar ||
                    ClientCurrentVehicle.Model.IsBike || ClientCurrentVehicle.Model.IsQuadBike);
-        }
-
-        private static float GetSteeringAngle(float currentAngle)
-        {
-            if (currentAngle > 20) return 40;
-            if (currentAngle < -20) return -40;
-            return Math.Abs(currentAngle) > 5 ? currentAngle : 0;
         }
 
         private static void ManageBrakeOverheating()
