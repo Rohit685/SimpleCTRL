@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("SimpleCTRL")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("HP Inc.")]
+[assembly: AssemblyCompany("Venoxity Development")]
 [assembly: AssemblyProduct("SimpleCTRL")]
-[assembly: AssemblyCopyright("Copyright © HP Inc. 2025")]
+[assembly: AssemblyCopyright("Copyright © 2021-2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
