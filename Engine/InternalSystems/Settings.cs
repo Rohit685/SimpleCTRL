@@ -1,3 +1,0 @@
-namespace SimpleCTRL.Engine.InternalSystems
-{
-}
