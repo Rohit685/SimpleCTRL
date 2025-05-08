@@ -37,6 +37,7 @@ namespace SimpleCTRL
 
                 VehicleDamageModule.Start();
                 VehicleSystemModule.Start();
+                KeybindManager.Start();
 
                 Logging.Info("SimpleCTRL successfully initialized.", "EntryPoint");
             }
