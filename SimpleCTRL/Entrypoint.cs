@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SimpleCTRL
 {
-    public class Class1
+    public class Entrypoint
     {
     }
 }
