@@ -66,6 +66,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Engine\InternalSystems\KeybindManager.cs" />
     <Compile Include="Engine\InternalSystems\Logging.cs" />
     <Compile Include="Engine\InternalSystems\Settings.cs" />
     <Compile Include="Entrypoint.cs" />
