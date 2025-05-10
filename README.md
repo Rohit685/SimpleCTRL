@@ -1,3 +1,3 @@
 # SimpleCTRL<br>
 
-SimpleCTRL is a plugin for controlling various vehicle functions such as indicators, engine control, and other features.
+A friendly, feature-packed plugin that brings realistic vehicle control and immersive driving mechanics to Grand Theft Auto V.
