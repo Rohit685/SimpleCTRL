@@ -15,10 +15,14 @@ namespace SimpleCTRL
         #region Plugin Entry Point       
         public static void Main()
         {
-            Logging.Info("SimpleCTRL plugin lifecycle started.", "EntryPoint");
+            Logging.Info("Plugin startup initiated.", "Entrypoint");
 
             DependencyManager.AddDependency("Venoxity.Common.dll", "1.0.8");
-            if (!DependencyManager.CheckDependencies()) return;
+            if (!DependencyManager.CheckDependencies())
+            {
+                Logging.Error("Missing required dependencies. Plugin will not start.", "Entrypoint");
+                return;
+             }
 
             InitializePlugin();
         }
