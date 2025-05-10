@@ -56,7 +56,6 @@ namespace SimpleCTRL
             try
             {
                 CleanUp();
-
                 Logging.Info("Plugin successfully unloaded.", "EntryPoint");
             }
             catch (Exception ex)
@@ -67,7 +66,7 @@ namespace SimpleCTRL
 
         private static void CleanUp()
         {
-            Logging.Info("Cleaning up resources...", "Entrypoint");
+            Logging.Info("Cleaning up plugin resources.", "Entrypoint");
         }
         #endregion
     }
