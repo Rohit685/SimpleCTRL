@@ -31,7 +31,7 @@ namespace SimpleCTRL
         #region Initialization
         private static void InitializePlugin()
         {
-            Logging.Info("Initializing SimpleCTRL...", "EntryPoint");
+            Logging.Info("Initializing systems and modules...", "Entrypoint");
 
             try
             {
@@ -43,11 +43,11 @@ namespace SimpleCTRL
                 VehicleSystemModule.Start();
                 KeybindManager.Start();
 
-                Logging.Info("SimpleCTRL successfully initialized.", "EntryPoint");
+                Logging.Info("All modules successfully initialized.", "Entrypoint");
             }
             catch (Exception ex)
             {
-                Logging.Error($"Initialization failed: {ex.Message}", "EntryPoint");
+                 Logging.Error($"Initialization failed: {ex.Message}\n{ex.StackTrace}", "Entrypoint");
             }
         }
         #endregion
@@ -55,16 +55,16 @@ namespace SimpleCTRL
         #region Cleanup
         public static void OnUnload(bool isTerminating)
         {
-            Logging.Info($"Plugin unloading initiated.", "EntryPoint");
+            Logging.Info($"Plugin unloading... Terminating = {isTerminating}", "Entrypoint");
 
             try
             {
                 CleanUp();
-                Logging.Info("Plugin successfully unloaded.", "EntryPoint");
+                Logging.Info("Plugin successfully unloaded.", "Entrypoint");
             }
             catch (Exception ex)
             {
-                Logging.Error($"Error during unload: {ex.Message}", "EntryPoint");
+                Logging.Error($"Error during unload: {ex.Message}\n{ex.StackTrace}", "Entrypoint");
             }
         }
 
