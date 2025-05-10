@@ -3,15 +3,10 @@
     internal class KeybindManager : CommonPlugin
     {
         #region Configuration & State
-        // --- Engine & Emergency Restrictions ---
         private static bool _restrictEmergency = false;
         private static bool _keepDoorsOpen = true;
         private static bool _doorsNotify = false;
-
-        // --- Seatbelt Tracking ---
         private static bool _isSeatbeltFastened;
-
-        // --- Control Hold Tracking ---
         private static bool isHeld;
         private static int heldTime;
         private static int elapsedTime;
@@ -85,41 +80,44 @@
         #region Utility Methods
         private static void CheckControlHoldDuration(Func<bool> controlCondition, int requiredTime, Action firstAction, Action alternativeAction = null)
         {
-            // Decrease the timeout counter if it's greater than zero
             if (timeout > 0)
                 timeout--;
 
-            // Check if the control condition is met and the timeout has elapsed
-            if (controlCondition.Invoke() && timeout <= 0)
+            bool isConditionMet = controlCondition.Invoke();
+
+            if (isConditionMet && timeout <= 0)
             {
-                // If the control is not already held, mark the start time
                 if (!isHeld)
                 {
                     isHeld = true;
-                    heldTime = (int)Game.GameTime;  // Store the time when the control is first held
+                    heldTime = (int)Game.GameTime;
+                    Logging.Debug("Control hold started", "KeybindManager");
                 }
                 else
                 {
-                    // Calculate the elapsed time since the control was first held
                     elapsedTime = (int)(Game.GameTime - heldTime);
+                    Logging.Debug($"Control hold ongoing: elapsedTime = {elapsedTime}ms", "KeybindManager");
 
-                    // If the required time has passed, trigger the first action
                     if (elapsedTime >= requiredTime)
                     {
+                        Logging.Debug("Required hold time met, invoking first action", "KeybindManager");
                         firstAction.Invoke();
                     }
                 }
             }
             else
             {
-                // If the control was held but released too early, trigger the alternative action (if provided)
                 if (isHeld && elapsedTime <= requiredTime && alternativeAction != null)
                 {
+                    Logging.Debug("Control released early, invoking alternative action", "KeybindManager");
                     alternativeAction.Invoke();
                 }
 
-                // Reset the holding state
+                if (isHeld)
+                    Logging.Debug("Control hold reset", "KeybindManager");
+
                 isHeld = false;
+                elapsedTime = 0;
             }
         }
 
