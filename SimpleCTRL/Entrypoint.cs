@@ -47,7 +47,7 @@ namespace SimpleCTRL
             }
             catch (Exception ex)
             {
-                 Logging.Error($"Initialization failed: {ex.Message}\n{ex.StackTrace}", "Entrypoint");
+                Logging.Error($"Initialization failed: {ex.Message}\n{ex.StackTrace}", "Entrypoint");
             }
         }
         #endregion
