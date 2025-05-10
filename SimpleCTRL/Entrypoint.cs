@@ -1,18 +1,18 @@
-﻿using SimpleCTRL.Modules;
+using SimpleCTRL.Modules;
 
 [assembly: Rage.Attributes.Plugin("SimpleCTRL", Author = "Venoxity Development", PrefersSingleInstance = true, ShouldTickInPauseMenu = true, SupportUrl = "https://discord.gg/jCEdAF8AQz")]
 namespace SimpleCTRL
 {
     public class Entrypoint : CommonPlugin
     {
-        #region Fields
+        #region Constants
         private static readonly Dictionary<string, DecoratorType> decorators = new Dictionary<string, DecoratorType>()
         {
             { "brakeHeat", DecoratorType.Int }
         };
         #endregion
 
-        #region Plugin Lifecycle        
+        #region Plugin Entry Point       
         public static void Main()
         {
             Logging.Info("SimpleCTRL plugin lifecycle started.", "EntryPoint");
@@ -24,7 +24,7 @@ namespace SimpleCTRL
         }
         #endregion
 
-        #region Plugin Initialization
+        #region Initialization
         private static void InitializePlugin()
         {
             Logging.Info("Initializing SimpleCTRL...", "EntryPoint");
@@ -48,7 +48,7 @@ namespace SimpleCTRL
         }
         #endregion
 
-        #region Unload
+        #region Cleanup
         public static void OnUnload(bool isTerminating)
         {
             Logging.Info($"Plugin unloading initiated.", "EntryPoint");
