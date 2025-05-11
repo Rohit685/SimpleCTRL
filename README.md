@@ -21,4 +21,7 @@ distributed in binary form, but the source code is maintained privately within t
 ## Intended Use
 
 This repository is intended for internal development and is only visible to authorized team members. **Do not 
-share plugin binaries or reference this repository in any public channels.**
+share plugin binaries or reference this repository in any public channels.** However, sharing development-related
+information, such as commit logs or progress updates, within **private channels** (e.g., Discord) is acceptable.
+
+All modifications must be tracked via **tagged releases** and documented in [`CHANGELOG.md`](./CHANGELOG.md).
