@@ -1,6 +1,17 @@
 # SimpleCTRL (Source – Internal Use Only)
 
+[![Status](https://img.shields.io/badge/visibility-private-informational?style=flat-square)](#)
+[![License](https://img.shields.io/badge/license-internal--use--only-lightgrey?style=flat-square)](#)
+[![Maintained by](https://img.shields.io/badge/maintainer-GravityScriptsV2-blue?style=flat-square)](#)
+
 This repository contains the **official internal source code** for the SimpleCTRL plugin, developed and maintained by the **Venoxity Development** team.
 
 > It serves as the central hub for source management, version tracking, release packaging, and technical documentation.
 > **Confidential – for internal use only. Do not distribute.**
+
+---
+
+## Summary
+
+**SimpleCTRL** is a closed-source plugin that enhances vehicle behavior and control in GTA V. It is publicly 
+distributed in binary form, but the source code is maintained privately within this internal repository.
