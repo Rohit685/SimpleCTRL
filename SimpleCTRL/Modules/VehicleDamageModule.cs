@@ -79,6 +79,7 @@
         }
         #endregion
 
+        #region Main Logic
         private static void FlipTick()
         {
             if (!TorqueMultiplierEnable && !LimpMode)
@@ -302,5 +303,6 @@
                 _lastVehicle = _currentVehicle;
             }
         }
+        #endregion
     }
 }
