@@ -157,11 +157,7 @@
                 }
 
                 healthEngineCurrent = _currentVehicle.EngineHealth;
-                if (healthEngineCurrent == 1000f)
-                {
-                    healthEngineLast = 1000f;
-                }
-
+                if (healthEngineCurrent == 1000f) healthEngineLast = 1000f;
                 healthEngineNew = healthEngineCurrent;
                 healthEngineDelta = healthEngineLast - healthEngineCurrent;
                 healthEngineDeltaScaled = healthEngineDelta * DamageFactorEngine * classMultiplier;
@@ -172,10 +168,7 @@
                 }
 
                 healthBodyCurrent = N.GetVehicleBodyHealth(_currentVehicle);
-                if (healthBodyCurrent == 1000f)
-                {
-                    healthBodyLast = 1000f;
-                }
+                if (healthBodyCurrent == 1000f) healthBodyLast = 1000f;
                 healthBodyNew = healthBodyCurrent;
                 healthBodyDelta = healthBodyLast - healthBodyCurrent;
                 healthBodyDeltaScaled = healthBodyDelta * DamageFactorBody * classMultiplier;
@@ -186,10 +179,7 @@
                 }
 
                 healthPetrolTankCurrent = _currentVehicle.FuelTankHealth;
-                if (healthPetrolTankCurrent == 1000f)
-                {
-                    healthPetrolTankLast = 1000f;
-                }
+                if (healthPetrolTankCurrent == 1000f) healthPetrolTankLast = 1000f;
                 healthPetrolTankNew = healthPetrolTankCurrent;
                 healthPetrolTankDelta = healthPetrolTankLast - healthPetrolTankCurrent;
                 healthPetrolTankDeltaScaled = healthPetrolTankDelta * DamageFactorPetrolTank * classMultiplier;
