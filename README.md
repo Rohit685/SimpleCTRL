@@ -15,3 +15,10 @@ This repository contains the **official internal source code** for the SimpleCTR
 
 **SimpleCTRL** is a closed-source plugin that enhances vehicle behavior and control in GTA V. It is publicly 
 distributed in binary form, but the source code is maintained privately within this internal repository.
+
+--- 
+
+## Intended Use
+
+This repository is intended for internal development and is only visible to authorized team members. **Do not 
+share plugin binaries or reference this repository in any public channels.**
