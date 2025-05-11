@@ -2,19 +2,11 @@
 {
     public class VehicleDamageModule : CommonPlugin
     {
-        #region Constants
-
-        private const float MaxVehicleHealth = 1000f;
-        private const float EngineSafeGuard = 100f;
-        private const float CascadingFailureThreshold = 310f;
-
-        #endregion
-
         #region Vehicle Configuration and Damage Settings
 
         // Vehicle state
         private static bool pedInSameVehicleLast;
-        private static Vehicle _lastVehicle, _repairedVehicle;
+        private static Vehicle _currentVehicle, _lastVehicle, _repairedVehicle;
 
         // Deformation and collision settings
         private static int DeformationMultiplier = -1;
@@ -32,6 +24,8 @@
         private static float DegradingHealthSpeedFactor = 3.0f;
         private static float CascadingFailureSpeedFactor = 1.5f;
         private static float DegradingFailureThreshold = 677f;
+        private static float CascadingFailureThreshold = 310f;
+        private static float EngineSafeGuard = 100f;
 
         // Torque and limp mode settings
         private static bool TorqueMultiplierEnable = true;
@@ -53,15 +47,15 @@
         private static float _fBrakeForce = 1f;
 
         // Engine Health
-        private static float healthEngineLast, healthEngineCurrent, healthEngineNew = MaxVehicleHealth;
+        private static float healthEngineLast, healthEngineCurrent, healthEngineNew = 1000f;
         private static float healthEngineDelta, healthEngineDeltaScaled = 0f;
 
         // Body Health
-        private static float healthBodyLast, healthBodyCurrent, healthBodyNew = MaxVehicleHealth;
+        private static float healthBodyLast, healthBodyCurrent, healthBodyNew = 1000f;
         private static float healthBodyDelta, healthBodyDeltaScaled = 0f;
 
         // Petrol Tank Health
-        private static float healthPetrolTankLast, healthPetrolTankCurrent, healthPetrolTankNew = MaxVehicleHealth;
+        private static float healthPetrolTankLast, healthPetrolTankCurrent, healthPetrolTankNew = 1000f;
         private static float healthPetrolTankDelta, healthPetrolTankDeltaScaled = 0f;
 
         #endregion
@@ -85,27 +79,34 @@
         }
         #endregion
 
-        #region Main Logic
         private static void FlipTick()
         {
-            if (!TorqueMultiplierEnable && !LimpMode) return;
-
-            if (!pedInSameVehicleLast) return;
-
-            float factor = 1f;
-
-            if (TorqueMultiplierEnable && healthEngineNew < 900)
+            if (!TorqueMultiplierEnable && !LimpMode)
             {
-                factor = (healthEngineNew + 200f) / 1100;
+                return;
             }
 
-            if (LimpMode && healthEngineNew < (EngineSafeGuard + 5))
+            if (TorqueMultiplierEnable || LimpMode)
             {
-                factor = LimpModeMultiplier;
-                N.SetVehicleMaxSpeed(ClientPed.CurrentVehicle, 20f);
-            }
+                if (!pedInSameVehicleLast)
+                {
+                    return;
+                }
 
-            ClientPed.CurrentVehicle.EngineTorqueMultiplier(factor);
+                float factor = 1f;
+                if (TorqueMultiplierEnable && healthEngineNew < 900)
+                {
+                    factor = (healthEngineNew + 200f) / 1100;
+                }
+
+                if (LimpMode && healthEngineNew < (EngineSafeGuard + 5))
+                {
+                    factor = LimpModeMultiplier;
+                    N.SetVehicleMaxSpeed(_currentVehicle, 20f);
+                }
+
+                _currentVehicle.EngineTorqueMultiplier(factor);
+            }
         }
 
         private static void MainLoop()
@@ -114,7 +115,24 @@
             {
                 if (pedInSameVehicleLast)
                 {
-                    RestoreVehicleSettings();
+                    _lastVehicle = ClientPed.LastVehicle;
+
+                    if (EntityExtensions.Exists(_lastVehicle))
+                    {
+                        if (DeformationMultiplier != -1)
+                        {
+                            _lastVehicle.HandlingData.DeformationDamageMultiplier = _fDeformationDamageMult; // Restore deformation multiplier
+                        }
+
+                        _lastVehicle.HandlingData.BrakeForce = _fBrakeForce; // Restore Brake Force multiplier
+
+                        if (WeaponsDamageMultiplier != 1)
+                        {
+                            _lastVehicle.HandlingData.WeaponDamageMultiplier = WeaponsDamageMultiplier; // Since we are out of the vehicle, we should no longer compensate for bodyDamageFactor
+                        }
+                        _lastVehicle.HandlingData.CollisionDamageMultiplier = _fCollisionDamageMult; // Restore the original CollisionDamageMultiplier
+                        _lastVehicle.HandlingData.EngineDamageMultiplier = _fEngineDamageMult; // Restore the original EngineDamageMultiplier
+                    }
                 }
 
                 pedInSameVehicleLast = false;
@@ -123,203 +141,166 @@
 
             if (ClientPed.IsInAnyVehicle(false))
             {
-                CalculateVehicleHealth();
+                _currentVehicle = ClientPed.CurrentVehicle;
 
-                UpdateVehicleState();
+                float classMultiplier;
 
-                if (ClientPed.CurrentVehicle != _lastVehicle)
+                try
+                {
+                    classMultiplier = ClassDamageMultiplier[(int)_currentVehicle.Class];
+                }
+                catch (ArgumentOutOfRangeException ex)
+                {
+                    classMultiplier = 1.0f;
+                    Logging.Error($"ArgumentOutOfRangeException in vehicle class multiplier: {ex.Message}", "VehicleDamageModule");
+                }
+
+                healthEngineCurrent = _currentVehicle.EngineHealth;
+                if (healthEngineCurrent == 1000f)
+                {
+                    healthEngineLast = 1000f;
+                }
+
+
+                healthEngineNew = healthEngineCurrent;
+                healthEngineDelta = healthEngineLast - healthEngineCurrent;
+                healthEngineDeltaScaled = healthEngineDelta * DamageFactorEngine * classMultiplier;
+
+                healthBodyCurrent = N.GetVehicleBodyHealth(_currentVehicle);
+                if (healthBodyCurrent == 1000f)
+                {
+                    healthBodyLast = 1000f;
+                }
+                healthBodyNew = healthBodyCurrent;
+                healthBodyDelta = healthBodyLast - healthBodyCurrent;
+                healthBodyDeltaScaled = healthBodyDelta * DamageFactorBody * classMultiplier;
+
+                healthPetrolTankCurrent = _currentVehicle.FuelTankHealth;
+                if (healthPetrolTankCurrent == 1000f)
+                {
+                    healthPetrolTankLast = 1000f;
+                }
+                healthPetrolTankNew = healthPetrolTankCurrent;
+                healthPetrolTankDelta = healthPetrolTankLast - healthPetrolTankCurrent;
+                healthPetrolTankDeltaScaled = healthPetrolTankDelta * DamageFactorPetrolTank * classMultiplier;
+
+                if (healthEngineCurrent > EngineSafeGuard + 1 && _currentVehicle.FuelLevel > 1f)
+                {
+                    _currentVehicle.IsDriveable = true;
+                }
+
+                if (healthEngineCurrent <= EngineSafeGuard && (!LimpMode || _currentVehicle.OilLevel() < 3f) && !N.IsVehicleTyreBurst(_currentVehicle, 1, true))
+                {
+                    _currentVehicle.IsDriveable = false;
+                    N.SetVehicleTyreBurst(_currentVehicle, 1, true, 1000f);
+                }
+
+                if (_currentVehicle != _lastVehicle)
                 {
                     pedInSameVehicleLast = false;
                 }
 
                 if (pedInSameVehicleLast)
                 {
-                    HandleDamageInVehicle();
+                    if (healthEngineCurrent != 1000f || healthBodyCurrent != 1000f || healthPetrolTankCurrent != 1000f)
+                    {
+                        // Combine the delta values (Get the largest of the three)
+                        float healthEngineCombinedDelta = Math.Max(healthEngineDeltaScaled, Math.Max(healthBodyDeltaScaled, healthPetrolTankDeltaScaled));
+
+                        // If complete damage, but not catastrophic(ie.explosion territory) pull back a bit, to give a couple seconds of engine runtime before dying
+                        if (healthEngineCombinedDelta > healthEngineCurrent)
+                        {
+                            healthEngineCombinedDelta = healthEngineCurrent - (CascadingFailureThreshold / 5);
+                        }
+
+                        // ======= Calculate new value =======
+                        healthEngineNew = healthEngineLast - healthEngineCombinedDelta;
+
+                        // ======= Sanity Check on new values and further manipulations
+                        //  If somewhat damaged, slowly degrade until slightly before cascading failure sets in, then stop
+
+                        if (healthEngineNew > (DegradingFailureThreshold + 5) && (_currentVehicle.Class == VehicleClass.Emergency ? healthEngineNew < 850f : healthEngineNew < 950f) && _currentVehicle.IsEngineOn && _currentVehicle.Speed > 2f)
+                        {
+                            healthEngineNew -= (0.02f * DegradingHealthSpeedFactor);
+                        }
+
+                        // If Damage is near catastrophic, cascade the failure
+                        if (healthEngineNew < CascadingFailureThreshold && _currentVehicle.IsEngineOn && _currentVehicle.Speed > 2f)
+                        {
+                            healthEngineNew -= (0.05f * CascadingFailureSpeedFactor);
+                        }
+
+                        // Prevent Engine going to or below zero. Ensures you can reenter a damaged car.
+                        if (healthEngineNew < EngineSafeGuard)
+                        {
+                            healthEngineNew = EngineSafeGuard;
+                        }
+
+                        if (healthBodyNew < 0f)
+                        {
+                            healthBodyNew = 0f;
+                        }
+                    }
+                    else
+                    {
+                        // Vehicle is fixed?
+                        _repairedVehicle = null;
+                        N.SetVehicleMaxSpeed(_currentVehicle, 500.01f);
+                    }
                 }
                 else
                 {
-                    InitializeNewVehicle();
+                    // Just got into a vehicle. Damage cannot be multipled this round
+
+                    // Set vehicle handling meta
+                    _fDeformationDamageMult = _currentVehicle.HandlingData.DeformationDamageMultiplier;
+                    _fBrakeForce = _currentVehicle.HandlingData.BrakeForce;
+                    if (DeformationMultiplier != -1)
+                    {
+                        _currentVehicle.HandlingData.DeformationDamageMultiplier = (float)Math.Pow(_fDeformationDamageMult, DeformationExponent) * DeformationMultiplier; // Multiply by our factor
+                    }
+
+                    if (WeaponsDamageMultiplier != -1)
+                    {
+                        _currentVehicle.HandlingData.WeaponDamageMultiplier = WeaponsDamageMultiplier / DamageFactorBody; // Set weaponsDamageMultiplier and compensate for damageFactorBody
+                    }
+
+                    _fCollisionDamageMult = _currentVehicle.HandlingData.CollisionDamageMultiplier;
+                    // Modify it by pulling all numbers to 1f
+                    _currentVehicle.HandlingData.CollisionDamageMultiplier = (float)Math.Pow(_fCollisionDamageMult, CollisionDamageExponent);
+
+                    _fEngineDamageMult = _currentVehicle.HandlingData.EngineDamageMultiplier;
+                    _currentVehicle.HandlingData.EngineDamageMultiplier = (float)Math.Pow(_fEngineDamageMult, EngineDamageExponent);
+
+                    // If body damage catastrophic, reset somewhat so we can get new damage to multiply
+                    if (healthBodyCurrent < CascadingFailureThreshold)
+                    {
+                        healthBodyNew = CascadingFailureThreshold;
+                    }
+
+                    pedInSameVehicleLast = true;
                 }
 
-                StoreCurrentValues();
+                // Set the actual values
+                if (healthEngineNew != healthEngineCurrent)
+                {
+                    _currentVehicle.EngineHealth = healthEngineNew;
+                }
+                if (healthBodyNew != healthBodyCurrent)
+                {
+                    N.SetVehicleBodyHealth(_currentVehicle, healthBodyNew);
+                }
+                if (healthPetrolTankNew != healthPetrolTankCurrent)
+                {
+                    _currentVehicle.FuelTankHealth = healthPetrolTankNew;
+                }
+
+                // Store current values, so we can calculate delta next time
+                healthEngineLast = healthEngineNew;
+                healthBodyLast = healthBodyNew;
+                healthPetrolTankLast = healthPetrolTankNew;
+                _lastVehicle = _currentVehicle;
             }
         }
-        #endregion
-
-        #region Vehicle Handling
-        private static void RestoreVehicleSettings()
-        {
-            _lastVehicle = ClientPed.LastVehicle;
-
-            if (EntityExtensions.Exists(_lastVehicle))
-            {
-                if (DeformationMultiplier != -1)
-                    _lastVehicle.HandlingData.DeformationDamageMultiplier = _fDeformationDamageMult;
-
-                _lastVehicle.HandlingData.BrakeForce = _fBrakeForce;
-
-                if (WeaponsDamageMultiplier != 1)
-                    _lastVehicle.HandlingData.WeaponDamageMultiplier = WeaponsDamageMultiplier;
-
-                _lastVehicle.HandlingData.CollisionDamageMultiplier = _fCollisionDamageMult;
-                _lastVehicle.HandlingData.EngineDamageMultiplier = _fEngineDamageMult;
-            }
-        }
-
-        private static void UpdateVehicleState()
-        {
-            if (healthEngineCurrent > EngineSafeGuard + 1 && ClientPed.CurrentVehicle.FuelLevel > 1f)
-            {
-                ClientPed.CurrentVehicle.IsDriveable = true;
-            }
-
-            if (healthEngineCurrent <= EngineSafeGuard && (!LimpMode || ClientPed.CurrentVehicle.OilLevel() < 3f) && !N.IsVehicleTyreBurst(ClientPed.CurrentVehicle, 1, true))
-            {
-                ClientPed.CurrentVehicle.IsDriveable = false;
-                N.SetVehicleTyreBurst(ClientPed.CurrentVehicle, 1, true, 1000f);
-            }
-        }
-
-        private static void HandleDamageInVehicle()
-        {
-            if (healthEngineCurrent != MaxVehicleHealth || healthBodyCurrent != MaxVehicleHealth || healthPetrolTankCurrent != MaxVehicleHealth)
-            {
-                // Combine the delta values (Get the largest of the three)
-                float healthEngineCombinedDelta = Math.Max(healthEngineDeltaScaled, Math.Max(healthBodyDeltaScaled, healthPetrolTankDeltaScaled));
-
-                // Prevent catastrophic damage from going below a reasonable threshold
-                healthEngineCombinedDelta = Math.Min(healthEngineCombinedDelta, healthEngineCurrent - (CascadingFailureThreshold / 5));
-
-                // ======= Calculate new value =======
-                healthEngineNew = healthEngineLast - healthEngineCombinedDelta;
-
-                // ======= Sanity Check and further manipulations =======
-                ApplyHealthDecay();
-            }
-            else
-            {
-                // Vehicle is fixed?
-                _repairedVehicle = null;
-                N.SetVehicleMaxSpeed(ClientPed.CurrentVehicle, 500.01f);
-            }
-        }
-
-        private static void ApplyHealthDecay()
-        {
-            if (healthEngineNew > (DegradingFailureThreshold + 5) && (ClientPed.CurrentVehicle.Class == VehicleClass.Emergency ? healthEngineNew < 850f : healthEngineNew < 950f) && ClientPed.CurrentVehicle.IsEngineOn && ClientPed.CurrentVehicle.Speed > 2f)
-            {
-                healthEngineNew -= (0.02f * DegradingHealthSpeedFactor);
-            }
-
-            if (healthEngineNew < CascadingFailureThreshold && ClientPed.CurrentVehicle.IsEngineOn && ClientPed.CurrentVehicle.Speed > 2f)
-            {
-                healthEngineNew -= (0.05f * CascadingFailureSpeedFactor);
-            }
-
-            if (healthEngineNew < EngineSafeGuard)
-            {
-                healthEngineNew = EngineSafeGuard;
-            }
-
-            if (healthBodyNew < 0f)
-            {
-                healthBodyNew = 0f;
-            }
-        }
-
-        private static void InitializeNewVehicle()
-        {
-            // Set vehicle handling meta
-            _fDeformationDamageMult = ClientPed.CurrentVehicle.HandlingData.DeformationDamageMultiplier;
-            _fBrakeForce = ClientPed.CurrentVehicle.HandlingData.BrakeForce;
-
-            if (DeformationMultiplier != -1)
-            {
-                ClientPed.CurrentVehicle.HandlingData.DeformationDamageMultiplier = (float)Math.Pow(_fDeformationDamageMult, DeformationExponent) * DeformationMultiplier;
-            }
-
-            if (WeaponsDamageMultiplier != -1)
-            {
-                ClientPed.CurrentVehicle.HandlingData.WeaponDamageMultiplier = WeaponsDamageMultiplier / DamageFactorBody;
-            }
-
-            _fCollisionDamageMult = ClientPed.CurrentVehicle.HandlingData.CollisionDamageMultiplier;
-            ClientPed.CurrentVehicle.HandlingData.CollisionDamageMultiplier = (float)Math.Pow(_fCollisionDamageMult, CollisionDamageExponent);
-
-            _fEngineDamageMult = ClientPed.CurrentVehicle.HandlingData.EngineDamageMultiplier;
-            ClientPed.CurrentVehicle.HandlingData.EngineDamageMultiplier = (float)Math.Pow(_fEngineDamageMult, EngineDamageExponent);
-
-            // If body damage is catastrophic, reset health
-            if (healthBodyCurrent < CascadingFailureThreshold)
-            {
-                healthBodyNew = CascadingFailureThreshold;
-            }
-
-            pedInSameVehicleLast = true;
-        }
-
-        private static void StoreCurrentValues()
-        {
-            if (healthEngineNew != healthEngineCurrent)
-            {
-                ClientPed.CurrentVehicle.EngineHealth = healthEngineNew;
-            }
-            if (healthBodyNew != healthBodyCurrent)
-            {
-                N.SetVehicleBodyHealth(ClientPed.CurrentVehicle, healthBodyNew);
-            }
-            if (healthPetrolTankNew != healthPetrolTankCurrent)
-            {
-                ClientPed.CurrentVehicle.FuelTankHealth = healthPetrolTankNew;
-            }
-
-            healthEngineLast = healthEngineNew;
-            healthBodyLast = healthBodyNew;
-            healthPetrolTankLast = healthPetrolTankNew;
-            _lastVehicle = ClientPed.CurrentVehicle;
-        }
-        #endregion
-
-        #region Health Calculation
-        // Calculate health changes for engine, body, and petrol tank
-        private static void CalculateVehicleHealth()
-        {
-            float classMultiplier = GetClassDamageMultiplier();
-
-            // Engine Health Calculation
-            healthEngineCurrent = ClientPed.CurrentVehicle.EngineHealth;
-            healthEngineLast = (healthEngineCurrent == MaxVehicleHealth) ? MaxVehicleHealth : healthEngineLast;
-            healthEngineNew = healthEngineCurrent;
-            healthEngineDelta = healthEngineLast - healthEngineCurrent;
-            healthEngineDeltaScaled = healthEngineDelta * DamageFactorEngine * classMultiplier;
-
-            // Body Health Calculation
-            healthBodyCurrent = N.GetVehicleBodyHealth(ClientPed.CurrentVehicle);
-            healthBodyLast = (healthBodyCurrent == MaxVehicleHealth) ? MaxVehicleHealth : healthBodyLast;
-            healthBodyNew = healthBodyCurrent;
-            healthBodyDelta = healthBodyLast - healthBodyCurrent;
-            healthBodyDeltaScaled = healthBodyDelta * DamageFactorBody * classMultiplier;
-
-            // Petrol Tank Health Calculation
-            healthPetrolTankCurrent = ClientPed.CurrentVehicle.FuelTankHealth;
-            healthPetrolTankLast = (healthPetrolTankCurrent == MaxVehicleHealth) ? MaxVehicleHealth : healthPetrolTankLast;
-            healthPetrolTankNew = healthPetrolTankCurrent;
-            healthPetrolTankDelta = healthPetrolTankLast - healthPetrolTankCurrent;
-            healthPetrolTankDeltaScaled = healthPetrolTankDelta * DamageFactorPetrolTank * classMultiplier;
-        }
-
-        private static float GetClassDamageMultiplier()
-        {
-            try
-            {
-                return ClassDamageMultiplier[(int)ClientPed.CurrentVehicle.Class];
-            }
-            catch (ArgumentOutOfRangeException ex)
-            {
-                Logging.Error($"ArgumentOutOfRangeException in vehicle class multiplier: {ex.Message}", "VehicleDamageModule");
-                return 1.0f; // Default to 1.0 if there's an error
-            }
-        }
-        #endregion
     }
 }
