@@ -40,7 +40,7 @@ namespace SimpleCTRL
                 Decorators.Register(decorators);
 
                 // VehicleHUD.Start();
-                // VehicleDamageModule.Start();
+                VehicleDamageModule.Start();
                 VehicleSystemModule.Start();
                 KeybindManager.Start();
 
