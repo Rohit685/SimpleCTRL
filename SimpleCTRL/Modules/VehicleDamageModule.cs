@@ -138,7 +138,7 @@
 
                 pedInSameVehicleLast = false;
                 return;
-            }
+            } 
 
             if (ClientPed.IsInAnyVehicle(false))
             {
@@ -162,10 +162,14 @@
                     healthEngineLast = 1000f;
                 }
 
-
                 healthEngineNew = healthEngineCurrent;
                 healthEngineDelta = healthEngineLast - healthEngineCurrent;
                 healthEngineDeltaScaled = healthEngineDelta * DamageFactorEngine * classMultiplier;
+
+                if (healthEngineDelta > 5)
+                {
+                    Logging.Debug($"Engine damage sustained. New value {healthEngineNew}", "VehicleDamageModule");
+                }
 
                 healthBodyCurrent = N.GetVehicleBodyHealth(_currentVehicle);
                 if (healthBodyCurrent == 1000f)
@@ -176,6 +180,11 @@
                 healthBodyDelta = healthBodyLast - healthBodyCurrent;
                 healthBodyDeltaScaled = healthBodyDelta * DamageFactorBody * classMultiplier;
 
+                if (healthBodyDelta > 5)
+                {
+                    Logging.Debug($"Body damage sustained. New value {healthBodyNew}", "VehicleDamageModule");
+                }
+
                 healthPetrolTankCurrent = _currentVehicle.FuelTankHealth;
                 if (healthPetrolTankCurrent == 1000f)
                 {
@@ -185,6 +194,11 @@
                 healthPetrolTankDelta = healthPetrolTankLast - healthPetrolTankCurrent;
                 healthPetrolTankDeltaScaled = healthPetrolTankDelta * DamageFactorPetrolTank * classMultiplier;
 
+                if (healthPetrolTankDelta > 5)
+                {
+                    Logging.Debug($"Tank damage sustained. New value {healthPetrolTankNew}", "VehicleDamageModule");
+                }
+
                 if (healthEngineCurrent > EngineSafeGuard + 1 && _currentVehicle.FuelLevel > 1f)
                 {
                     _currentVehicle.IsDriveable = true;
@@ -192,6 +206,7 @@
 
                 if (healthEngineCurrent <= EngineSafeGuard && (!LimpMode || _currentVehicle.OilLevel() < 3f) && !N.IsVehicleTyreBurst(_currentVehicle, 1, true))
                 {
+                    Logging.Debug("Engine health fell below threshold. Making vehicle undriveable (limp mode off)", "VehicleDamageModule");
                     _currentVehicle.IsDriveable = false;
                     N.SetVehicleTyreBurst(_currentVehicle, 1, true, 1000f);
                 }
@@ -251,6 +266,7 @@
                 }
                 else
                 {
+                    Logging.Debug("New vehicle detected. Ignoring damage this tick", "VehicleDamageModule");
                     // Just got into a vehicle. Damage cannot be multipled this round
 
                     // Set vehicle handling meta
