@@ -91,16 +91,13 @@
                 {
                     isHeld = true;
                     heldTime = (int)Game.GameTime;
-                    Logging.Debug("Control hold started", "KeybindManager");
                 }
                 else
                 {
                     elapsedTime = (int)(Game.GameTime - heldTime);
-                    Logging.Debug($"Control hold ongoing: elapsedTime = {elapsedTime}ms", "KeybindManager");
 
                     if (elapsedTime >= requiredTime)
                     {
-                        Logging.Debug("Required hold time met, invoking first action", "KeybindManager");
                         firstAction.Invoke();
                     }
                 }
@@ -109,12 +106,8 @@
             {
                 if (isHeld && elapsedTime <= requiredTime && alternativeAction != null)
                 {
-                    Logging.Debug("Control released early, invoking alternative action", "KeybindManager");
                     alternativeAction.Invoke();
                 }
-
-                if (isHeld)
-                    Logging.Debug("Control hold reset", "KeybindManager");
 
                 isHeld = false;
                 elapsedTime = 0;
