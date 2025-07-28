@@ -24,6 +24,32 @@ namespace SimpleCTRL.Engine.InternalSystems
 
         #endregion
 
+        #region Forwarded Vehicle Damage Config Properties
+
+        public static float DeformationMultiplier => VehicleDamageSettings.Deformation.DeformationMultiplier;
+        public static float DeformationExponent => VehicleDamageSettings.Deformation.DeformationExponent;
+        public static float CollisionDamageExponent => VehicleDamageSettings.Deformation.CollisionDamageExponent;
+
+        public static float DamageFactorEngine => VehicleDamageSettings.DamageFactors.DamageFactorEngine;
+        public static float DamageFactorBody => VehicleDamageSettings.DamageFactors.DamageFactorBody;
+        public static float DamageFactorPetrolTank => VehicleDamageSettings.DamageFactors.DamageFactorPetrolTank;
+        public static float EngineDamageExponent => VehicleDamageSettings.DamageFactors.EngineDamageExponent;
+        public static float WeaponsDamageMultiplier => VehicleDamageSettings.DamageFactors.WeaponsDamageMultiplier;
+
+        public static float DegradingHealthSpeedFactor => VehicleDamageSettings.HealthThresholds.DegradingHealthSpeedFactor;
+        public static float CascadingFailureSpeedFactor => VehicleDamageSettings.HealthThresholds.CascadingFailureSpeedFactor;
+        public static float DegradingFailureThreshold => VehicleDamageSettings.HealthThresholds.DegradingFailureThreshold;
+        public static float CascadingFailureThreshold => VehicleDamageSettings.HealthThresholds.CascadingFailureThreshold;
+        public static float EngineSafeGuard => VehicleDamageSettings.HealthThresholds.EngineSafeGuard;
+
+        public static bool TorqueMultiplierEnable => VehicleDamageSettings.LimpModeSettings.TorqueMultiplierEnable;
+        public static bool LimpMode => VehicleDamageSettings.LimpModeSettings.LimpMode;
+        public static float LimpModeMultiplier => VehicleDamageSettings.LimpModeSettings.LimpModeMultiplier;
+
+        public static IReadOnlyList<float> ClassDamageMultiplier => VehicleDamageSettings.ClassDamageMultiplier;
+
+        #endregion
+
         #region Initialization
 
         public static void Initialize()
