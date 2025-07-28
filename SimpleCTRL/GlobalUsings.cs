@@ -9,3 +9,4 @@ global using Rage;
 global using Rage.Native;
 global using SimpleCTRL.Engine.FrontendSystems.UI;
 global using SimpleCTRL.Engine.InternalSystems;
+global using SimpleCTRL.Engine.Data;

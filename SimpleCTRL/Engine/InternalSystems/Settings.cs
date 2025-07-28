@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace SimpleCTRL.Engine.InternalSystems
@@ -19,6 +20,8 @@ namespace SimpleCTRL.Engine.InternalSystems
         public static bool EngineRunOnExitNotification = true;
         public static bool BrakeOverheatingNotification = true;
 
+        public static VehicleDamageConfig VehicleDamageSettings { get; private set; }
+
         #endregion
 
         #region Initialization
@@ -26,8 +29,11 @@ namespace SimpleCTRL.Engine.InternalSystems
         public static void Initialize()
         {
             Logging.Debug("Initializing configuration handler...", "Settings");
+
             LoadINI("default");
             LoadINI("custom");
+            LoadVehicleDamageConfig();
+
             LogConfig();
         }
 
@@ -60,6 +66,25 @@ namespace SimpleCTRL.Engine.InternalSystems
             EngineRunOnExitNotification = val.ReadBoolean("NOTIFICATIONS", "EngineRunOnExitNotification", EngineRunOnExitNotification);
             BrakeOverheatingNotification = val.ReadBoolean("NOTIFICATIONS", "BrakeOverheatingNotification", BrakeOverheatingNotification);
             return true;
+        }
+
+        #endregion
+
+        #region XML Loading
+
+        private static void LoadVehicleDamageConfig()
+        {
+            try
+            {
+                string xmlPath = Path.Combine("plugins", "SimpleCTRL", "data", "VehicleDamageConfig.xml");
+                VehicleDamageSettings = VehicleDamageConfig.Load(xmlPath);
+                Logging.Info("Vehicle damage config loaded.", "Settings");
+            }
+            catch (Exception ex)
+            {
+                Logging.Error($"Failed to load vehicle damage config: {ex.Message}", "Settings");
+                VehicleDamageSettings = new VehicleDamageConfig(); 
+            }
         }
 
         #endregion
