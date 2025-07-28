@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Engine\Data\VehicleDamageConfig.cs" />
     <Compile Include="Engine\FrontendSystems\UI\VehicleHUD.cs" />
     <Compile Include="Engine\InternalSystems\KeybindManager.cs" />
     <Compile Include="Engine\InternalSystems\Logging.cs" />
