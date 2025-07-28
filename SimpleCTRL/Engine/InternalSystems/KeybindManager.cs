@@ -50,7 +50,7 @@
 
                 if (ShouldNotifyEngineRunOnExit(currentVehicle, isInVehicle))
                 {
-                    Game.DisplayNotification("Hold ~b~F ~w~when exiting to leave the engine running.");
+                    Game.DisplayNotification("Tap ~b~F ~w~to leave engine running. Hold to exit normally.");
                     _doorsNotify = true;
                 }
 
@@ -66,13 +66,13 @@
 
                     CheckControlHoldDuration(controlCondition, 200, () =>
                     {
-                        currentVehicle.IsEngineOn = true;
-                        ClientPed.Tasks.LeaveVehicle(_keepDoorsOpen ? LeaveVehicleFlags.LeaveDoorOpen : LeaveVehicleFlags.None);
+                        ClientPed.Tasks.LeaveVehicle(LeaveVehicleFlags.None);
                     }, () =>
                     {
-                        ClientPed.Tasks.LeaveVehicle(LeaveVehicleFlags.None);
+                        ClientPed.Tasks.LeaveVehicle(_keepDoorsOpen ? LeaveVehicleFlags.LeaveDoorOpen : LeaveVehicleFlags.None).WaitForCompletion();
+                        currentVehicle.IsEngineOn = true;
                     });
-                }    
+                }
             }
         }
         #endregion
