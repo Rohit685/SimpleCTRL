@@ -5,11 +5,14 @@ namespace SimpleCTRL
 {
     public class Entrypoint : CommonPlugin
     {
-        #region Constants
-        private static readonly Dictionary<string, DecoratorType> decorators = new Dictionary<string, DecoratorType>()
+        #region Constants & Fields
+        private static readonly Dictionary<string, DecoratorType> decorators = new()
         {
             { "brakeHeat", DecoratorType.Int }
         };
+
+        private static bool isUIVisible = false;
+        private static VehicleControlUI ui;
         #endregion
 
         #region Plugin Entry Point       
@@ -22,7 +25,7 @@ namespace SimpleCTRL
             {
                 Logging.Error("Missing required dependencies. Plugin will not start.", "Entrypoint");
                 return;
-             }
+            }
 
             InitializePlugin();
         }
@@ -39,10 +42,16 @@ namespace SimpleCTRL
                 Decorators.Initialize();
                 Decorators.Register(decorators);
 
-                // VehicleHUD.Start();
                 VehicleDamageModule.Start();
                 VehicleSystemModule.Start();
                 KeybindManager.Start();
+
+                ui = new VehicleControlUI();
+                ui.Initialize();
+
+                GameFiber.StartNew(UIUpdateLoop);
+
+                Game.RawFrameRender += OnRawFrameRender;
 
                 Logging.Info("All modules successfully initialized.", "Entrypoint");
             }
@@ -50,6 +59,41 @@ namespace SimpleCTRL
             {
                 Logging.Error($"Initialization failed: {ex.Message}\n{ex.StackTrace}", "Entrypoint");
             }
+        }
+        #endregion
+
+        #region GameFiber Loop
+        private static void UIUpdateLoop()
+        {
+            while (true)
+            {
+                GameFiber.Yield();
+
+                ui.IsInteractive = isUIVisible;
+
+                if (Game.IsKeyDown(Keys.F6))
+                {
+                    isUIVisible = !isUIVisible;
+                }
+
+                if (!isUIVisible)
+                    continue;
+
+                if (Game.IsKeyDown(Keys.LButton))
+                {
+                    ui.HandleClick();
+                }
+            }
+        }
+        #endregion
+
+        #region Rendering
+        private static void OnRawFrameRender(object sender, GraphicsEventArgs e)
+        {
+            if (!isUIVisible)
+                return;
+
+            ui.Draw(e.Graphics);
         }
         #endregion
 
@@ -72,6 +116,7 @@ namespace SimpleCTRL
         private static void CleanUp()
         {
             Logging.Info("Cleaning up plugin resources.", "Entrypoint");
+            Game.RawFrameRender -= OnRawFrameRender;
         }
         #endregion
     }
