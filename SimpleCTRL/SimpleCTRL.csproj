@@ -79,6 +79,7 @@
     <Compile Include="GlobalUsings.cs" />
     <Compile Include="Modules\VehicleDamageModule.cs" />
     <Compile Include="Modules\VehicleSystemModule.cs" />
+    <Compile Include="Engine\FrontendSystems\UI\SelectableButton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
