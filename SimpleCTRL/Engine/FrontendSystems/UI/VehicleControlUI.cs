@@ -1,4 +1,6 @@
-﻿namespace SimpleCTRL.Engine.FrontendSystems.UI
+﻿using System.Linq;
+
+namespace SimpleCTRL.Engine.FrontendSystems.UI
 {
     public class VehicleControlUI
     {
@@ -6,13 +8,29 @@
         private Canvas uiCanvas;
         private RectangleWidget backgroundPanel;
         private SelectableButton engineToggleButton;
-        public readonly List<SelectableButton> controlButtons = new();
+        private readonly List<SelectableButton> controlButtons = new();
+
+        private List<VehicleButtonSlot> topRowSlots = new();
+        private List<VehicleButtonSlot> bottomRowSlots = new();
+
+        private List<string> topSlotOrder = new();
+        private List<string> bottomSlotOrder = new();
+
+        public int VehicleDoorCount { get; private set; } = 0;
 
         public bool IsInteractive
         {
             get => uiCanvas.IsInteractive;
             set => uiCanvas.IsInteractive = value;
         }
+
+        private const int ButtonWidth = 72;
+        private const int ButtonHeight = 54;
+        private const int SpacingX = 15;
+        private const int RowSpacingY = 24;
+        private const int EngineSpacing = 10;
+        private const int ScreenWidth = 1920;
+        private const int StartY = 920;
         #endregion
 
         #region Initialization
@@ -22,104 +40,164 @@
             string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins", "SimpleCTRL");
             uiCanvas.Load(Path.Combine(basePath, "textures"), Path.Combine(basePath, "canvas.xml"));
 
-            SetupUI(screenWidth: 1920);
+            CreateEngineToggleButton();
+            RefreshSlots();
+            AttachObservers();
         }
 
-        private void SetupUI(int screenWidth)
+        private void CreateEngineToggleButton()
         {
-            const int buttonWidth = 72, buttonHeight = 54, spacingX = 15, rowSpacingY = 24;
-            const int topRowCount = 8, bottomRowCount = 7, bottomRowSlots = 8;
-
-            int topRowWidth = topRowCount * buttonWidth + (topRowCount - 1) * spacingX;
-            int bottomRowWidth = bottomRowSlots * buttonWidth + (bottomRowSlots - 1) * spacingX;
-            int gridWidth = Math.Max(topRowWidth, bottomRowWidth);
-
-            int totalWidth = buttonWidth + spacingX + gridWidth;
-            int startX = (screenWidth - totalWidth) / 2;
-            int startY = 920;
-            int totalHeight = buttonHeight * 2 + rowSpacingY;
-
-            CreateEngineToggleButton(buttonWidth, buttonHeight, startX, startY, totalHeight);
-            CreateControlButtons(topRowCount, bottomRowCount, buttonWidth, buttonHeight);
-            AttachObservers();
-            PositionControlButtons(topRowCount, bottomRowCount, buttonWidth, buttonHeight, spacingX, rowSpacingY, startX, startY);
-            UpdateBackgroundPanel(startX, startY, buttonWidth, totalWidth, totalHeight);
+            engineToggleButton = new SelectableButton(
+                "engineToggle",
+                uiCanvas,
+                new Point(0, 0),
+                new Size(ButtonWidth, ButtonHeight),
+                "panel/empty.png"
+            );
         }
         #endregion
 
-        #region UI Components
-        private void CreateEngineToggleButton(int width, int height, int startX, int startY, int totalHeight)
+        #region Dynamic & Ordered Slots
+        public void SetSlotOrder(List<string> topOrder, List<string> bottomOrder)
         {
-            engineToggleButton = new SelectableButton(
-                id: "engineToggle",
-                parentCanvas: uiCanvas,
-                position: new Point(startX, startY + (totalHeight - height) / 2),
-                size: new Size(width, height),
-                iconPath: "panel/empty.png"
-            );
+            topSlotOrder = topOrder;
+            bottomSlotOrder = bottomOrder;
+            RefreshSlots();
         }
 
-        private void CreateControlButtons(int topCount, int bottomCount, int width, int height)
+        public void UpdateDynamicSlots(int vehicleDoorCount)
+        {
+            if (VehicleDoorCount == vehicleDoorCount) return;
+            VehicleDoorCount = vehicleDoorCount;
+            RefreshSlots();
+        }
+
+        private void RefreshSlots()
+        {
+            // Remove old dynamic slots
+            topRowSlots.RemoveAll(s => s.IsDynamic);
+            bottomRowSlots.RemoveAll(s => s.IsDynamic);
+
+            // Add dynamic slots up to VehicleDoorCount
+            for (int i = 1; i <= VehicleDoorCount; i++)
+            {
+                AddDynamicSlotIfOrdered($"door_{i}", topSlotOrder, topRowSlots);
+                AddDynamicSlotIfOrdered($"window_{i}", topSlotOrder, topRowSlots);
+                AddDynamicSlotIfOrdered($"seat_{i}", bottomSlotOrder, bottomRowSlots);
+            }
+
+            // Rebuild top/bottom rows in order while filtering by VehicleDoorCount
+            topRowSlots = topSlotOrder
+                .Select(id => topRowSlots.FirstOrDefault(s => s.Id == id) ?? new VehicleButtonSlot(id))
+                .Where(s => IsSlotAllowed(s.Id))
+                .ToList();
+
+            bottomRowSlots = bottomSlotOrder
+                .Select(id => bottomRowSlots.FirstOrDefault(s => s.Id == id) ?? new VehicleButtonSlot(id))
+                .Where(s => IsSlotAllowed(s.Id))
+                .ToList();
+
+            // Recreate buttons
+            CreateControlButtons();
+            PositionControlButtons();
+            UpdateBackgroundPanel();
+        }
+
+        // Returns true if a slot should be shown for the current vehicle
+        private bool IsSlotAllowed(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return false;
+
+            if (id.StartsWith("door_") || id.StartsWith("window_") || id.StartsWith("seat_"))
+                return GetSlotIndex(id) <= VehicleDoorCount;
+
+            return true; // always show other types (hazards, lights, hood, etc.)
+        }
+
+        // Parses "door_1" or "window_2" -> 1, 2, etc.
+        private int GetSlotIndex(string id)
+        {
+            var parts = id.Split('_');
+            if (parts.Length < 2) return 0;
+            return int.TryParse(parts[1], out int index) ? index : 0;
+        }
+
+        private void AddDynamicSlotIfOrdered(string id, List<string> orderList, List<VehicleButtonSlot> slotList)
+        {
+            if (orderList.Contains(id) && !slotList.Any(s => s.Id == id))
+                slotList.Add(new VehicleButtonSlot(id, true));
+        }
+
+        private void CreateControlButtons()
         {
             controlButtons.Clear();
 
-            string[] topIcons = { "left-indicator", "hazards", "right-indicator", "empty", "hood", "door-front", "empty", "empty" };
-            string[] bottomIcons = { "cruise-control", "headlight-low", "interior-light", "trunk", "door-front", "empty", "empty" };
-
-            void AddButtons(int count, string[] icons)
+            void AddRow(List<VehicleButtonSlot> slots)
             {
-                for (int i = 0; i < count; i++)
+                foreach (var slot in slots.Where(s => s.Icon != "empty"))
                 {
-                    string iconName = i < icons.Length ? icons[i] : "empty";
                     controlButtons.Add(new SelectableButton(
-                        id: iconName,
-                        parentCanvas: uiCanvas,
-                        position: new Point(100, 100),
-                        size: new Size(width, height),
-                        iconPath: $"panel/{iconName}.png"
+                        slot.Id,
+                        uiCanvas,
+                        new Point(0, 0),
+                        new Size(ButtonWidth, ButtonHeight),
+                        $"panel/{slot.Icon}.png"
                     ));
                 }
             }
 
-            AddButtons(topCount, topIcons);
-            AddButtons(bottomCount, bottomIcons);
-        }
-
-        private void AttachObservers()
-        {
-            foreach (var btn in controlButtons)
-                btn.AddObserver(new VehicleControlObserver());
+            AddRow(topRowSlots);
+            AddRow(bottomRowSlots);
         }
         #endregion
 
         #region Layout
-        private void PositionControlButtons(int topCount, int bottomCount, int width, int height, int spacingX, int rowSpacingY, int startX, int startY)
+        private void PositionControlButtons()
         {
-            int baseX = startX + width + spacingX;
+            int topCount = topRowSlots.Count(s => s.Icon != "empty");
+            int bottomCount = bottomRowSlots.Count(s => s.Icon != "empty");
 
-            for (int i = 0; i < topCount; i++)
-                controlButtons[i].SetPosition(new Point(baseX + i * (width + spacingX), startY));
+            int topWidth = topCount * (ButtonWidth + SpacingX) - SpacingX;
+            int bottomWidth = bottomCount * (ButtonWidth + SpacingX) - SpacingX;
 
-            for (int i = 0; i < bottomCount; i++)
+            int panelLeft = (ScreenWidth - (ButtonWidth + EngineSpacing + Math.Max(topWidth, bottomWidth))) / 2
+                            + ButtonWidth + EngineSpacing;
+
+            int index = 0;
+            foreach (var slot in topRowSlots.Where(s => s.Icon != "empty"))
             {
-                int slotIndex = i < 3 ? i : i + 1;
-                int x = baseX + slotIndex * (width + spacingX);
-                int y = startY + height + rowSpacingY;
-                controlButtons[topCount + i].SetPosition(new Point(x, y));
+                int x = panelLeft + index * (ButtonWidth + SpacingX);
+                int y = StartY;
+                controlButtons[index].SetPosition(new Point(x, y));
+                index++;
+            }
+
+            int bottomIndex = 0;
+            foreach (var slot in bottomRowSlots.Where(s => s.Icon != "empty"))
+            {
+                int x = panelLeft + bottomIndex * (ButtonWidth + SpacingX);
+                int y = StartY + ButtonHeight + RowSpacingY;
+                controlButtons[index + bottomIndex].SetPosition(new Point(x, y));
+                bottomIndex++;
             }
         }
 
-        private void UpdateBackgroundPanel(int startX, int startY, int buttonWidth, int totalWidth, int totalHeight)
+        private void UpdateBackgroundPanel()
         {
-            const int padding = 10;
-            int bgX = startX - padding;
-            int bgY = startY - padding;
-            int bgWidth = totalWidth + padding * 2;
-            int bgHeight = totalHeight + padding * 2;
+            int gridWidth = Math.Max(topRowSlots.Count(s => s.Icon != "empty"),
+                                     bottomRowSlots.Count(s => s.Icon != "empty"))
+                                     * (ButtonWidth + SpacingX) - SpacingX;
+            int gridHeight = ButtonHeight * 2 + RowSpacingY;
+
+            int panelWidth = ButtonWidth + EngineSpacing + gridWidth;
+            int panelHeight = gridHeight;
+
+            int panelLeft = (ScreenWidth - panelWidth) / 2;
+            int panelTop = StartY;
 
             if (backgroundPanel == null)
             {
-                backgroundPanel = new RectangleWidget(bgWidth, bgHeight)
+                backgroundPanel = new RectangleWidget(panelWidth + 20, panelHeight + 20)
                 {
                     Parent = uiCanvas,
                     BackgroundColor = Color.FromArgb(128, 0, 0, 0)
@@ -127,11 +205,35 @@
             }
             else
             {
-                backgroundPanel.Resize(new Size(bgWidth, bgHeight));
+                backgroundPanel.Resize(new Size(panelWidth + 20, panelHeight + 20));
             }
 
-            backgroundPanel.MoveTo(new Point(bgX, bgY));
-            backgroundPanel.UpdateBounds();
+            backgroundPanel.MoveTo(new Point(panelLeft - 10, panelTop - 10));
+            UpdateEngineTogglePosition();
+        }
+
+        private void UpdateEngineTogglePosition()
+        {
+            int gridWidth = Math.Max(topRowSlots.Count(s => s.Icon != "empty"),
+                                     bottomRowSlots.Count(s => s.Icon != "empty"))
+                                     * (ButtonWidth + SpacingX) - SpacingX;
+            int gridHeight = ButtonHeight * 2 + RowSpacingY;
+
+            int panelWidth = ButtonWidth + EngineSpacing + gridWidth;
+            int panelHeight = gridHeight;
+
+            int panelLeft = (ScreenWidth - panelWidth) / 2;
+            int panelTop = StartY;
+
+            engineToggleButton.SetPosition(new Point(panelLeft, panelTop + (panelHeight - ButtonHeight) / 2));
+        }
+        #endregion
+
+        #region Observers
+        private void AttachObservers()
+        {
+            foreach (var btn in controlButtons)
+                btn.AddObserver(new VehicleControlObserver());
         }
         #endregion
 
@@ -161,5 +263,22 @@
             uiCanvas.Cursor.Draw(graphics);
         }
         #endregion
+    }
+
+    public class VehicleButtonSlot
+    {
+        public string Id { get; set; }
+        public string Icon { get; set; }
+        public bool IsDynamic { get; set; }
+
+        public VehicleButtonSlot(string id, bool isDynamic = false)
+        {
+            Id = id;
+            Icon = id;
+            IsDynamic = isDynamic;
+
+            if (id.StartsWith("seat_"))
+                Icon = "seat";
+        }
     }
 }
