@@ -11,7 +11,10 @@ namespace SimpleCTRL.Engine.FrontendSystems.UI
         Hood,
         LowBeamHeadlights,
         InteriorLight,
-        Trunk
+        Trunk,
+        Door,
+        Window,
+        Seat
     }
     #endregion
 
@@ -24,10 +27,22 @@ namespace SimpleCTRL.Engine.FrontendSystems.UI
             { "left_indicator", VehicleFeature.LeftIndicator },
             { "hazards", VehicleFeature.Hazards },
             { "right_indicator", VehicleFeature.RightIndicator },
-            { "hood", VehicleFeature.Hood },
+            { "front_hood", VehicleFeature.Hood },
             { "headlight_low", VehicleFeature.LowBeamHeadlights },
             { "interior_light", VehicleFeature.InteriorLight },
-            { "trunk", VehicleFeature.Trunk }
+            { "rear_hood", VehicleFeature.Trunk },
+            { "door_1", VehicleFeature.Door },
+            { "door_2", VehicleFeature.Door },
+            { "door_3", VehicleFeature.Door },
+            { "door_4", VehicleFeature.Door },
+            { "window_1", VehicleFeature.Window },
+            { "window_2", VehicleFeature.Window },
+            { "window_3", VehicleFeature.Window },
+            { "window_4", VehicleFeature.Window },
+            { "seat_1", VehicleFeature.Seat },
+            { "seat_2", VehicleFeature.Seat },
+            { "seat_3", VehicleFeature.Seat },
+            { "seat_4", VehicleFeature.Seat },
         };
 
         private readonly Dictionary<VehicleFeature, bool> featureStates =
@@ -45,7 +60,7 @@ namespace SimpleCTRL.Engine.FrontendSystems.UI
 
             if (buttonFeatureMap.TryGetValue(button.Id, out var feature))
             {
-                ToggleFeature(feature);
+                ToggleFeature(button.Id, feature);
             }
             else
             {
@@ -57,21 +72,19 @@ namespace SimpleCTRL.Engine.FrontendSystems.UI
 
         #region Feature Toggle Logic
 
-        private void ToggleFeature(VehicleFeature feature)
+        private void ToggleFeature(string buttonId, VehicleFeature feature)
         {
             if (ClientCurrentVehicle == null) return;
 
             bool isActive = featureStates[feature];
 
             if (!isActive && feature is VehicleFeature.LeftIndicator or VehicleFeature.RightIndicator or VehicleFeature.Hazards)
-            {
                 ResetIndicators();
-            }
 
             if (!isActive)
-                ActivateFeature(feature);
+                ActivateFeature(buttonId, feature);
             else
-                DeactivateFeature(feature);
+                DeactivateFeature(buttonId, feature);
 
             Game.LogTrivial($"Feature '{feature}' is now {(featureStates[feature] ? "ON" : "OFF")}");
         }
@@ -92,7 +105,7 @@ namespace SimpleCTRL.Engine.FrontendSystems.UI
 
         #region Activation / Deactivation
 
-        private void ActivateFeature(VehicleFeature feature)
+        private void ActivateFeature(string buttonId, VehicleFeature feature)
         {
             featureStates[feature] = true;
 
@@ -125,10 +138,22 @@ namespace SimpleCTRL.Engine.FrontendSystems.UI
                 case VehicleFeature.Trunk:
                     NativeFunction.CallByName<uint>("SET_VEHICLE_DOOR_OPEN", ClientCurrentVehicle, (int)VehicleDoorIndex.Trunk, false, false);
                     break;
+
+                case VehicleFeature.Door:
+                    ToggleDoor(buttonId, true);
+                    break;
+
+                case VehicleFeature.Window:
+                    ToggleWindow(buttonId, true);
+                    break;
+
+                case VehicleFeature.Seat:
+                    ToggleSeat(buttonId);
+                    break;
             }
         }
 
-        private void DeactivateFeature(VehicleFeature feature)
+        private void DeactivateFeature(string buttonId, VehicleFeature feature)
         {
             switch (feature)
             {
@@ -153,11 +178,101 @@ namespace SimpleCTRL.Engine.FrontendSystems.UI
                 case VehicleFeature.Trunk:
                     NativeFunction.CallByName<uint>("SET_VEHICLE_DOOR_SHUT", ClientCurrentVehicle, (int)VehicleDoorIndex.Trunk, false);
                     break;
+
+                case VehicleFeature.Door:
+                    ToggleDoor(buttonId, false);
+                    break;
+
+                case VehicleFeature.Window:
+                    ToggleWindow(buttonId, false);
+                    break;
             }
 
             featureStates[feature] = false;
         }
 
         #endregion
+
+        private int GetDoorIndex(string buttonId)
+        {
+            return buttonId switch
+            {
+                "door_1" => 0,
+                "door_2" => 1,
+                "door_3" => 2,
+                "door_4" => 3,
+                _ => -1 // invalid door
+            };
+        }
+
+        private int GetWindowIndex(string buttonId)
+        {
+            return buttonId switch
+            {
+                "window_1" => 0,
+                "window_2" => 1,
+                "window_3" => 2,
+                "window_4" => 3,
+                _ => -1 // invalid window
+            };
+        }
+
+        private int GetSeatIndex(string buttonId, Vehicle vehicle)
+        {
+            int index = buttonId switch
+            {
+                "seat_1" => -1,
+                "seat_2" => 0,
+                "seat_3" => 1,
+                "seat_4" => 2,
+                _ => -2
+            };
+
+            if (index == -2) 
+            {
+                for (int i = 0; i <= 2; i++) 
+                {
+                    if (!vehicle.IsSeatFree(i)) continue;
+                    index = i;
+                    break;
+                }
+            }
+
+            return index;
+        }
+
+        private void ToggleDoor(string buttonId, bool open)
+        {
+            int index = GetDoorIndex(buttonId);
+            if (index == -1) return;
+
+            NativeFunction.CallByName<uint>(
+                open ? "SET_VEHICLE_DOOR_OPEN" : "SET_VEHICLE_DOOR_SHUT",
+                ClientCurrentVehicle,
+                index,
+                false,
+                false
+            );
+        }
+
+        private void ToggleWindow(string buttonId, bool down)
+        {
+            int index = GetWindowIndex(buttonId);
+            if (index == -1) return;
+
+            NativeFunction.CallByName<uint>(
+                down ? "ROLL_DOWN_WINDOW" : "ROLL_UP_WINDOW",
+                ClientCurrentVehicle,
+                index
+            );
+        }
+
+        private void ToggleSeat(string buttonId)
+        {
+            int index = GetSeatIndex(buttonId, ClientCurrentVehicle);
+            if (index == -2) return;
+
+            NativeFunction.CallByName<uint>("SET_PED_INTO_VEHICLE", ClientPed, ClientCurrentVehicle, index);
+        }
     }
 }
