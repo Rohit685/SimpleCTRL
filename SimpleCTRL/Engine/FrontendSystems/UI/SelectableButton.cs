@@ -67,7 +67,11 @@
             underlineBar.MoveTo(new Point(pos.X + (Size.Width - underlineWidth) / 2, pos.Y + Size.Height - underlineBar.Height - 8));
         }
 
-        public void Toggle() => IsActive = !IsActive;
+        public void Toggle()
+        {
+            IsActive = !IsActive;
+            NotifyObservers();
+        }
 
         private void UpdateVisualState()
         {
