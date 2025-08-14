@@ -87,7 +87,8 @@
 
         private void AttachObservers()
         {
-            // TODO: Add observer logic
+            foreach (var btn in controlButtons)
+                btn.AddObserver(new VehicleControlObserver());
         }
         #endregion
 
