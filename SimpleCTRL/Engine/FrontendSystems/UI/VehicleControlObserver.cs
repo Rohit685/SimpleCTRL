@@ -217,7 +217,7 @@ namespace SimpleCTRL.Engine.FrontendSystems.UI
             };
         }
 
-        private int GetSeatIndex(string buttonId, Vehicle vehicle)
+        public static int GetSeatIndex(string buttonId, Vehicle vehicle)
         {
             int index = buttonId switch
             {
