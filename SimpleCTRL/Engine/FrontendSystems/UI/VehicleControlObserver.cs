@@ -21,12 +21,12 @@ namespace SimpleCTRL.Engine.FrontendSystems.UI
 
         private readonly Dictionary<string, VehicleFeature> buttonFeatureMap = new()
         {
-            { "left-indicator", VehicleFeature.LeftIndicator },
+            { "left_indicator", VehicleFeature.LeftIndicator },
             { "hazards", VehicleFeature.Hazards },
-            { "right-indicator", VehicleFeature.RightIndicator },
+            { "right_indicator", VehicleFeature.RightIndicator },
             { "hood", VehicleFeature.Hood },
-            { "headlight-low", VehicleFeature.LowBeamHeadlights },
-            { "interior-light", VehicleFeature.InteriorLight },
+            { "headlight_low", VehicleFeature.LowBeamHeadlights },
+            { "interior_light", VehicleFeature.InteriorLight },
             { "trunk", VehicleFeature.Trunk }
         };
 
