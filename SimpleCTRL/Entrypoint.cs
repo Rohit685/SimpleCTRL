@@ -48,6 +48,10 @@ namespace SimpleCTRL
 
                 ui = new VehicleControlUI();
                 ui.Initialize();
+                ui.SetSlotOrder(
+                    topOrder: new List<string> { "left_indicator", "hazards", "right_indicator", "empty", "front_hood", "door_1", "door_3", "window_1", "window_4", "seat_1", "seat_3" },
+                    bottomOrder: new List<string> { "cruise_control", "headlight_low", "interior_light", "empty", "rear_hood", "door_2", "door_4", "window_2", "window_4", "seat_2", "seat_4" }
+                );
 
                 GameFiber.StartNew(UIUpdateLoop);
 
@@ -64,21 +68,29 @@ namespace SimpleCTRL
         #endregion
 
         #region GameFiber Loop
+        private static Vehicle previousVehicle = null;
+
         private static void UIUpdateLoop()
         {
             while (true)
             {
                 GameFiber.Yield();
+                if (ui == null) continue;
 
-                if (ui == null)
-                    continue;
-
-                if (Game.IsKeyDown(Keys.F6))
-                    isUIVisible = !isUIVisible;
-
+                if (Game.IsKeyDown(Keys.F6)) isUIVisible = !isUIVisible;
                 ui.IsInteractive = isUIVisible;
 
-                if (isUIVisible && Game.IsKeyDown(Keys.LButton))
+                if (!isUIVisible) continue;
+
+                var veh = Game.LocalPlayer.Character.CurrentVehicle;
+                if (veh != null && veh != previousVehicle)
+                {
+                    previousVehicle = veh;
+                    int doorCount = veh.Model.NumberOfSeats;
+                    ui.UpdateDynamicSlots(doorCount);
+                }
+
+                if (Game.IsKeyDown(Keys.LButton))
                     ui.HandleClick();
             }
         }
