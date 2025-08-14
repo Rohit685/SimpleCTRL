@@ -31,6 +31,11 @@ namespace SimpleCTRL.Engine.FrontendSystems.UI
         private const int EngineSpacing = 10;
         private const int ScreenWidth = 1920;
         private const int StartY = 920;
+
+        private bool IsDriver =>
+            Game.LocalPlayer.Character.CurrentVehicle != null &&
+            Game.LocalPlayer.Character.CurrentVehicle.Driver == Game.LocalPlayer.Character;
+
         #endregion
 
         #region Initialization
@@ -110,7 +115,14 @@ namespace SimpleCTRL.Engine.FrontendSystems.UI
             if (id.StartsWith("door_") || id.StartsWith("window_") || id.StartsWith("seat_"))
                 return GetSlotIndex(id) <= VehicleDoorCount;
 
-            return true; // always show other types (hazards, lights, hood, etc.)
+            //if (!IsDriver)
+            //{
+            //    if (id.Contains("indicator") || id == "hazards") return false;
+            //    if (id == "cruise_control" || id == "interior_light" || id == "headlight_low") return false;
+            //    if (id == "front_hood" || id == "rear_hood") return false;
+            //}
+
+            return true;
         }
 
         // Parses "door_1" or "window_2" -> 1, 2, etc.
