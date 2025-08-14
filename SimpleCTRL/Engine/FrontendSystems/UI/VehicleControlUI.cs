@@ -42,7 +42,6 @@ namespace SimpleCTRL.Engine.FrontendSystems.UI
 
             CreateEngineToggleButton();
             RefreshSlots();
-            AttachObservers();
         }
 
         private void CreateEngineToggleButton()
@@ -136,13 +135,16 @@ namespace SimpleCTRL.Engine.FrontendSystems.UI
             {
                 foreach (var slot in slots.Where(s => s.Icon != "empty"))
                 {
-                    controlButtons.Add(new SelectableButton(
+                    var btn = new SelectableButton(
                         slot.Id,
                         uiCanvas,
                         new Point(0, 0),
                         new Size(ButtonWidth, ButtonHeight),
                         $"panel/{slot.Icon}.png"
-                    ));
+                    );
+
+                    btn.AddObserver(new VehicleControlObserver());
+                    controlButtons.Add(btn);
                 }
             }
 
@@ -226,14 +228,6 @@ namespace SimpleCTRL.Engine.FrontendSystems.UI
             int panelTop = StartY;
 
             engineToggleButton.SetPosition(new Point(panelLeft, panelTop + (panelHeight - ButtonHeight) / 2));
-        }
-        #endregion
-
-        #region Observers
-        private void AttachObservers()
-        {
-            foreach (var btn in controlButtons)
-                btn.AddObserver(new VehicleControlObserver());
         }
         #endregion
 
