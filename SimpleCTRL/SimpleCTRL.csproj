@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine\Data\VehicleDamageConfig.cs" />
+    <Compile Include="Engine\FrontendSystems\UI\VehicleControlObserver.cs" />
     <Compile Include="Engine\FrontendSystems\UI\VehicleControlUI.cs" />
     <Compile Include="Engine\InternalSystems\KeybindManager.cs" />
     <Compile Include="Engine\InternalSystems\Logging.cs" />
