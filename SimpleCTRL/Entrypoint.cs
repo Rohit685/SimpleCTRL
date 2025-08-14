@@ -11,11 +11,11 @@ namespace SimpleCTRL
             { "brakeHeat", DecoratorType.Int }
         };
 
-        private static bool isUIVisible = false;
+        private static bool isUIVisible;
         private static VehicleControlUI ui;
         #endregion
 
-        #region Plugin Entry Point       
+        #region Entry Point       
         public static void Main()
         {
             Logging.Info("Plugin startup initiated.", "Entrypoint");
@@ -51,6 +51,7 @@ namespace SimpleCTRL
 
                 GameFiber.StartNew(UIUpdateLoop);
 
+                Game.RawFrameRender -= OnRawFrameRender;
                 Game.RawFrameRender += OnRawFrameRender;
 
                 Logging.Info("All modules successfully initialized.", "Entrypoint");
@@ -69,20 +70,16 @@ namespace SimpleCTRL
             {
                 GameFiber.Yield();
 
-                ui.IsInteractive = isUIVisible;
-
-                if (Game.IsKeyDown(Keys.F6))
-                {
-                    isUIVisible = !isUIVisible;
-                }
-
-                if (!isUIVisible)
+                if (ui == null)
                     continue;
 
-                if (Game.IsKeyDown(Keys.LButton))
-                {
+                if (Game.IsKeyDown(Keys.F6))
+                    isUIVisible = !isUIVisible;
+
+                ui.IsInteractive = isUIVisible;
+
+                if (isUIVisible && Game.IsKeyDown(Keys.LButton))
                     ui.HandleClick();
-                }
             }
         }
         #endregion
@@ -90,10 +87,8 @@ namespace SimpleCTRL
         #region Rendering
         private static void OnRawFrameRender(object sender, GraphicsEventArgs e)
         {
-            if (!isUIVisible)
-                return;
-
-            ui.Draw(e.Graphics);
+            if (isUIVisible && ui != null)
+                ui.Draw(e.Graphics);
         }
         #endregion
 
