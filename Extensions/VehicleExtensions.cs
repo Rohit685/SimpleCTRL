@@ -1,6 +1,4 @@
-﻿using Common;
-using Common.Native;
-using Rage;
+﻿using Rage;
 using Rage.Native;
 using SimpleCTRL.Components;
 using SimpleCTRL.Core.Models.UI;
@@ -10,6 +8,8 @@ using SimpleCTRL.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Common;
+using Common.Native;
 
 namespace SimpleCTRL.Extensions
 {
@@ -124,7 +124,7 @@ namespace SimpleCTRL.Extensions
         /// </summary>
         /// <param name="vehicle">The vehicle.</param>
         /// <returns><c>true</c> if the player is driving the vehicle; otherwise, <c>false</c>.</returns>
-        public static bool IsPlayerDriving(this Vehicle vehicle)
+        private static bool IsPlayerDriving(this Vehicle vehicle)
         {
             bool driving = false;
             if (Game.LocalPlayer.Character != null && EntityExtensions.Exists(Game.LocalPlayer.Character))
@@ -396,7 +396,7 @@ namespace SimpleCTRL.Extensions
                 {
                     if (ConfigHandler.RefuelNotification == true)
                     {
-                        float gallonsPumped = Common.API.Math.ConvertLitresToGallons(Managed.FuelAmountPumped);
+                        float gallonsPumped = Common.API.MathUtils.ConvertLitresToGallons(Managed.FuelAmountPumped);
                         string fuelMsg = $"Pumped {Math.Round(Managed.FuelAmountPumped, 1)} L // {Math.Round(gallonsPumped, 1)} gallons";
                         Game.DisplayNotification("~o~[FUEL] ~w~" + fuelMsg);
                     }
@@ -502,7 +502,7 @@ namespace SimpleCTRL.Extensions
                         {
                             if (ConfigHandler.RefuelNotification == true)
                             {
-                                float gallonsPumped = Common.API.Math.ConvertLitresToGallons(Managed.FuelAmountPumped);
+                                float gallonsPumped = Common.API.MathUtils.ConvertLitresToGallons(Managed.FuelAmountPumped);
                                 string fuelMsg = $"Pumped {Math.Round(Managed.FuelAmountPumped, 1)} L // {Math.Round(gallonsPumped, 1)} gallons";
                                 Game.DisplayNotification("~o~[FUEL] ~w~" + fuelMsg);
                             }

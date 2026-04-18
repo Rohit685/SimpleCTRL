@@ -184,7 +184,7 @@ namespace SimpleCTRL.Handlers
             VehicleIndicatorMode = val.ReadString("OTHER", "VehicleIndicatorMode", VehicleIndicatorMode);
             VehicleIndicatorSounds = val.ReadBoolean("OTHER", "VehicleIndicatorSounds", VehicleIndicatorSounds);
             VehicleParkSirenKill = val.ReadBoolean("OTHER", "VehicleParkSirenKill", VehicleParkSirenKill);
-            AircraftLowFuelWarning = Common.API.Math.Clamp(Convert.ToSingle(val.ReadDouble("OTHER", "AircraftLowFuelWarning", (double)AircraftLowFuelWarning)), 1f, 100f);
+            AircraftLowFuelWarning = Common.API.MathUtils.Clamp(Convert.ToSingle(val.ReadDouble("OTHER", "AircraftLowFuelWarning", (double)AircraftLowFuelWarning)), 1f, 100f);
             AircraftUseAirportPumps = val.ReadBoolean("OTHER", "AircraftUseAirportPumps", AircraftUseAirportPumps);
             AircraftUseFuelTankers = val.ReadBoolean("OTHER", "AircraftUseFuelTankers", AircraftUseFuelTankers);
 

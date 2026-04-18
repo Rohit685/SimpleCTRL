@@ -1,4 +1,6 @@
 ﻿using Common.Native;
+using Common.UI.Elements;
+using Rectangle = Common.UI.Elements.Rectangle;
 using RAGENativeUI.Elements;
 using System;
 using System.Drawing;
@@ -49,11 +51,11 @@ namespace SimpleCTRL.Core.Models.UI
 
 		public static bool fuelBarAnimationDir = true;
 
-		public static Common.Elements.Rectangle fuelBarBackdrop = new Common.Elements.Rectangle(fuelBarBackdropPosition, fuelBarBackdropSize, fuelBarBackdropColour);
+		public static Rectangle fuelBarBackdrop = new Rectangle(fuelBarBackdropPosition, fuelBarBackdropSize, fuelBarBackdropColour);
 
-		public static Common.Elements.Rectangle fuelBarBack = new Common.Elements.Rectangle(fuelBarBackPosition, fuelBarBackSize, fuelBarBackColour);
+		public static Rectangle fuelBarBack = new Rectangle(fuelBarBackPosition, fuelBarBackSize, fuelBarBackColour);
 
-		public static Common.Elements.Rectangle fuelBar = new Common.Elements.Rectangle(fuelBarPosition, fuelBarSize, fuelBarColourNormal);
+		public static Rectangle fuelBar = new Rectangle(fuelBarPosition, fuelBarSize, fuelBarColourNormal);
 
 		public static PointF Position
 		{

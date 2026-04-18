@@ -107,7 +107,7 @@ namespace SimpleCTRL.Components
 										pump.Position.Z = resultArg;
 										Rage.Object obj = new Rage.Object(model.Hash, pump.Position);
 										Globals.DepartmentPumpObjects.Add(obj);
-										NativeFunction.CallByHash<int>(0x8524A8B0171D5E07, obj, 0.0f, 0.0f, Common.API.Math.DirectionToRotation(Common.API.Math.HeadingToDirection(pump.Rotation), 0f).Z, 1);
+										NativeFunction.CallByHash<int>(0x8524A8B0171D5E07, obj, 0.0f, 0.0f, Common.API.MathUtils.DirectionToRotation(Common.API.MathUtils.HeadingToDirection(pump.Rotation), 0f).Z, 1);
 										if (EntityExtensions.Exists(obj))
 										{
 											obj.IsInvincible = true;

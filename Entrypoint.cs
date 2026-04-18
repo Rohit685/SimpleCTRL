@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Common.Native;
 
 [assembly: Plugin("SimpleCTRL", Author = "Venoxity Development", PrefersSingleInstance = true, ShouldTickInPauseMenu = true, SupportUrl = "https://discord.gg/jCEdAF8AQz")]
 namespace SimpleCTRL
@@ -25,6 +26,8 @@ namespace SimpleCTRL
             if (CheckDependencies())
             {
                 Logging.Info("starting...", "SimpleCTRL");
+                Logging.Info("Disabling the phone control", "SimpleCTRL");
+                Game.DisableControlAction(0, GameControl.Phone, true);
                 ConfigHandler.Initialize();
                 Decorators.Initialize();
                 Decorators.Register(decorators);

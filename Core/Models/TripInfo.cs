@@ -10,11 +10,11 @@ public class TripInfo
     public Vector3 LastPosition { get; set; } = Vector3.Zero;
 
 
-    public float FuelEconomyInLPer100Km => Math.GetFuelEconomyInLPer100Km(FuelConsumed, DistanceTraveledKM);
+    public float FuelEconomyInLPer100Km => MathUtils.GetFuelEconomyInLPer100Km(FuelConsumed, DistanceTraveledKM);
 
-    public float FuelEconomyInMPG => Math.ConvertLPer100KmToMPG(FuelEconomyInLPer100Km);
+    public float FuelEconomyInMPG => MathUtils.ConvertLPer100KmToMPG(FuelEconomyInLPer100Km);
 
-    public float DistanceTraveledMiles => Math.ConvertKilometersToMiles(DistanceTraveledKM);
+    public float DistanceTraveledMiles => MathUtils.ConvertKilometersToMiles(DistanceTraveledKM);
 
     public void Reset(Vector3 v)
     {
