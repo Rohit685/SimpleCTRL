@@ -222,6 +222,7 @@ namespace SimpleCTRL.Threads
                 {
                     Logging.Warning("Failed to find bonnet bone for vehicle, cannot display repair prompt",
                         "RepairTick");
+                    return;
                 }
                 
                 Text.Draw3D(_lastVehicle.GetBonePosition(boneIndex), "Press [E] to repair", 0.065f);
@@ -237,6 +238,7 @@ namespace SimpleCTRL.Threads
                 {
                     Logging.Warning("Failed to find bonnet bone for vehicle, cannot display repair prompt",
                         "RepairTick");
+                    return;
                 }
                 
                 if (player.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) > 2.5f)
@@ -321,6 +323,7 @@ namespace SimpleCTRL.Threads
                     {
                         Logging.Warning("Failed to find engine bone for vehicle, cannot display repair prompt",
                             "FlipTick");
+                        return;
                     }
                     
                     if (isRepairing && (Game.IsPaused || IsDead() || Game.LocalPlayer.Character.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) > 1.5f))
