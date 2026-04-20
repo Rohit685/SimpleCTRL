@@ -7,6 +7,7 @@ using SimpleCTRL.Handlers;
 using SimpleCTRL.Utils;
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace SimpleCTRL.Threads
 {
@@ -188,104 +189,114 @@ namespace SimpleCTRL.Threads
 
         private static void RepairTick()
         {
-            if (_lastVehicle.Exists() && !cantRepairOnFootClasses.Contains(_lastVehicle.Class))
+            if (!_lastVehicle.Exists() || cantRepairOnFootClasses.Contains(_lastVehicle.Class)) return;
+            Ped player = Game.LocalPlayer.Character;
+            if (CannotDoAction() || isRepairing || _lastVehicle.EngineHealth > ConfigHandler.DegradingFailureThreshold)
             {
-                Ped player = Game.LocalPlayer.Character;
-                if (CannotDoAction())
+                prompt = false;
+                return;
+            }
+
+            if (prompt)
+            {
+                int boneIndex = _lastVehicle.GetBoneIndex("bonnet");
+
+                if (boneIndex == -1)
+                {
+                    Logging.Warning("Failed to find bonnet bone for vehicle, cannot display repair prompt", "RepairTick");
+                }
+                
+                if (player.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) < 1.8f)
                 {
                     prompt = false;
-                    return;
                 }
 
-                if (isRepairing || _lastVehicle.EngineHealth > ConfigHandler.DegradingFailureThreshold)
+                Text.Draw3D(_lastVehicle.GetBonePosition(boneIndex) + new Vector3(0f, 0f, 0.5f), "Move near here to repair", 0.08f);
+            }
+
+            if (_lastVehicle != _repairedVehicle)
+            {
+                int boneIndex = _lastVehicle.GetBoneIndex("bonnet");
+
+                if (boneIndex == -1)
+                {
+                    Logging.Warning("Failed to find bonnet bone for vehicle, cannot display repair prompt",
+                        "RepairTick");
+                }
+                
+                Text.Draw3D(_lastVehicle.GetBonePosition(boneIndex), "Press [E] to repair", 0.065f);
+            }
+
+            if (_lastVehicle == _repairedVehicle) return;
+            {
+                if (!Game.IsKeyDown(Keys.E) ||
+                    Game.LocalPlayer.Character.IsInAnyVehicle(false)) return;
+                int boneIndex = _lastVehicle.GetBoneIndex("bonnet");
+
+                if (boneIndex == -1)
+                {
+                    Logging.Warning("Failed to find bonnet bone for vehicle, cannot display repair prompt",
+                        "RepairTick");
+                }
+                
+                if (player.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) > 2.5f)
+                {
+                    prompt = true;
+                }
+                else
                 {
                     prompt = false;
-                    return;
-                }
-
-                if (prompt)
-                {
-                    int boneIndex = _lastVehicle.GetBoneIndex("bonnet");
-                    if (player.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) < 1.8f)
+                    if (_lastVehicle.OilLevel() <= 0)
                     {
-                        prompt = false;
+                        Logging.Debug($"Failed to repair: too damaged. {_lastVehicle.OilLevel()}", "SpecialModesManager");
+                        Game.DisplayNotification("~r~Your vehicle was too badly damaged. Unable to repair!");
+                        return;
                     }
 
-                    Text.Draw3D(_lastVehicle.GetBonePosition(boneIndex) + new Vector3(0f, 0f, 0.5f), "Move near here to repair", 0.08f);
-                }
-
-                if (_lastVehicle != _repairedVehicle)
-                {
-                    int boneIndex = _lastVehicle.GetBoneIndex("bonnet");
-                    Text.Draw3D(_lastVehicle.GetBonePosition(boneIndex), "Press [E] to repair", 0.065f);
-                }
-
-                if (_lastVehicle != _repairedVehicle)
-                {
-                    if (Game.IsKeyDown(System.Windows.Forms.Keys.E) && !Game.LocalPlayer.Character.IsInAnyVehicle(false))
+                    if (_lastVehicle.EngineHealth > ConfigHandler.CascadingFailureThreshold + 5)
                     {
-                        int boneIndex = _lastVehicle.GetBoneIndex("bonnet");
-                        if (player.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) > 2.5f)
-                        {
-                            prompt = true;
-                        }
-                        else
-                        {
-                            prompt = false;
-                            if (_lastVehicle.OilLevel() <= 0)
-                            {
-                                Logging.Debug($"Failed to repair: too damaged. {_lastVehicle.OilLevel()}", "SpecialModesManager");
-                                Game.DisplayNotification("~r~Your vehicle was too badly damaged. Unable to repair!");
-                                return;
-                            }
-                            else if (_lastVehicle.EngineHealth > ConfigHandler.CascadingFailureThreshold + 5)
-                            {
-                                Logging.Debug($"Failed to repair: not enough damage. {_lastVehicle.EngineHealth}", "SpecialModesManager");
-                                Game.DisplayNotification("~y~" + GetRandom(ConfigHandler.NoFixMessages));
-                                return;
-                            }
-
-                            isRepairing = true;
-                            player.Heading = _lastVehicle.Heading - 180f;
-
-                            player.Tasks.ClearImmediately();
-                            _lastVehicle.Doors[4].Open(true);
-                            player.Tasks.PlayAnimation(repairAnimDict, repairAnimString, 5f, AnimationFlags.UpperBodyOnly);
-                            Game.DisplaySubtitle("Attempting to repair vehicle", 6000);
-                            // NativeFunction.CallByHash<int>(0x6E13FC662B882D1D, _lastVehicle, 1); // SET_VEHICLE_TYRE_FIXED
-                            N.SetVehicleTyreFixed(_lastVehicle, 1);
-                            GameFiber.Wait(6000);
-                            if (isRepairing)
-                            {
-                                player.Tasks.ClearImmediately();
-                                _lastVehicle.Doors[4].Close(true);
-                                isRepairing = false;
-                                if (EntityExtensions.Exists(_repairedVehicle) && _repairedVehicle == _lastVehicle)
-                                {
-                                    Logging.Debug("Failed to repair: already repaired this vehicle", "SpecialModesManager");
-                                    Game.DisplayNotification("~y~" + GetRandom(ConfigHandler.NoFixMessages));
-                                    return;
-                                }
-                                if (_lastVehicle.OilLevel() < 2f)
-                                {
-                                    Logging.Debug("Failed to repair: ran oil pan dry", "SpecialModesManager");
-                                    Game.DisplayNotification("~r~You were unable to repair the vehicle. The oil pan looks all dried up.");
-                                    return;
-                                }
-                                if (_lastVehicle.FuelLevel > 1f)
-                                {
-                                    _lastVehicle.IsDriveable = true;
-                                }
-                                _lastVehicle.EngineHealth = ConfigHandler.CascadingFailureThreshold + 5;
-                                healthEngineLast = ConfigHandler.CascadingFailureThreshold + 5;
-                                N.SetVehicleMaxSpeed(_lastVehicle, 500.01f);
-                                Logging.Debug($"Vehicle repaired! Engine health now {healthEngineLast}", "SpecialModesManager");
-                                Game.DisplayNotification("~g~" + GetRandom(ConfigHandler.FixMessages) + ", now get to a mechanic!");
-                                _repairedVehicle = _lastVehicle;
-                            }
-                        }
+                        Logging.Debug($"Failed to repair: not enough damage. {_lastVehicle.EngineHealth}", "SpecialModesManager");
+                        Game.DisplayNotification("~y~" + GetRandom(ConfigHandler.NoFixMessages));
+                        return;
                     }
-                } 
+
+                    isRepairing = true;
+                    player.Heading = _lastVehicle.Heading - 180f;
+
+                    player.Tasks.ClearImmediately();
+                    _lastVehicle.Doors[4].Open(true);
+                    player.Tasks.PlayAnimation(repairAnimDict, repairAnimString, 5f, AnimationFlags.UpperBodyOnly);
+                    Game.DisplaySubtitle("Attempting to repair vehicle", 6000);
+                    // NativeFunction.CallByHash<int>(0x6E13FC662B882D1D, _lastVehicle, 1); // SET_VEHICLE_TYRE_FIXED
+                    N.SetVehicleTyreFixed(_lastVehicle, 1);
+                    GameFiber.Wait(6000);
+                    if (!isRepairing) return;
+                    player.Tasks.ClearImmediately();
+                    _lastVehicle.Doors[4].Close(true);
+                    isRepairing = false;
+                    if (_repairedVehicle.Exists() && _repairedVehicle == _lastVehicle)
+                    {
+                        Logging.Debug("Failed to repair: already repaired this vehicle", "SpecialModesManager");
+                        Game.DisplayNotification("~y~" + GetRandom(ConfigHandler.NoFixMessages));
+                        return;
+                    }
+                    if (_lastVehicle.OilLevel() < 2f)
+                    {
+                        Logging.Debug("Failed to repair: ran oil pan dry", "SpecialModesManager");
+                        Game.DisplayNotification("~r~You were unable to repair the vehicle. The oil pan looks all dried up.");
+                        return;
+                    }
+                    if (_lastVehicle.FuelLevel > 1f)
+                    {
+                        _lastVehicle.IsDriveable = true;
+                    }
+                    _lastVehicle.EngineHealth = ConfigHandler.CascadingFailureThreshold + 5;
+                    healthEngineLast = ConfigHandler.CascadingFailureThreshold + 5;
+                    N.SetVehicleMaxSpeed(_lastVehicle, 500.01f);
+                    Logging.Debug($"Vehicle repaired! Engine health now {healthEngineLast}", "SpecialModesManager");
+                    Game.DisplayNotification("~g~" + GetRandom(ConfigHandler.FixMessages) + ", now get to a mechanic!");
+                    _repairedVehicle = _lastVehicle;
+                }
             }
         }
 
@@ -305,6 +316,13 @@ namespace SimpleCTRL.Threads
                 if (_lastVehicle != null)
                 {
                     int boneIndex = _lastVehicle.GetBoneIndex("engine");
+
+                    if (boneIndex == -1)
+                    {
+                        Logging.Warning("Failed to find engine bone for vehicle, cannot display repair prompt",
+                            "FlipTick");
+                    }
+                    
                     if (isRepairing && (Game.IsPaused || IsDead() || Game.LocalPlayer.Character.DistanceTo(_lastVehicle.GetBonePosition(boneIndex)) > 1.5f))
                     {
                         isRepairing = false;
@@ -316,6 +334,7 @@ namespace SimpleCTRL.Threads
             }
             catch (Exception)
             {
+                // ignored
             }
 
             if (Game.LocalPlayer.Character.IsInAnyVehicle(false))

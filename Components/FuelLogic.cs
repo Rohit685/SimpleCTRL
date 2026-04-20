@@ -9,50 +9,44 @@ namespace SimpleCTRL.Components
     {
 		internal static float ConsumeCarFuel(Vehicle v, float kilometresTravelled)
 		{
-			if (EntityExtensions.Exists(v))
-			{
+			if (!EntityExtensions.Exists(v)) return 0f;
 #pragma warning disable CS0219 // Variable is assigned but its value is never used
-				float fuelUsed = 0f;
+			float fuelUsed = 0f;
 #pragma warning restore CS0219 // Variable is assigned but its value is never used
-				if (v.Model.IsBicycle || v.Model.IsHelicopter || v.Model.IsPlane)
-				{
-					return 0f;
-				}
-				if (v.Model.IsCar || v.Model.IsBike || v.Model.IsQuadBike)
-				{
-					return ConsumeFuelRoadVehicle(v, kilometresTravelled);
-				}
+			if (v.Model.IsBicycle || v.Model.IsHelicopter || v.Model.IsPlane)
+			{
 				return 0f;
+			}
+			if (v.Model.IsCar || v.Model.IsBike || v.Model.IsQuadBike)
+			{
+				return ConsumeFuelRoadVehicle(v, kilometresTravelled);
 			}
 			return 0f;
 		}
 
 		internal static float ConsumeFuelAircraft(Vehicle v, TimeSpan timeElapsed)
 		{
-			if (EntityExtensions.Exists(v))
+			if (!EntityExtensions.Exists(v)) return 0f;
+			float fuelUsed = 0f;
+
+			if (Math.Abs(timeElapsed.TotalHours) > 1.0)
 			{
-				float fuelUsed = 0f;
-
-				if (Math.Abs(timeElapsed.TotalHours) > 1.0)
-				{
-					return 0f;
-				}
-
-				AircraftFuelSpecs afs = v.GetAircraftFuelSpecs();
-				if (afs == null)
-				{
-					afs = new AircraftFuelSpecs();
-					afs.Models.Add(v.DisplayName());
-				}
-
-				float baseLitresPerHour = afs.LitresPerHour;
-				float fuelConsumptionMultiplier = 4f;
-				fuelUsed = baseLitresPerHour * fuelConsumptionMultiplier * (float)timeElapsed.TotalHours;
-				fuelUsed = FloatExtensions.SafeFloat(fuelUsed, 0f);
-
-				return Math.Abs(fuelUsed);
+				return 0f;
 			}
-			return 0f;
+
+			AircraftFuelSpecs afs = v.GetAircraftFuelSpecs();
+			if (afs == null)
+			{
+				afs = new AircraftFuelSpecs();
+				afs.Models.Add(v.DisplayName());
+			}
+
+			float baseLitresPerHour = afs.LitresPerHour;
+			float fuelConsumptionMultiplier = 4f;
+			fuelUsed = baseLitresPerHour * fuelConsumptionMultiplier * (float)timeElapsed.TotalHours;
+			fuelUsed = FloatExtensions.SafeFloat(fuelUsed, 0f);
+
+			return Math.Abs(fuelUsed);
 		}
 
 		private static float ConsumeFuelRoadVehicle(Vehicle v, float kilometresTravelled)
