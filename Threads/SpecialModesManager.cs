@@ -1,4 +1,4 @@
-﻿using Common;
+using Common;
 using Common.UI.Elements;
 using Common.Native;
 using Rage;
@@ -187,6 +187,12 @@ namespace SimpleCTRL.Threads
             }
         }
 
+        /// <summary>
+        /// Attempts to start and perform an on-foot repair of the last tracked vehicle when the player interacts near the bonnet and the vehicle's damage conditions allow it.
+        /// </summary>
+        /// <remarks>
+        /// Displays context 3D prompts near the vehicle bonnet, validates bonnet bone and player distance, and begins a timed repair animation when the player presses E while on foot. The method enforces preconditions (vehicle exists, repairable class, player able to act, not already repairing, and engine below the degrading threshold) and aborts with user notifications if the vehicle is too damaged, not damaged enough, already repaired, or out of oil. During a successful repair it sets the vehicle driveable when fuel is sufficient, sets engine health to the cascading-failure threshold plus 5, updates max speed, clears/sets internal state flags (isRepairing, prompt, _repairedVehicle, healthEngineLast), and displays success or failure notifications. Early exits occur on missing bonnet bone, distance checks, or if the repair is cancelled mid-animation.
+        /// </remarks>
         private static void RepairTick()
         {
             if (!_lastVehicle.Exists() || cantRepairOnFootClasses.Contains(_lastVehicle.Class)) return;
@@ -311,6 +317,16 @@ namespace SimpleCTRL.Threads
         private static bool IsDead() => Game.LocalPlayer.Character.IsDead || N.DecorGetBool(Game.LocalPlayer.Character, "IsDead");
         private static string GetRandom(this List<string> list) => list[new Random().Next(list.Count)];
 
+        /// <summary>
+        /// Performs per-frame vehicle safety and state maintenance: interrupts ongoing hood repairs when appropriate, prevents automatic reversing and vehicle flipping, and applies torque or limp-mode limits based on engine health.
+        /// </summary>
+        /// <remarks>
+        /// - Cancels an active repair if the player becomes paused, dead, or moves away from the vehicle's engine bone.
+        /// - When enabled, prevents automatic reversing by disabling accelerate/brake inputs at very low speed and applying a slight speed dampening and brake lights.
+        /// - When enabled, restricts lateral/vertical steering input if the vehicle roll is extreme while nearly stationary to reduce flipping.
+        /// - When enabled, applies an engine torque multiplier or limp-mode speed cap according to current engine health and configured multipliers.
+        /// - Side effects: may disable control actions, modify vehicle forward speed, toggle brake lights, change vehicle max speed, and set the current vehicle's engine torque multiplier.
+        /// </remarks>
         private static void FlipTick()
         {
             try

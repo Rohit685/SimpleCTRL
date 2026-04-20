@@ -1,4 +1,4 @@
-﻿using Common.Native;
+using Common.Native;
 using Rage;
 using Rage.Native;
 using SimpleCTRL.Extensions;
@@ -81,6 +81,12 @@ namespace SimpleCTRL.Components
 			#endregion
 		}
 
+		/// <summary>
+		/// Continuously ensures department gas pump objects are present near the player when the fuel system is enabled.
+		/// </summary>
+		/// <remarks>
+		/// If the fuel system is not enabled, the method returns immediately. While running, it repeatedly checks configured department pump locations, spawns pump objects when the player is nearby and no pump object exists at the location, adjusts object ground Z, adds created objects to Globals.DepartmentPumpObjects, and marks those objects as invincible, frozen, explosion- and fire-proof, and collision-proof. This method runs indefinitely on the calling fiber.
+		/// </remarks>
 		internal static void CreateDepartmentPumps()
 		{
 			if (ConfigHandler.FuelSystem != true) return;

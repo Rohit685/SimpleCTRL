@@ -1,4 +1,4 @@
-﻿using Common;
+using Common;
 using Rage;
 using SimpleCTRL.Extensions;
 using System;
@@ -7,6 +7,12 @@ namespace SimpleCTRL.Components
 {
     internal static class FuelLogic
     {
+		/// <summary>
+		/// Calculates the fuel consumed by a vehicle over a distance in kilometres.
+		/// </summary>
+		/// <param name="v">The vehicle to evaluate; if the vehicle does not exist the method returns 0.</param>
+		/// <param name="kilometresTravelled">Distance travelled in kilometres.</param>
+		/// <returns>The amount of fuel consumed in litres for the given distance; returns 0 for non-existent vehicles, bicycles, helicopters, planes, and vehicle models without road-fuel calculations.</returns>
 		internal static float ConsumeCarFuel(Vehicle v, float kilometresTravelled)
 		{
 			if (!EntityExtensions.Exists(v)) return 0f;
@@ -24,6 +30,12 @@ namespace SimpleCTRL.Components
 			return 0f;
 		}
 
+		/// <summary>
+		/// Calculates the litres of fuel consumed by an aircraft over the given time interval.
+		/// </summary>
+		/// <param name="v">The aircraft whose fuel consumption is being calculated.</param>
+		/// <param name="timeElapsed">The elapsed time interval to calculate consumption for.</param>
+		/// <returns>`0f` if the vehicle does not exist or if the absolute value of `timeElapsed.TotalHours` is greater than 1.0; otherwise the non-negative number of litres consumed during the interval.</returns>
 		internal static float ConsumeFuelAircraft(Vehicle v, TimeSpan timeElapsed)
 		{
 			if (!EntityExtensions.Exists(v)) return 0f;
@@ -49,6 +61,12 @@ namespace SimpleCTRL.Components
 			return Math.Abs(fuelUsed);
 		}
 
+		/// <summary>
+		/// Calculates the fuel consumption (in litres) for a road vehicle over the specified distance.
+		/// </summary>
+		/// <param name="v">The vehicle whose fuel consumption to calculate.</param>
+		/// <param name="kilometresTravelled">Distance travelled in kilometres (used when the vehicle is moving).</param>
+		/// <returns>The amount of fuel consumed in litres; always a non-negative value.</returns>
 		private static float ConsumeFuelRoadVehicle(Vehicle v, float kilometresTravelled)
 		{
 			VehicleFuelSpecs vfs = VehicleProperties.VehicleSpecs[(VehicleClass)18];

@@ -1,4 +1,4 @@
-﻿using Common.Native;
+using Common.Native;
 using Common.UI.Elements;
 using Rectangle = Common.UI.Elements.Rectangle;
 using RAGENativeUI.Elements;
@@ -75,6 +75,17 @@ namespace SimpleCTRL.Core.Models.UI
 		private static bool IsUsingController => !NativeFunction.Natives.xA571D46727E2B718<bool>(2);
 		#endregion
 
+		/// <summary>
+		/// Update and draw the HUD fuel bar using the provided fuel values and vehicle type.
+		/// </summary>
+		/// <param name="currentFuelLevel">Current amount of fuel.</param>
+		/// <param name="maxFuelLevel">Maximum fuel capacity; used to compute the fuel percentage.</param>
+		/// <param name="isElectric">If true, use electric vehicle color scheme; otherwise use standard colors.</param>
+		/// <remarks>
+		/// The method positions the bar within the game's safe zone, adjusts the bar width to reflect the fuel percentage,
+		/// applies a flashing warning color when the percentage is below 15% (and maxFuelLevel &gt; 0), and then renders the
+		/// backdrop, back, and fuel bar elements.
+		/// </remarks>
 		public static void RenderBar(float currentFuelLevel, float maxFuelLevel, bool isElectric)
 		{
 			float fuelLevelPercentage = currentFuelLevel / maxFuelLevel * 100f;
